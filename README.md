@@ -14,6 +14,8 @@ Ever Overseer is a participation tracking application designed for use with [Bra
   * [Python MySQL Connector](https://dev.mysql.com/downloads/connector/python/)
 * An SQL Server
   * If you are using MySQL, the Authentication Method **MUST** be the Legacy Version. PDO does not support the use of `caching_sha2_password` Authentication. 
+* A Neucore Application
+  * The application needs the `app-chars` and `app-groups` roles added, along with any groups that you want to be able to host fleets or view participation data.
 * A Registered Eve Online Application. 
   * This can be setup via the [Eve Online Developers Site](https://developers.eveonline.com/).
 
