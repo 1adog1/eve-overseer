@@ -1,0 +1,97 @@
+.background {
+	bottom: 0%;
+	left: 0;
+	margin-bottom: 5vh;
+	background: rgb(50, 50, 50);
+	font-family: "Noto Sans", sans-serif;
+	color: #f1f1f1;
+	height: 100%;
+	width: 100%;
+	overflow-y: scroll;
+}
+
+.ColumnHeader {
+	font-family: "Noto Sans", sans-serif;
+	font-size: 35px;
+	text-align: center;
+	color: #f1f1f1;
+}
+
+.CharacterImage {
+	max-height: 75%;
+	max-width: 75%;
+	height: auto;
+	width: auto%;
+}
+
+.LoginImage {
+	max-height: 75%;
+	max-width: 75%;
+	height: auto;
+	width: auto%;
+}
+
+.successSVG {
+    filter: invert(30%) sepia(75%) saturate(3800%) hue-rotate(80deg) brightness(95%) contrast(100%);
+}
+
+.warnSVG {
+    filter: invert(80%) sepia(10%) saturate(5200%) hue-rotate(360deg) brightness(100%) contrast(100%);
+}
+
+.alertSVG {
+    filter: invert(35%) sepia(85%) saturate(6700%) hue-rotate(0deg) brightness(95%) contrast(95%);
+}
+
+#characterRoles {
+	white-space: pre-line;
+}
+
+h1 {
+	font-family: "Noto Sans", sans-serif;
+	color: #f1f1f1;	
+}
+
+p {
+	font-family: "Noto Sans", sans-serif;
+	color: #f1f1f1;
+}
+
+ul {
+	font-family: "Noto Sans", sans-serif;
+	color: #f1f1f1;
+}
+
+li {
+	font-family: "Noto Sans", sans-serif;
+	color: #f1f1f1;
+}
+
+tr {
+	font-family: "Noto Sans", sans-serif;
+	color: #f1f1f1;
+	padding: 0.5%;
+	border: thin solid rgba(25, 25, 25, 0.75);
+	vertical-align: middle;
+	text-align: center;
+}
+
+th {
+	font-family: "Noto Sans", sans-serif;
+	color: #f1f1f1;
+	padding: 0.5%;
+	border: thin solid rgba(25, 25, 25, 0.75);
+	background-color: rgba(30, 30, 30, 0.75);
+	vertical-align: middle;
+	text-align: center;
+}
+
+td {
+	font-family: "Noto Sans", sans-serif;
+	color: #f1f1f1;
+	padding: 0.5%;
+	border: thin solid rgba(25, 25, 25, 0.75);
+	background-color: rgba(40, 40, 40, 0.75);
+	vertical-align: middle;
+	text-align: center;
+}
