@@ -1,0 +1,6 @@
+# config
+/config/config.ini
+
+# caches
+/checker/__pycache__/
+/cronjob/__pycache__/
