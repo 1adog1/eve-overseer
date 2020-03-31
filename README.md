@@ -35,7 +35,7 @@ The checker is responsible for tracking fleet data in real time.
 
 ## Cronjob Setup
 The cronjob is used to translate fleet stats into participation stats. It links players to core accounts and bases participation off this data. This can take several hours to run and so you should probably only run this once or twice a day. 
-* After setting up the `/config/config.ini` file and connecting to the webapp at least once, you can run `/cronjob/cronChecks.py` to begin tracking fleet data. 
+* After setting up the `/config/config.ini` file and connecting to the webapp at least once, you can run `/cronjob/cronChecks.py` as a cronjob to update participation data. 
 
 ## To Deploy the Checker and Cronjob to Seperate Servers
 In the event that it's not easy to deploy the entire app to one server, the Python-Based Cronjob and Checker can be transferred to another server by following the instructions below:
