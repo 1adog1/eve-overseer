@@ -44,6 +44,17 @@
 
 </head>
 
+<style>
+
+    #fleetList {
+        height: 690px; 
+        overflow-y: auto; 
+        white-space: pre-wrap; 
+        scrollbar-width: thin; 
+    }
+
+</style>
+
 <?php require $_SERVER['DOCUMENT_ROOT'] . "/../src/site/siteCore.php"; ?>
 
 <body class="background">
@@ -65,7 +76,7 @@
             
                 <h3 class="text-center">List of Fleets</h3>
                 
-                <div class="list-group" id="fleetList" style="height: 720px; overflow-y: auto; white-space: pre-wrap;">
+                <div class="list-group p-1" id="fleetList">
                 
                 </div>
             

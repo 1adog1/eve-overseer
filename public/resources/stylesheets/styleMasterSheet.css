@@ -1,3 +1,22 @@
+html {
+    
+    scrollbar-width: thin; 
+    scrollbar-color: LightGrey rgba(0, 0, 0, 0);
+    
+}
+
+::-webkit-scrollbar {
+    width: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: LightGrey; 
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: DimGrey; 
+}
+
 .background {
 	bottom: 0%;
 	left: 0;
