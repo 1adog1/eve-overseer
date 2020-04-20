@@ -19,7 +19,7 @@ import mysql.connector as DatabaseConnector
 #################
 # PATH OVERRIDE #
 #################
-configPathOverride = False
+configPathOverride = "/var/app"
 dataPathOverride = False
 
 #If you need to run the python part of this app elsewhere for whatever reason, set the above two variables to absolute paths where the config.ini and two .json files will be contained respectively. Otherwise, keep them set to False.
@@ -38,17 +38,17 @@ def dataFile(pathOverride, extraFolder):
     else:
         return(pathOverride)
 
-if Path(dataFile(configPathOverride, "/config") + "/config.ini").is_file():
-    config = configparser.ConfigParser()
-    config.read(dataFile(configPathOverride, "/config") + "/config.ini")
-    
-    databaseInfo = config["Database"]
-    coreInfo = config["NeuCore"]
-    websiteInfo = config["Website"]
-    
+config = configparser.ConfigParser()
+if Path(configPathOverride + "/config/config.ini").is_file():
+    config.read(configPathOverride + "/config/config.ini")
+elif Path("./config/config.ini").is_file():
+    config.read("./config/config.ini")
 else:
     raise Warning("No Configuration File Found!")
-    
+databaseInfo = config["Database"]
+coreInfo = config["NeuCore"]
+websiteInfo = config["Website"]
+
 with open(dataFile(dataPathOverride, "/resources/data") + "/geographicInformation.json", "r") as geographyFile:
     geographicInformation = json.load(geographyFile)
         

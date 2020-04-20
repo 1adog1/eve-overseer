@@ -1,6 +1,7 @@
 <?php
 
-    $configArray = parse_ini_file("config.ini");
+    $configFile = is_file('/var/app/config/config.ini') ? '/var/app/config/config.ini' : 'config.ini';
+    $configArray = parse_ini_file($configFile);
     
     //NEUCORE CONFIGURATION
     $appid = $configArray["AppID"];

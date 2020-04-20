@@ -4,3 +4,12 @@
 # caches
 /checker/__pycache__/
 /cronjob/__pycache__/
+
+# IDEs etc.
+/.idea
+/.venv
+
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml
