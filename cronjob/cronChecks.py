@@ -199,7 +199,7 @@ def runChecks():
                             
                             time.sleep(1)
                     
-                    time.sleep(0.3)
+                    time.sleep(0.4)
             
             masterDictCopy = masterDict.copy()
             for eachMaster in masterDictCopy:
