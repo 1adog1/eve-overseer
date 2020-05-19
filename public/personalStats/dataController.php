@@ -124,13 +124,13 @@
                         
                         $joinHour = $characterData["join_time"] / 3600 % 24;
                         
-                        if ($joinHour >= 8 and $joinHour < 16) {
+                        if ($joinHour >= 5 and $joinHour < 13) {
                             $checkData["Timezones"]["AUTZ"] += $characterData["time_in_fleet"];
                         }
-                        elseif ($joinHour >= 16 and $joinHour < 24) {
+                        elseif ($joinHour >= 13 and $joinHour < 21) {
                             $checkData["Timezones"]["EUTZ"] += $characterData["time_in_fleet"];
                         }
-                        elseif ($joinHour >= 0 and $joinHour < 8) {
+                        elseif ($joinHour >= 21 or $joinHour < 5) {
                             $checkData["Timezones"]["USTZ"] += $characterData["time_in_fleet"];
                         }
                         

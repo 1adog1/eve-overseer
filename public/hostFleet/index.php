@@ -35,7 +35,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Eve Overseer</title>
+	<title>Fleet Hosting</title>
 	<link rel="stylesheet" href="../resources/stylesheets/styleMasterSheet.css">
 	<link rel="icon" href="../resources/images/favicon.ico">
 	
@@ -47,7 +47,7 @@
     
 	<script src="../resources/js/fleetHosting.js"></script>
     
-	<meta property="og:title" content="Eve Overseer">
+	<meta property="og:title" content="Fleet Hosting">
 	<meta property="og:description" content="The Overseer Website">
 	<meta property="og:type" content="website">
 	<meta property="og:url" content="<?php echo $siteURL; ?>">

@@ -3,6 +3,27 @@ jQuery(document).ready(function () {
 });
 
 
+function getFormattedMinutes(timeframe) {
+    
+    var totalMinutes = Math.floor(timeframe / 60);
+    var totalSeconds = Math.floor(timeframe % 60);
+    var totalTime = totalMinutes.toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false}) + "m " + totalSeconds.toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false}) + "s"
+    
+    return totalTime;
+    
+}
+
+function getFormattedHours(timeframe) {
+    
+    var rawTime = timeframe / 3600;
+    var totalHours = Math.floor(rawTime);
+    var totalMinutes = Math.floor((rawTime - totalHours) * 60);
+    var totalTime = totalHours + "h " + totalMinutes.toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false}) + "m";
+    
+    return totalTime;
+    
+}
+
 function topRow (incomingData) {
     
     $("#characterOverview").append(
@@ -32,16 +53,14 @@ function topRow (incomingData) {
                     .text(incomingData["Alliance"])
             )
     );
-    
-    var time_in_fleets = incomingData["Total Time"] / 3600;
-    
+        
     $("#fleetOverview").append(
         $("<div/>")
             .text("Fleets Attended: " + incomingData["Total Fleets"])
     );
     $("#fleetOverview").append(
         $("<div/>")
-            .text("Time in Fleets: " + time_in_fleets.toFixed(2) + " Hours")
+            .text("Time in Fleets: " + getFormattedHours(incomingData["Total Time"]))
     );
     $("#fleetOverview").append(
         $("<div/>")
@@ -55,8 +74,10 @@ function formatCalendar (incomingData) {
     var dataRows = [];
     
     for (dateData in incomingData){
+        
+        var valueTime = incomingData[dateData] / 60;
                 
-        dataRows.push([new Date(dateData*1000), incomingData[dateData]/60]);
+        dataRows.push([new Date(dateData*1000), {v: valueTime, f: getFormattedHours(incomingData[dateData])}]);
         
     }
     
@@ -76,10 +97,6 @@ function formatCalendar (incomingData) {
         $("#calendarContainer").height(325);
         
         fullCalendar.draw(calendarChart, {title: "Minutes Spent In Fleets", colorAxis: {values: [0, 240, 300], colors: ["#e7f5fe", "#586674", "ForestGreen"], minValue: 0, maxValue: 300}});
-        
-        //var calendarLayout = fullCalendar.getChartLayoutInterface();
-
-        //var divHeight = calendarLayout.getBoundingBox('chartarea').height
                 
     }
 
@@ -91,8 +108,8 @@ function formatShips (incomingData) {
     var dataRows = [["Ship Name", "Hours In Fleets"]];
     
     for (shipData in incomingData){
-                
-        dataRows.push([shipData, incomingData[shipData]/3600]);
+
+        dataRows.push([shipData, {v: (incomingData[shipData]/3600), f: getFormattedHours(incomingData[shipData])}]);
         
     }
     
@@ -104,7 +121,7 @@ function formatShips (incomingData) {
         var shipChart = google.visualization.arrayToDataTable(dataRows);
         
         var fullShips = new google.visualization.PieChart(document.getElementById('shipContainer'));
-        fullShips.draw(shipChart, {title: "Ship Usage (Hours)", titleTextStyle: {color: "white", fontSize: 28, bold: false}, pieHole: 0.4, pieSliceBorderColor: "transparent", backgroundColor: "transparent", legend: {textStyle: {color: "white"}}, height: 400, tooltip: {trigger: "selection"}, pieSliceText: "value"});
+        fullShips.draw(shipChart, {title: "Ship Usage (Hours)", titleTextStyle: {color: "white", fontSize: 28, bold: false}, pieHole: 0.4, sliceVisibilityThreshold: 0.03, pieSliceBorderColor: "transparent", backgroundColor: "transparent", legend: {textStyle: {color: "white"}}, height: 400, tooltip: {trigger: "selection"}, pieSliceText: "value"});
     
     }
     
@@ -117,8 +134,8 @@ function formatTimezones (incomingData) {
     var pickColors = {"EUTZ": "ForestGreen", "USTZ": "SteelBlue", "AUTZ": "OrangeRed"}
     
     for (eachTimezone in incomingData){
-                
-        dataRows.push([eachTimezone, incomingData[eachTimezone]/3600, pickColors[eachTimezone]]);
+
+        dataRows.push([eachTimezone, {v: (incomingData[eachTimezone]/3600), f: getFormattedHours(incomingData[eachTimezone])}, pickColors[eachTimezone]]);
         
     }
 
@@ -145,8 +162,13 @@ function formatRoles (incomingData) {
     var pickColors = {"Fleet": bootstrapColors.getPropertyValue('--danger'), "Wing": bootstrapColors.getPropertyValue('--primary'), "Squad": bootstrapColors.getPropertyValue('--success')}
     
     for (eachRole in incomingData){
+        
+        var rawTime = incomingData[eachRole] / 3600;
+        var totalHours = Math.floor(rawTime);
+        var totalMinutes = Math.floor((rawTime - totalHours) * 60);
+        var totalTime = totalHours + "h " + totalMinutes + "m";
                 
-        dataRows.push([eachRole, incomingData[eachRole]/3600, pickColors[eachRole]]);
+        dataRows.push([eachRole, {v: rawTime, f: totalTime}, pickColors[eachRole]]);
         
     }
 
@@ -191,13 +213,13 @@ function listFleets (incomingData) {
                         .append(
                             $("<div/>")
                                 .addClass("col-3")
-                                .text((eachFleet["time_in_fleet"]/60).toFixed(2) + " Minutes")
+                                .text(getFormattedHours(eachFleet["time_in_fleet"]))
                         )                        
                 )
-        );
-        $("#previousFleets").append(
+        )
+        .append(
             $("<div/>")
-                .addClass("collapse card text-white bg-secondary mt-1 p-1")
+                .addClass("collapse card border-light text-white bg-secondary mt-1 p-1")
                 .attr("id", "fleet-" + eachFleet["Fleet ID"])
                 .append(
                     $("<div/>")
@@ -232,22 +254,56 @@ function listFleets (incomingData) {
                         .addClass("row mt-4")
                         .append(
                             $("<div/>")
-                                .addClass("col-6 text-center font-weight-bold")
-                                .text("Time in Roles")
+                                .addClass("col-6 text-left font-weight-bold")
                                 .append (
-                                    $("<div/>")
-                                        .addClass("col-12 text-left font-weight-normal")
-                                        .attr("id", "roles-" + eachFleet["Fleet ID"])
+                                    $("<table/>")
+                                        .addClass("table table-dark small")
+                                        .append (
+                                            $("<thead/>")
+                                                .append (
+                                                    $("<tr/>")
+                                                        .append (
+                                                            $("<th/>")
+                                                                .text("Position")
+                                                        )
+                                                        .append (
+                                                            $("<th/>")
+                                                                .text("Time")
+                                                        )
+                                                )
+                                        )
+                                        .append (
+                                            $("<tbody/>")
+                                                .addClass("text-left font-weight-normal")
+                                                .attr("id", "roles-" + eachFleet["Fleet ID"])
+                                        )
                                 )
                         )
                         .append(
                             $("<div/>")
-                                .addClass("col-6 text-center font-weight-bold")
-                                .text("Time in Ships")
+                                .addClass("col-6 text-left font-weight-bold")
                                 .append (
-                                    $("<div/>")
-                                        .addClass("col-12 text-left font-weight-normal")
-                                        .attr("id", "ships-" + eachFleet["Fleet ID"])
+                                    $("<table/>")
+                                        .addClass("table table-dark small")
+                                        .append (
+                                            $("<thead/>")
+                                                .append (
+                                                    $("<tr/>")
+                                                        .append (
+                                                            $("<th/>")
+                                                                .text("Ship")
+                                                        )
+                                                        .append (
+                                                            $("<th/>")
+                                                                .text("Time")
+                                                        )
+                                                )
+                                        )
+                                        .append (
+                                            $("<tbody/>")
+                                                .addClass("text-left font-weight-normal")
+                                                .attr("id", "ships-" + eachFleet["Fleet ID"])
+                                        )
                                 )
                         )
                 )
@@ -284,8 +340,17 @@ function listFleets (incomingData) {
         for (eachRole in eachFleet["time_in_roles"]) {
             
             $("#roles-" + eachFleet["Fleet ID"]).append(
-                $("<div/>")
-                    .text(eachRole + ": " + (eachFleet["time_in_roles"][eachRole]/60).toFixed(2) + " min")
+                $("<tr/>")
+                    .append (
+                        $("<td/>")
+                            .addClass("p-2")
+                            .text(eachRole)
+                    )
+                    .append (
+                        $("<td/>")
+                            .addClass("p-2")
+                            .text(getFormattedMinutes(eachFleet["time_in_roles"][eachRole]))
+                    )
             );
             
         }
@@ -293,8 +358,19 @@ function listFleets (incomingData) {
         for (eachShip in eachFleet["time_in_ships"]) {
             
             $("#ships-" + eachFleet["Fleet ID"]).append(
-                $("<div/>")
-                    .text(eachFleet["time_in_ships"][eachShip]["Name"] + ": " + (eachFleet["time_in_ships"][eachShip]["Time"]/60).toFixed(2) + " min")
+            
+                $("<tr/>")
+                    .append (
+                        $("<td/>")
+                            .addClass("p-2")
+                            .text(eachFleet["time_in_ships"][eachShip]["Name"])
+                    )
+                    .append (
+                        $("<td/>")
+                            .addClass("p-2")
+                            .text(getFormattedMinutes(eachFleet["time_in_ships"][eachShip]["Time"]))
+                    )
+            
             );            
             
         }

@@ -39,6 +39,9 @@ The cronjob is used to translate fleet stats into participation stats. It links 
 
 ## To Deploy the Checker and Cronjob to Seperate Servers
 In the event that it's not easy to deploy the entire app to one server, the Python-Based Cronjob and Checker can be transferred to another server by following the instructions below:
-* Make sure to copy the `/config/config.ini` file along with the `/resources/data/geographicInformation.json` and `/resources/data/TypeIDs.json` files somewhere python can access them after they've been setup.
+* Make sure to copy the `/config/config.ini` file along with the `/resources/data/geographicInformation.json` `/resources/data/aggregateTypes.json` and `/resources/data/TypeIDs.json` files somewhere python can access them after they've been setup.
 * Move the `/checker` and `/cronjob` folders to wherever you'll be running them from.
-* In `/cronjob/cronChecks.py` and `/checker/checker.py` change  the `configPathOverride` variable to an absolute path where your copy of `config.ini` being stored, and `dataPathOverride` to an absolute path where your two .json file copies are being stored.
+* In `/cronjob/cronChecks.py` and `/checker/checker.py` change  the `configPathOverride` variable to an absolute path where your copy of `config.ini` being stored, and `dataPathOverride` to an absolute path where your three .json file copies are being stored.
+
+# Credits
+* Icons used across the webapp are from the [Octicon](https://github.com/primer/octicons/) project by GitHub.

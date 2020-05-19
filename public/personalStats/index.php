@@ -24,7 +24,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Eve Overseer</title>
+	<title>Personal Stats</title>
 	<link rel="stylesheet" href="../resources/stylesheets/styleMasterSheet.css">
 	<link rel="icon" href="../resources/images/favicon.ico">
 	
@@ -37,7 +37,7 @@
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script src="../resources/js/personalStats.js"></script>
 	
-	<meta property="og:title" content="Eve Overseer">
+	<meta property="og:title" content="Personal Stats">
 	<meta property="og:description" content="The Overseer Website">
 	<meta property="og:type" content="website">
 	<meta property="og:url" content="<?php echo $siteURL; ?>">

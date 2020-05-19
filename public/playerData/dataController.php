@@ -37,7 +37,7 @@
                 
                 $shortStats = json_decode($pulledData["shortstats"], true);
                 
-                $checkData["Player List"][] = ["ID" => $pulledData["playerid"], "Name" => htmlspecialchars($pulledData["playername"]), "Attended" => $shortStats["30 Days Attended"], "Commanded" => $shortStats["30 Days Led"], "Last Attended" => date("F jS, Y", $shortStats["Last Attended Fleet"]), "Has Core" => boolval($pulledData["hascore"]), "Is FC" => boolval($pulledData["isfc"])];
+                $checkData["Player List"][] = ["ID" => $pulledData["playerid"], "Name" => htmlspecialchars($pulledData["playername"]), "Recent Attended" => $shortStats["30 Days Attended"], "Recent Commanded" => $shortStats["30 Days Led"], "Total Attended" => $shortStats["Total Attended"], "Total Commanded" => $shortStats["Total Led"], "Last Attended Time" => $shortStats["Last Attended Fleet"], "Last Attended" => date("F jS, Y", $shortStats["Last Attended Fleet"]), "Has Core" => boolval($pulledData["hascore"]), "Is FC" => boolval($pulledData["isfc"])];
                 
                 $rowCounter ++;
                 
@@ -46,6 +46,8 @@
                 }
                                 
             }
+            
+            $checkData["Counter"] = $rowCounter;
                         
         }
         elseif (isset($_POST["Action"]) and $_POST["Action"] == "Get Alts") {
@@ -114,7 +116,7 @@
             
                     $checkData["Status"] = "Data Found";
                     
-                    $checkData["Player List"][] = ["ID" => $pulledData["playerid"], "Name" => htmlspecialchars($pulledData["playername"]), "Attended" => $shortStats["30 Days Attended"], "Commanded" => $shortStats["30 Days Led"], "Last Attended" => date("F jS, Y", $shortStats["Last Attended Fleet"]), "Has Core" => boolval($pulledData["hascore"]), "Is FC" => boolval($pulledData["isfc"])];
+                    $checkData["Player List"][] = ["ID" => $pulledData["playerid"], "Name" => htmlspecialchars($pulledData["playername"]), "Recent Attended" => $shortStats["30 Days Attended"], "Recent Commanded" => $shortStats["30 Days Led"], "Total Attended" => $shortStats["Total Attended"], "Total Commanded" => $shortStats["Total Led"], "Last Attended Time" => $shortStats["Last Attended Fleet"], "Last Attended" => date("F jS, Y", $shortStats["Last Attended Fleet"]), "Has Core" => boolval($pulledData["hascore"]), "Is FC" => boolval($pulledData["isfc"])];
                     
                     $rowCounter ++;
                     
@@ -125,6 +127,8 @@
                 }
                                 
             }
+            
+            $checkData["Counter"] = $rowCounter;
             
         }
         else {

@@ -24,7 +24,7 @@ import mysql.connector as DatabaseConnector
 configPathOverride = "/var/app"
 dataPathOverride = False
 
-#If you need to run the python part of this app elsewhere for whatever reason, set the above two variables to absolute paths where the config.ini and two .json files will be contained respectively. Otherwise, keep them set to False.
+#If you need to run the python part of this app elsewhere for whatever reason, set the above two variables to absolute paths where the config.ini and three .json files will be contained respectively. Otherwise, keep them set to False.
 
 def dataFile(pathOverride, extraFolder):
     
@@ -43,8 +43,8 @@ def dataFile(pathOverride, extraFolder):
 config = configparser.ConfigParser()
 if Path(configPathOverride + "/config/config.ini").is_file():
     config.read(configPathOverride + "/config/config.ini")
-elif Path("./config/config.ini").is_file():
-    config.read("./config/config.ini")
+elif Path("../config/config.ini").is_file():
+    config.read("../config/config.ini")
 else:
     raise Warning("No Configuration File Found!")
 databaseInfo = config["Database"]
@@ -55,6 +55,9 @@ with open(dataFile(dataPathOverride, "/resources/data") + "/geographicInformatio
         
 with open(dataFile(dataPathOverride, "/resources/data") + "/TypeIDs.json", "r") as typeIDFile:
     typeIDList = json.load(typeIDFile)
+    
+with open(dataFile(dataPathOverride, "/resources/data") + "/aggregateTypes.json", "r") as typeToGroupFile:
+    typeToGroupList = json.load(typeToGroupFile)
 
 def runChecks():
 
@@ -128,7 +131,8 @@ def runChecks():
                                 "Squad Commander": 0,
                                 "Squad Member": 0
                             },
-                            "time_in_ships": {}
+                            "time_in_ships": {},
+                            "time_in_systems": {}
                         }
                     
                     aggregatedData[snapshotData["Fleet"]["Character ID"]]["time_in_fleet"] += 15
@@ -141,6 +145,16 @@ def runChecks():
                         tempShipStats[snapshotData["Fleet"]["Ship Name"]] = 0
                         
                     tempShipStats[snapshotData["Fleet"]["Ship Name"]] += 1
+                    
+                    if snapshotData["Fleet"]["Region"] not in aggregatedData[snapshotData["Fleet"]["Character ID"]]["time_in_systems"]:
+                        aggregatedData[snapshotData["Fleet"]["Character ID"]]["time_in_systems"][snapshotData["Fleet"]["Region"]] = {"Time":0, "Systems":{}}
+                        
+                    if snapshotData["Fleet"]["System"] not in aggregatedData[snapshotData["Fleet"]["Character ID"]]["time_in_systems"][snapshotData["Fleet"]["Region"]]["Systems"]:
+                        aggregatedData[snapshotData["Fleet"]["Character ID"]]["time_in_systems"][snapshotData["Fleet"]["Region"]]["Systems"][snapshotData["Fleet"]["System"]] = {"Time":0}
+                    
+                    aggregatedData[snapshotData["Fleet"]["Character ID"]]["time_in_systems"][snapshotData["Fleet"]["Region"]]["Time"] += 15
+                    
+                    aggregatedData[snapshotData["Fleet"]["Character ID"]]["time_in_systems"][snapshotData["Fleet"]["Region"]]["Systems"][snapshotData["Fleet"]["System"]]["Time"] += 15
                     
                     if snapshotData["Fleet"]["Ship ID"] not in aggregatedData[snapshotData["Fleet"]["Character ID"]]["time_in_ships"]:
                         aggregatedData[snapshotData["Fleet"]["Character ID"]]["time_in_ships"][snapshotData["Fleet"]["Ship ID"]] = {"Name": snapshotData["Fleet"]["Ship Name"], "Time":0}
@@ -165,7 +179,8 @@ def runChecks():
                                     "Squad Commander": 0,
                                     "Squad Member": 0
                                 },
-                                "time_in_ships": {}
+                                "time_in_ships": {},
+                                "time_in_systems": {}
                             }
                         
                         aggregatedData[aggregateWing["Character ID"]]["time_in_fleet"] += 15
@@ -178,6 +193,16 @@ def runChecks():
                             tempShipStats[aggregateWing["Ship Name"]] = 0
                             
                         tempShipStats[aggregateWing["Ship Name"]] += 1
+                        
+                        if aggregateWing["Region"] not in aggregatedData[aggregateWing["Character ID"]]["time_in_systems"]:
+                            aggregatedData[aggregateWing["Character ID"]]["time_in_systems"][aggregateWing["Region"]] = {"Time":0, "Systems":{}}
+                            
+                        if aggregateWing["System"] not in aggregatedData[aggregateWing["Character ID"]]["time_in_systems"][aggregateWing["Region"]]["Systems"]:
+                            aggregatedData[aggregateWing["Character ID"]]["time_in_systems"][aggregateWing["Region"]]["Systems"][aggregateWing["System"]] = {"Time":0}
+                        
+                        aggregatedData[aggregateWing["Character ID"]]["time_in_systems"][aggregateWing["Region"]]["Time"] += 15
+                        
+                        aggregatedData[aggregateWing["Character ID"]]["time_in_systems"][aggregateWing["Region"]]["Systems"][aggregateWing["System"]]["Time"] += 15
                         
                         if aggregateWing["Ship ID"] not in aggregatedData[aggregateWing["Character ID"]]["time_in_ships"]:
                             aggregatedData[aggregateWing["Character ID"]]["time_in_ships"][aggregateWing["Ship ID"]] = {"Name": aggregateWing["Ship Name"], "Time":0}
@@ -202,7 +227,8 @@ def runChecks():
                                         "Squad Commander": 0,
                                         "Squad Member": 0
                                     },
-                                    "time_in_ships": {}
+                                    "time_in_ships": {},
+                                    "time_in_systems": {}
                                 }
                             
                             aggregatedData[aggregateSquad["Character ID"]]["time_in_fleet"] += 15
@@ -215,6 +241,16 @@ def runChecks():
                                 tempShipStats[aggregateSquad["Ship Name"]] = 0
                                 
                             tempShipStats[aggregateSquad["Ship Name"]] += 1
+                            
+                            if aggregateSquad["Region"] not in aggregatedData[aggregateSquad["Character ID"]]["time_in_systems"]:
+                                aggregatedData[aggregateSquad["Character ID"]]["time_in_systems"][aggregateSquad["Region"]] = {"Time":0, "Systems":{}}
+                                
+                            if aggregateSquad["System"] not in aggregatedData[aggregateSquad["Character ID"]]["time_in_systems"][aggregateSquad["Region"]]["Systems"]:
+                                aggregatedData[aggregateSquad["Character ID"]]["time_in_systems"][aggregateSquad["Region"]]["Systems"][aggregateSquad["System"]] = {"Time":0}
+                            
+                            aggregatedData[aggregateSquad["Character ID"]]["time_in_systems"][aggregateSquad["Region"]]["Time"] += 15
+                            
+                            aggregatedData[aggregateSquad["Character ID"]]["time_in_systems"][aggregateSquad["Region"]]["Systems"][aggregateSquad["System"]]["Time"] += 15
                             
                             if aggregateSquad["Ship ID"] not in aggregatedData[aggregateSquad["Character ID"]]["time_in_ships"]:
                                 aggregatedData[aggregateSquad["Character ID"]]["time_in_ships"][aggregateSquad["Ship ID"]] = {"Name": aggregateSquad["Ship Name"], "Time":0}
@@ -238,7 +274,8 @@ def runChecks():
                                         "Squad Commander": 0,
                                         "Squad Member": 0
                                     },
-                                    "time_in_ships": {}
+                                    "time_in_ships": {},
+                                    "time_in_systems": {}
                                 }
                             
                             aggregatedData[aggregateMembers["Character ID"]]["time_in_fleet"] += 15
@@ -251,6 +288,16 @@ def runChecks():
                                 tempShipStats[aggregateMembers["Ship Name"]] = 0
                                 
                             tempShipStats[aggregateMembers["Ship Name"]] += 1                            
+                            
+                            if aggregateMembers["Region"] not in aggregatedData[aggregateMembers["Character ID"]]["time_in_systems"]:
+                                aggregatedData[aggregateMembers["Character ID"]]["time_in_systems"][aggregateMembers["Region"]] = {"Time":0, "Systems":{}}
+                                
+                            if aggregateMembers["System"] not in aggregatedData[aggregateMembers["Character ID"]]["time_in_systems"][aggregateMembers["Region"]]["Systems"]:
+                                aggregatedData[aggregateMembers["Character ID"]]["time_in_systems"][aggregateMembers["Region"]]["Systems"][aggregateMembers["System"]] = {"Time":0}
+                            
+                            aggregatedData[aggregateMembers["Character ID"]]["time_in_systems"][aggregateMembers["Region"]]["Time"] += 15
+                            
+                            aggregatedData[aggregateMembers["Character ID"]]["time_in_systems"][aggregateMembers["Region"]]["Systems"][aggregateMembers["System"]]["Time"] += 15
                             
                             if aggregateMembers["Ship ID"] not in aggregatedData[aggregateMembers["Character ID"]]["time_in_ships"]:
                                 aggregatedData[aggregateMembers["Character ID"]]["time_in_ships"][aggregateMembers["Ship ID"]] = {"Name": aggregateMembers["Ship Name"], "Time":0}
@@ -389,7 +436,11 @@ def runChecks():
                                     else:
                                         regionToAdd = geographicInformation[str(members["solar_system_id"])]["region"]
                                     
-                                    defaultData = {"Character Name": "Unknown Character", "Character ID": members["character_id"], "Corporation Name": "Unknown Corporation", "Corporation ID": 0, "Alliance Name": "No Alliance", "Alliance ID": 0, "Ship Name": "Unknown Ship", "Ship ID": members["ship_type_id"], "System": geographicInformation[str(members["solar_system_id"])]["name"], "Region": regionToAdd}
+                                    defaultData = {"Character Name": "Unknown Character", "Character ID": members["character_id"], "Corporation Name": "Unknown Corporation", "Corporation ID": 0, "Alliance Name": "No Alliance", "Alliance ID": 0, "Ship Name": "Unknown Ship", "Ship ID": members["ship_type_id"], "Ship Class":"Unknown Class", "Ship Class ID": "0", "System": geographicInformation[str(members["solar_system_id"])]["name"], "Region": regionToAdd}
+                                    
+                                    if str(defaultData["Ship ID"]) in typeToGroupList:
+                                        defaultData["Ship Class"] = typeToGroupList[str(defaultData["Ship ID"])]["Group Name"]
+                                        defaultData["Ship Class ID"] = typeToGroupList[str(defaultData["Ship ID"])]["Group ID"]
                                 
                                     if members["role"] == "fleet_commander":
                                         fcFound = True

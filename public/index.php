@@ -53,12 +53,14 @@
 					<div class="card-header">
 						<div class="display-4 text-center">Welcome to Eve Overseer!</div>
 					</div>
-					<div class="card-body">
-						<p class="text-center">This app allows for the tracking of fleet activity and fleet members.</p>
-						<br>
-						<p class="text-center">To view previous fleet activity or your personal stats, you can login through the <strong>View Statistics</strong> option.</p>
-						<p class="text-center">To host a fleet, login via the <strong>Fleet Commander Login</strong> option.</p>
-					</div>
+                                        
+                    <div class="card-body">
+                        <div class="text-center">This app allows for the tracking of fleet activity and fleet members.</div>
+                        <br>
+                        <div class="text-center">To view previous fleet activity or your personal stats, you can login through the <strong>View Statistics</strong> option.</div>
+                        <div class="text-center">To host a fleet, login via the <strong>Fleet Commander Login</strong> option.</div>
+                    </div>
+                    
 				</div>
 			</div>
 			<div class="col-xl-3">

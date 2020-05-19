@@ -22,7 +22,7 @@
         
         if (isset($_POST["Action"]) and $_POST["Action"] == "Get" and (isset($_POST["FleetID"]))) {
             
-            $checkData = ["Status" => "Unknown", "Header Data" => [], "Member Data" => [], "Ship Data" => ["Ship List" => [], "Snapshot History" => []]];
+            $checkData = ["Status" => "Unknown", "Header Data" => [] , "Affiliation Data" => [], "Member Data" => [], "Ship Data" => ["Ship List" => [], "Snapshot History" => []]];
             
             $fleetID = htmlspecialchars($_POST["FleetID"]);
 
@@ -35,20 +35,43 @@
                                 
                 foreach ($pulledArrayData as $throwaway => $pulledData) {
                     
+                    if (in_array("HR", $_SESSION["AccessRoles"]) or in_array("Super Admin", $_SESSION["AccessRoles"])) {
+                        
+                        $checkData["Header Data"]["FleetID"] = $pulledData["fleetid"];
+                        
+                    }
+                    
                     $checkData["Header Data"]["Name"] = $pulledData["fleetname"];
                     $checkData["Header Data"]["SRP Level"] = $pulledData["srplevel"];
                     $checkData["Header Data"]["Boss"] = $pulledData["commandername"];
                     $checkData["Header Data"]["Boss ID"] = $pulledData["commanderid"];
                     $checkData["Header Data"]["Member Count"] = $pulledData["peakmembers"];
+                    $checkData["Header Data"]["Start Timestamp"] = $pulledData["starttime"];
                     $checkData["Header Data"]["Start Time"] = date("F jS, Y - H:i:s", $pulledData["starttime"]);
                     $checkData["Header Data"]["End Time"] = date("F jS, Y - H:i:s", $pulledData["endtime"]);
-                    $checkData["Header Data"]["Run Time"] = ($pulledData["endtime"] - $pulledData["starttime"]) / 3600;
+                    $checkData["Header Data"]["Run Time"] = ($pulledData["endtime"] - $pulledData["starttime"]);
                     
                     $checkData["Member Data"] = json_decode($pulledData["memberstats"], true);
                     
                     foreach ($checkData["Member Data"] as $memberID => $memberData) {
                         
                         $checkData["Member Data"][$memberID]["Join Time"] = date("H:i:s", $memberData["join_time"]);
+                        
+                        if (!isset($checkData["Affiliation Data"][$memberData["alliance_id"]])) {
+                            
+                            $checkData["Affiliation Data"][$memberData["alliance_id"]] = ["Name" => $memberData["alliance_name"], "Count" => 0, "Corporations" => []];
+                            
+                        }
+                        
+                        if (!isset($checkData["Affiliation Data"][$memberData["alliance_id"]]["Corporations"][$memberData["corp_id"]])) {
+                            
+                            $checkData["Affiliation Data"][$memberData["alliance_id"]]["Corporations"][$memberData["corp_id"]] = ["Name" => $memberData["corp_name"], "Count" => 0];
+                            
+                        }
+                        
+                        $checkData["Affiliation Data"][$memberData["alliance_id"]]["Count"] += 1;
+                        
+                        $checkData["Affiliation Data"][$memberData["alliance_id"]]["Corporations"][$memberData["corp_id"]]["Count"] += 1;
                         
                     }
                     
@@ -102,6 +125,30 @@
                 error_log("Database Query Failed");
                 
             }
+        }
+        elseif (isset($_POST["Action"]) and $_POST["Action"] == "Delete" and isset($_POST["FleetID"])) {
+            
+            if (in_array("HR", $_SESSION["AccessRoles"]) or in_array("Super Admin", $_SESSION["AccessRoles"])) {
+            
+                $fleetID = htmlspecialchars($_POST["FleetID"]);
+                
+                $toPull = $GLOBALS['MainDatabase']->prepare("DELETE FROM fleets WHERE fleetid=:fleetid LIMIT 1");
+                $toPull->bindParam(":fleetid", $fleetID);
+                $toPull->execute();
+                
+                $checkData["Status"] = "Success";
+                
+                makeLogEntry("Fleet Deleted", "Fleet Stats", $_SESSION["Character Name"], "Data for the fleet " . $fleetID . " has been deleted.");
+                            
+            }
+            else {
+                
+                $checkData["Status"] = "Error";
+                
+                error_log("Insufficient Permissions");
+                
+            }
+            
         }
         else {
             

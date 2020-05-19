@@ -24,7 +24,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Eve Overseer</title>
+	<title>Fleet Stats</title>
 	<link rel="stylesheet" href="../resources/stylesheets/styleMasterSheet.css">
 	<link rel="icon" href="../resources/images/favicon.ico">
 	
@@ -37,7 +37,7 @@
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script src="../resources/js/fleetStats.js"></script>
 	
-	<meta property="og:title" content="Eve Overseer">
+	<meta property="og:title" content="Fleet Stats">
 	<meta property="og:description" content="The Overseer Website">
 	<meta property="og:type" content="website">
 	<meta property="og:url" content="<?php echo $siteURL; ?>">
@@ -47,7 +47,7 @@
 <style>
 
     #fleetList {
-        height: 690px; 
+        max-height: 690px; 
         overflow-y: auto; 
         white-space: pre-wrap; 
         scrollbar-width: thin; 
@@ -72,16 +72,21 @@
             </div>
         </noscript>
         <div class="row">
-            <div class="col-lg-2">
+            <div class="col-lg-3">
             
-                <h3 class="text-center">List of Fleets</h3>
-                
-                <div class="list-group p-1" id="fleetList">
-                
+                <div class="card bg-dark">
+                    <div class="card-header">
+                        <h3>List of Fleets</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="list-group" id="fleetList">
+                        
+                        </div>
+                    </div>
                 </div>
-            
+                            
             </div>
-            <div class="col-lg-10">
+            <div class="col-lg-9">
                 <div class="row" id="headerRow" hidden>
                     
                     <div class="col-xl-4">
@@ -126,7 +131,7 @@
                     
                     <div class="col-xl-8">
                         
-                        <style>div.google-visualization-tooltip { height:274px; width:225px; font-size:10px; top:89px !important;right:0px !important; overflow-y: scroll;}</style>
+                        <style>div.google-visualization-tooltip { height:278px; width:225px; font-size:10px; top:86px !important;right:0px !important; overflow-y: scroll;}</style>
                         <div id="snapshotContainer">
                         
                         </div>
@@ -142,6 +147,31 @@
                 
                 <br>
                 
+                <div class="row" id="affiliationRow" hidden>
+                
+                    <div class="col-xl-12">
+
+                        <div class="card bg-dark">
+                            <div class="card-header">
+                                <h3>Fleet Affiliation Breakdown</h3>
+                                <small>Click an alliance to see its corporations</small>
+                            </div>
+                            <div class="card-body">
+                            
+                                <div class="list-group" id="fleetAffiliations">
+                                
+                                
+                                
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                
+                </div>
+                
+                <br>
+                
                 <div class="row" id="breakdownRow" hidden>
                     
                     <div class="col-xl-12">
@@ -149,7 +179,7 @@
                         <div class="card bg-dark">
                             <div class="card-header">
                                 <h3>Fleet Members</h3>
-                                Click Rows For Individual Stats
+                                <small>Click rows for individual stats</small>
                             </div>
                             <div class="card-body">
                             
@@ -165,8 +195,11 @@
                                             <div class="col-3">
                                                 <strong>Corporation</strong>
                                             </div>
-                                            <div class="col-3">
+                                            <div class="col-2">
                                                 <strong>Join Time</strong>
+                                            </div>
+                                            <div class="col-1">
+                                                <strong>Alerts</strong>
                                             </div>
                                         </div>
                                     </div>

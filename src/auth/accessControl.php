@@ -40,6 +40,14 @@ if (checkTableExists($GLOBALS['MainDatabase'], "players") === false) {
 	$GLOBALS['MainDatabase']->exec("CREATE TABLE players (playerid TEXT, playername TEXT, hascore INT, playeralts LONGTEXT, attendedfleets LONGTEXT, shortstats LONGTEXT, commandedfleets LONGTEXT, isfc INT)");
 }
 
+if (checkTableExists($GLOBALS['MainDatabase'], "alliances") === false) {
+	$GLOBALS['MainDatabase']->exec("CREATE TABLE alliances (allianceid TEXT, alliancename TEXT, shortstats LONGTEXT, represented BIGINT, corporations LONGTEXT)");
+}
+
+if (checkTableExists($GLOBALS['MainDatabase'], "corporations") === false) {
+	$GLOBALS['MainDatabase']->exec("CREATE TABLE corporations (corporationid TEXT, corporationname TEXT, shortstats LONGTEXT, represented BIGINT, members BIGINT)");
+}
+
 /*
 memberstats column:
 character_id : {

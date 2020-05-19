@@ -117,51 +117,91 @@ function shipBreakdown(incomingData) {
     var ships = {};
     
     if (incomingData["Fleet"]["Has Commander"]) {
-        if (ships.hasOwnProperty(incomingData["Fleet"]["Ship ID"])) {
-            ships[incomingData["Fleet"]["Ship ID"]]["Count"]++;
+        
+        if (incomingData["Fleet"]["Ship Class ID"] in ships) {
+            ships[incomingData["Fleet"]["Ship Class ID"]]["Count"]++;
         }
         else {
-            ships[incomingData["Fleet"]["Ship ID"]] = {"Count": 1, "Name": incomingData["Fleet"]["Ship Name"]};
+            ships[incomingData["Fleet"]["Ship Class ID"]] = {"Count": 1, "Name": incomingData["Fleet"]["Ship Class"], "Ships": {}};
         }
+        
+        if (incomingData["Fleet"]["Ship ID"] in ships[incomingData["Fleet"]["Ship Class ID"]]["Ships"]) {
+            ships[incomingData["Fleet"]["Ship Class ID"]]["Ships"][incomingData["Fleet"]["Ship ID"]]["Count"]++;
+        }
+        else {
+            ships[incomingData["Fleet"]["Ship Class ID"]]["Ships"][incomingData["Fleet"]["Ship ID"]] = {"Count": 1, "Name": incomingData["Fleet"]["Ship Name"]};
+        }
+        
     }
     
     for (wingData of incomingData["Fleet"]["Wings"]){
         if (wingData["Has Commander"]) {
             
-            if (ships.hasOwnProperty(wingData["Ship ID"])) {
-                ships[wingData["Ship ID"]]["Count"]++;
+            if (wingData["Ship Class ID"] in ships) {
+                ships[wingData["Ship Class ID"]]["Count"]++;
             }
             else {
-                ships[wingData["Ship ID"]] = {"Count": 1, "Name": wingData["Ship Name"]};
+                ships[wingData["Ship Class ID"]] = {"Count": 1, "Name": wingData["Ship Class"], "Ships": {}};
+            }
+            
+            if (wingData["Ship ID"] in ships[wingData["Ship Class ID"]]["Ships"]) {
+                ships[wingData["Ship Class ID"]]["Ships"][wingData["Ship ID"]]["Count"]++;
+            }
+            else {
+                ships[wingData["Ship Class ID"]]["Ships"][wingData["Ship ID"]] = {"Count": 1, "Name": wingData["Ship Name"]};
             }
             
         }
         for (squadData of wingData["Squads"]) {
             if (squadData["Has Commander"]) {
 
-                if (ships.hasOwnProperty(squadData["Ship ID"])) {
-                    ships[squadData["Ship ID"]]["Count"]++;
+                if (squadData["Ship Class ID"] in ships) {
+                    ships[squadData["Ship Class ID"]]["Count"]++;
                 }
                 else {
-                    ships[squadData["Ship ID"]] = {"Count": 1, "Name": squadData["Ship Name"]};
+                    ships[squadData["Ship Class ID"]] = {"Count": 1, "Name": squadData["Ship Class"], "Ships": {}};
+                }
+
+                if (squadData["Ship ID"] in ships[squadData["Ship Class ID"]]["Ships"]) {
+                    ships[squadData["Ship Class ID"]]["Ships"][squadData["Ship ID"]]["Count"]++;
+                }
+                else {
+                    ships[squadData["Ship Class ID"]]["Ships"][squadData["Ship ID"]] = {"Count": 1, "Name": squadData["Ship Name"]};
                 }
 
             }
             for (memberData of squadData["Members"]) {
 
-                if (ships.hasOwnProperty(memberData["Ship ID"])) {
-                    ships[memberData["Ship ID"]]["Count"]++;
+                if (memberData["Ship Class ID"] in ships) {
+                    ships[memberData["Ship Class ID"]]["Count"]++;
                 }
                 else {
-                    ships[memberData["Ship ID"]] = {"Count": 1, "Name": memberData["Ship Name"]};
+                    ships[memberData["Ship Class ID"]] = {"Count": 1, "Name": memberData["Ship Class"], "Ships": {}};
                 }
+
+                if (memberData["Ship ID"] in ships[memberData["Ship Class ID"]]["Ships"]) {
+                    ships[memberData["Ship Class ID"]]["Ships"][memberData["Ship ID"]]["Count"]++;
+                }
+                else {
+                    ships[memberData["Ship Class ID"]]["Ships"][memberData["Ship ID"]] = {"Count": 1, "Name": memberData["Ship Name"]};
+                }
+                
             }
         }
     }
     
     var shipsSorted = [];
-    for (eachShip in ships) {
-        shipsSorted.push({"Name": ships[eachShip]["Name"], "ID": eachShip, "Count": ships[eachShip]["Count"]})
+    for (eachClass in ships) {
+        var subShips = [];
+        
+        for (eachShip in ships[eachClass]["Ships"]) {
+            
+            subShips.push({"Name": ships[eachClass]["Ships"][eachShip]["Name"], "ID": eachShip, "Count": ships[eachClass]["Ships"][eachShip]["Count"]})
+            
+        }
+        
+        shipsSorted.push({"Name": ships[eachClass]["Name"], "ID": eachClass, "Count": ships[eachClass]["Count"], "Ships": subShips})
+        
     }
     
     var fullySortedShips = shipsSorted.slice(0);
@@ -170,22 +210,43 @@ function shipBreakdown(incomingData) {
     });
     
     $("#ship_breakdown").empty();
-    for (eachShip of fullySortedShips) {
+    for (eachClass of fullySortedShips) {
         $("#ship_breakdown").append(
             $("<li/>")
-                .attr("id", "ship_" + eachShip["ID"])
+                .attr("id", "class_" + eachClass["ID"])
                 .addClass("list-group-item list-group-item bg-secondary p-1 mt-1")
         );
-        $("#ship_" + eachShip["ID"]).append(
+        $("#class_" + eachClass["ID"]).append(
             $("<span/>")
                 .addClass("badge badge-dark ml-3")
-                .text(eachShip["Count"])
+                .text(eachClass["Count"])
         );
-        $("#ship_" + eachShip["ID"]).append(
+        $("#class_" + eachClass["ID"]).append(
             $("<span/>")
                 .addClass("font-weight-bold text-light ml-3")
-                .text(eachShip["Name"])
+                .text(eachClass["Name"])
         );
+        
+        for (eachShip of eachClass["Ships"]) {
+            
+            $("#ship_breakdown").append(
+                $("<li/>")
+                    .attr("id", "ship_" + eachShip["ID"])
+                    .addClass("list-group-item list-group-item bg-secondary p-1 ml-4 mt-1")
+            );
+            $("#ship_" + eachShip["ID"]).append(
+                $("<span/>")
+                    .addClass("badge badge-dark ml-3")
+                    .text(eachShip["Count"])
+            );
+            $("#ship_" + eachShip["ID"]).append(
+                $("<span/>")
+                    .addClass("font-weight-bold text-light ml-3")
+                    .text(eachShip["Name"])
+            );
+            
+        }
+        
     }
 }
 
@@ -638,99 +699,6 @@ function fleetOverview (incomingData) {
 }
 
 function populateData () {
-    
-    incomingData = {
-    "Boss Name": "Wyeck Tantalion",
-    "Boss ID": 2112830258,
-    "Start Time": 1575685160,
-    "Fleet":
-        {
-        "Has Commander":true, 
-        "Character ID":2112830258, 
-        "Character Name":"Wyeck Tantalion", 
-        "Ship ID": 621,
-        "Ship Name": "Caracal",
-        "Corporation ID":98522659,
-        "Corporation Name":"Incredible.",
-        "Alliance ID":99003214,
-        "Alliance Name":"Brave Collective",
-        "System":"GE-8JV",
-        "Region":"Catch",
-        "Wings":
-            [
-                {
-                "Wing Name": "Some Wing",
-                "Has Commander":true, 
-                "Character ID":93823876, 
-                "Character Name":"Galieon Smith", 
-                "Ship ID": 621,
-                "Ship Name": "Caracal",
-                "Corporation ID":98522659,
-                "Corporation Name":"Incredible.",
-                "Alliance ID":99003214,
-                "Alliance Name":"Brave Collective",
-                "System":"GE-8JV",
-                "Region":"Catch",
-                "Squads": 
-                    [
-                        {
-                        "Squad Name": "Some Squad",
-                        "Has Commander":true, 
-                        "Character ID":94449437, 
-                        "Character Name":"Dog Voodoo",
-                        "Ship ID": 621,
-                        "Ship Name": "Caracal",
-                        "Corporation ID":98522659,
-                        "Corporation Name":"Incredible.",
-                        "Alliance ID":99003214,
-                        "Alliance Name":"Brave Collective",
-                        "System":"GE-8JV",
-                        "Region":"Catch",                    
-                        "Members":
-                            [
-                                {
-                                "Character ID":2114727782, 
-                                "Character Name":"Gerry Atrix",
-                                "Ship ID": 621,
-                                "Ship Name": "Caracal",
-                                "Corporation ID":98169165,
-                                "Corporation Name":"Brave Newbies Inc.",
-                                "Alliance ID":99003214,
-                                "Alliance Name":"Brave Collective",
-                                "System":"GE-8JV",
-                                "Region":"Catch"
-                                },
-                                {
-                                "Character ID":1231790466, 
-                                "Character Name":"Zack Power",
-                                "Ship ID": 608,
-                                "Ship Name": "Atron",
-                                "Corporation ID":285883631,
-                                "Corporation Name":"Dreadnoughtz Conclave",
-                                "Alliance ID":99003838,
-                                "Alliance Name":"Requiem Eternal",
-                                "System":"GE-8JV",
-                                "Region":"Catch"
-                                },
-                                {
-                                "Character ID":883818051, 
-                                "Character Name":"solis",
-                                "Ship ID": 608,
-                                "Ship Name": "Atron",
-                                "Corporation ID":285883631,
-                                "Corporation Name":"Dreadnoughtz Conclave",
-                                "Alliance ID":99003838,
-                                "Alliance Name":"Requiem Eternal",
-                                "System":"GE-8JV",
-                                "Region":"Catch"
-                                }                         
-                            ]
-                        }
-                    ]
-                }
-            ]
-        }
-    };
     
     $.ajax({
         url: "monitoringController.php",
