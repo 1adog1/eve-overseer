@@ -56,15 +56,24 @@
 
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
         
-        if (isset($_POST["Action"]) and $_POST["Action"] == "Start") {
-            
+        if (isset($_POST["Action"]) and htmlspecialchars($_POST["Action"]) == "Start") {
+                        
             $approvedSRP = ["Fun", "Stratop", "CTA", "Save", "ADM"];
             
             $fleetName = htmlspecialchars($_POST["Name"]);
             
             if (in_array(htmlspecialchars($_POST["SRP"]), $approvedSRP)) {
                 
-                $fleetSRP = htmlspecialchars($_POST["SRP"]);
+                if (isset($_POST["Voltron"]) and htmlspecialchars($_POST["Voltron"]) == "true") {
+                    
+                    $fleetSRP = htmlspecialchars($_POST["SRP"]) . " (Voltron)";
+                    
+                }
+                else {
+                    
+                    $fleetSRP = htmlspecialchars($_POST["SRP"]);
+                    
+                }
                 
                 $toPull = $GLOBALS['MainDatabase']->prepare("SELECT * FROM tracking WHERE commanderid=:commanderid");
                 $toPull->bindParam(":commanderid", $_SESSION["CharacterID"]);

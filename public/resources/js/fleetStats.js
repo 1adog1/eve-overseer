@@ -1,7 +1,7 @@
 jQuery(document).ready(function () {
     
     getFleets ();
-    
+            
 });
 
 function getFormattedMinutes(timeframe) {
@@ -49,6 +49,8 @@ function getFleets () {
                     $("#fleetList").append(
                         $("<a/>")
                             .addClass("small list-group-item list-group-item-action list-group-item-primary p-2 text-left h6 fleet-list")
+                            .attr("data-toggle", "tooltip")
+                            .attr("title", "<b>Boss:</b> " + result["Fleet Data"][fleets]["Boss"] + " <br/><b>SRP Level:</b> " + result["Fleet Data"][fleets]["SRP Level"] + "<br/><b>Members:</b> " + result["Fleet Data"][fleets]["Total Members"] + " <br/><b>Run Time:</b> " + getFormattedHours(result["Fleet Data"][fleets]["Run Time"]))
                             .attr("href", "#")
                             .attr("id", fleets)
                             .attr("onclick", "populateData(" + fleets + ")")
@@ -62,6 +64,11 @@ function getFleets () {
                                             .attr("style", "height: 16px; width: 16px;")
                                             .addClass("float-right mt-2 text-center align-self-center fleet-status")
                                     )
+                                    .append(
+                                        $("<span/>")
+                                            .attr("id", "voltron-" + fleets)
+                                            .addClass("float-right p-1 mt-2 mr-4 text-center align-self-center")
+                                    )
                             )
                             .append(
                                 $("<div/>")
@@ -70,7 +77,15 @@ function getFleets () {
                             )
                     );
                     
+                    if (result["Fleet Data"][fleets]["Voltron"] == "true") {
+                        $("#voltron-" + fleets)
+                            .addClass("badge badge-info")
+                            .text("Voltron");
+                    }
+                    
                 }
+                
+                $("[data-toggle='tooltip']").tooltip({html: true, boundary: "window", trigger: "hover", placement: "right"});
                 
             }
         }

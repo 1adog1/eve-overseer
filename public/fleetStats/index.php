@@ -52,6 +52,10 @@
         white-space: pre-wrap; 
         scrollbar-width: thin; 
     }
+    
+    .tooltip-inner {
+        text-align: left;
+    }
 
 </style>
 

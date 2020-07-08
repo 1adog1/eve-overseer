@@ -70,9 +70,9 @@
                 
                 $altData = json_decode($pulledData["playeralts"], true);
                 
-                foreach ($altData as $throwaway => $eachAlt) {
+                foreach ($altData as $eachAlt) {
                     
-                    $CharacterJson = file_get_contents("http://esi.evetech.net/latest/characters/" . $eachAlt . "/?datasource=tranquility");
+                    $CharacterJson = file_get_contents("http://esi.evetech.net/latest/characters/" . $eachAlt["ID"] . "/?datasource=tranquility");
                     $CharacterData = json_decode($CharacterJson, TRUE);
                     
                     $corpID = $CharacterData["corporation_id"];
@@ -91,7 +91,7 @@
                         $allianceName = "[No Alliance]";
                     }
                     
-                    $checkData["Alt List"][] = ["ID" => (int)$eachAlt, "Name" => checkCache("Character", $eachAlt), "Corp ID" => $corpID, "Corp Name" => $corpName, "Alliance ID" => $allianceID, "Alliance Name" => $allianceName];
+                    $checkData["Alt List"][] = ["ID" => (int)$eachAlt["ID"], "Name" => checkCache("Character", $eachAlt["ID"]), "Corp ID" => $corpID, "Corp Name" => $corpName, "Alliance ID" => $allianceID, "Alliance Name" => $allianceName];
                     
                 }
                 

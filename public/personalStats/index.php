@@ -164,7 +164,7 @@
                         <h3>Attended Fleets</h3>
                         Click Rows For Personalized Stats
 					</div>
-                    <div class="card-body">
+                    <div class="card-body" style="max-height: 600px; overflow: auto;">
                     
                         <div class="list-group" id="previousFleets">
                             <div class="card-header card text-white bg-secondary p-1 mt-1">

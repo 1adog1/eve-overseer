@@ -9,7 +9,7 @@ function startMonitoring() {
         type: "POST",
         mimeType: "application/json",
         dataType: 'json',
-        data: {"Action": "Start", "Name": $("#fleet_name").val(), "SRP": $("#fleet_srp").val()},
+        data: {"Action": "Start", "Name": $("#fleet_name").val(), "SRP": $("#fleet_srp").val(), "Voltron": $('#Voltron').prop('checked')},
        
         success: function(result){
            
@@ -736,7 +736,8 @@ function populateData () {
                 );
                 
                 $("#fleet_name").attr("disabled", "disabled");
-                $("#fleet_srp").attr("disabled", "disabled");                
+                $("#fleet_srp").attr("disabled", "disabled");
+                $("#Voltron").attr("disabled", "disabled"); 
                 
                 if (result["Found Data"]) {
                     
@@ -763,7 +764,8 @@ function populateData () {
                 
                 $("#fleet_name").removeAttr("disabled");
                 $("#fleet_srp").removeAttr("disabled");
-                
+                $("#Voltron").removeAttr("disabled");
+
                 $("#fleet_boss").empty();
                 $("#member_count").empty();
                 $("#fleet_started").empty();

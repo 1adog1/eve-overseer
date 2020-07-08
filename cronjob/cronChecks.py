@@ -67,6 +67,8 @@ def runChecks():
         knownMembers = []
         knownActives = []
         
+        corporationCache = {}
+        
         currentTime = datetime.now()
         readableCurrentTime = currentTime.strftime("%d %B, %Y - %H:%M:%S EVE")
         print("[" + readableCurrentTime + "] Starting Analysis...\n")
@@ -170,10 +172,16 @@ def runChecks():
                 
                 for eachMaster in masterDict:
                     
-                    if str(eachMember) in masterDict[eachMaster]["Alts"]:
+                    for eachFound in masterDict[eachMaster]["Alts"]:
+                    
+                        if str(eachMember) == str(eachFound["ID"]):
+                            
+                            alreadyFound = True
+                            foundID = eachMaster
                         
-                        alreadyFound = True
-                        foundID = eachMaster
+                            break
+                            
+                    if alreadyFound:
                     
                         break
                     
@@ -188,8 +196,7 @@ def runChecks():
                     encodedString = base64.urlsafe_b64encode(authCode.encode("utf-8")).decode()
                     coreHeader = {"Authorization" : "Bearer " + encodedString}
                     
-                    accountURL = coreInfo["AppURL"] + "api/app/v1/player/" + str(eachMember)
-                    altsURL = coreInfo["AppURL"] + "api/app/v1/characters/" + str(eachMember)
+                    accountURL = coreInfo["AppURL"] + "api/app/v1/player-with-characters/" + str(eachMember)
                     groupsURL = coreInfo["AppURL"] + "api/app/v2/groups/" + str(eachMember)
                     
                     while True:
@@ -204,24 +211,36 @@ def runChecks():
                             masterDict["core-" + str(accountData["id"])] = {"Name":str(accountData["name"]), "Has Core":1, "Alts":[], "Fleets Attended":[fleetID], "Fleets Commanded":[], "Is FC":0, "Short Stats":{"Last Attended Fleet":0, "30 Days Attended":0, "30 Days Led":0, "Total Attended":0, "Total Led":0}}
                             
                             #Get Player Alts
-                            while True:
+                            for eachAlt in accountData["characters"]:
                             
-                                altsRequest = requests.get(altsURL, headers=coreHeader)
-                            
-                                if str(altsRequest.status_code) == "200":
-                                
-                                    altsData = json.loads(altsRequest.text)
+                                if "corporation" in eachAlt and eachAlt["corporation"] != None:
                                     
-                                    for eachAlt in altsData:
-                                        masterDict["core-" + str(accountData["id"])]["Alts"].append(str(eachAlt["id"]))
-                                
-                                    break
-                                
+                                    tempCorporationID = eachAlt["corporation"]["id"]
+                                    tempCorporation = eachAlt["corporation"]["name"]
+                                    
+                                    if "alliance" in eachAlt["corporation"] and eachAlt["corporation"]["alliance"] != None:
+                                    
+                                        tempAllianceID = eachAlt["corporation"]["alliance"]["id"]
+                                        tempAlliance = eachAlt["corporation"]["alliance"]["name"]
+                                        
+                                    else:
+                                    
+                                        tempAllianceID = 0
+                                        tempAlliance = "[No Alliance]"
+                                    
                                 else:
-                                
-                                    print("An error occurred while looking for the alts of " + str(memberDict[eachMember]["name"]) + "... Trying again in a sec.")
                                     
-                                    time.sleep(1)
+                                    tempCorporationID = 0
+                                    tempCorporation = "[No Corporation]"
+                            
+                                masterDict["core-" + str(accountData["id"])]["Alts"].append({
+                                    "ID": str(eachAlt["id"]),
+                                    "Name": str(eachAlt["name"]),
+                                    "Corporation ID": str(tempCorporationID),
+                                    "Corporation": str(tempCorporation),
+                                    "Alliance ID": str(tempAllianceID),
+                                    "Alliance": str(tempAlliance)
+                                })
                             
                             #Check if Player is FC
                             while True:
@@ -251,7 +270,83 @@ def runChecks():
                         #Character Does Not Have Core Account
                         elif str(accountRequest.status_code) == "404":
                         
-                            masterDict["character-" + str(eachMember)] = {"Name":str(memberDict[eachMember]["name"]), "Has Core":0, "Alts":[str(eachMember)], "Fleets Attended":[fleetID], "Fleets Commanded":[], "Is FC":0, "Short Stats":{"Last Attended Fleet":0, "30 Days Attended":0, "30 Days Led":0, "Total Attended":0, "Total Led":0}}
+                            while True:
+                                try:
+                                
+                                    affiliationURL = "https://esi.evetech.net/latest/characters/affiliation/?datasource=tranquility"
+                                    affiliationHeaders = {"accept": "application/json", "Content-Type": "application/json"}
+                                    affiliationPost = json.dumps([int(eachMember)])
+                                    
+                                    namesURL = "https://esi.evetech.net/latest/universe/names/?datasource=tranquility"
+                                    namesPrePost = []
+                                    
+                                    affiliationRequest = requests.post(affiliationURL, headers=affiliationHeaders, data=affiliationPost)
+                                    
+                                    affiliationData = json.loads(affiliationRequest.text)
+                                    
+                                    altsData = None
+                                    
+                                    for eachAffiliation in affiliationData:
+                                        if str(eachAffiliation["character_id"]) == str(eachMember):
+                                            
+                                            namesPrePost.append(eachAffiliation["corporation_id"])
+                                            
+                                            tempCorporationID = eachAffiliation["corporation_id"]
+                                            
+                                            if "alliance_id" in eachAffiliation:
+                                            
+                                                namesPrePost.append(eachAffiliation["alliance_id"])
+                                                
+                                                tempAllianceID = eachAffiliation["alliance_id"]
+                                            
+                                            else:
+                                            
+                                                tempAllianceID = 0
+                                                tempAlliance = "[No Alliance]"
+                                                
+                                            if tempCorporationID in corporationCache:
+                                            
+                                                tempCorporation = corporationCache[tempCorporationID]["Name"]
+                                                tempAllianceID = corporationCache[tempCorporationID]["Alliance ID"]
+                                                tempAlliance = corporationCache[tempCorporationID]["Alliance"]
+                                            
+                                            else:
+                                                
+                                                namesPost = json.dumps(namesPrePost)
+                                                    
+                                                namesRequest = requests.post(namesURL, headers=affiliationHeaders, data=namesPost)
+                                                namesData = json.loads(namesRequest.text)
+                                                
+                                                for eachName in namesData:
+                                                    
+                                                    if eachName["category"] == "corporation" and str(eachName["id"]) == str(tempCorporationID):
+                                                    
+                                                        tempCorporation = eachName["name"]
+                                                    
+                                                    if eachName["category"] == "alliance" and str(eachName["id"]) == str(tempAllianceID):
+                                                    
+                                                        tempAlliance = eachName["name"]
+                                                        
+                                                corporationCache[tempCorporationID] = {"Name": tempCorporation, "Alliance ID": tempAllianceID, "Alliance": tempAlliance}
+                                                        
+                                            altsData = {
+                                                "ID": str(eachMember),
+                                                "Name": str(memberDict[eachMember]["name"]),
+                                                "Corporation ID": str(tempCorporationID),
+                                                "Corporation": str(tempCorporation),
+                                                "Alliance ID": str(tempAllianceID),
+                                                "Alliance": str(tempAlliance)
+                                            }
+                                    
+                                    break
+                                    
+                                except:
+                                
+                                    print("An error occurred while getting affiliation data for " + str(memberDict[eachMember]["name"]) + "... Trying again in a sec.")
+                                    
+                                    time.sleep(1)
+                        
+                            masterDict["character-" + str(eachMember)] = {"Name":str(memberDict[eachMember]["name"]), "Has Core":0, "Alts":[altsData], "Fleets Attended":[fleetID], "Fleets Commanded":[], "Is FC":0, "Short Stats":{"Last Attended Fleet":0, "30 Days Attended":0, "30 Days Led":0, "Total Attended":0, "Total Led":0}}
                             
                             break
                         
@@ -261,7 +356,7 @@ def runChecks():
                             
                             time.sleep(1)
                     
-                    time.sleep(0.7)
+                    time.sleep(0.5)
             
             masterDictCopy = masterDict.copy()
             for eachMaster in masterDictCopy:
@@ -283,7 +378,7 @@ def runChecks():
                             
                     #Check if FC of This Fleet
                     for eachCheckAlt in masterDictCopy[eachMaster]["Alts"]:
-                        if str(eachCheckAlt) == str(commanderID):
+                        if str(eachCheckAlt["ID"]) == str(commanderID):
                         
                             masterDict[eachMaster]["Fleets Commanded"].append(fleetID)
                             

@@ -82,7 +82,7 @@
                 <input type="text" class="form-control" id="fleet_name">
             
             </div>
-            <div id="srp_selection" class="form-group col-xl-4">
+            <div id="srp_selection" class="form-group col-xl-3">
 
                 <label for="fleet_srp">SRP Level</label>
                 <select class="form-control" id="fleet_srp">
@@ -94,7 +94,15 @@
                     <option value="ADM">ADM Fleet</option>
                 
                 </select>
+                
+            </div>
+            <div id="voltron_selection" class="form-group col-xl-1 d-flex">
             
+                <div class="custom-control custom-checkbox align-self-center mt-4">
+                    <input type="checkbox" class="custom-control-input" id="Voltron" value="true">
+                    <label class="custom-control-label" for="Voltron">Coalition Fleet</label>
+                </div>
+                
             </div>
             <div class="form-group col-xl-4 mt-2">
             
