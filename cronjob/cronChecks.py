@@ -264,6 +264,8 @@ def runChecks():
                                     print("An error occurred while looking for the groups of " + str(memberDict[eachMember]["name"]) + "... Trying again in a sec.")
                                     
                                     time.sleep(1)
+                                    
+                            time.sleep(0.5)
                             
                             break
                         
@@ -355,8 +357,6 @@ def runChecks():
                             print("An error occurred while looking for the core account of " + str(memberDict[eachMember]["name"]) + "... Trying again in a sec.")
                             
                             time.sleep(1)
-                    
-                    time.sleep(0.5)
             
             masterDictCopy = masterDict.copy()
             for eachMaster in masterDictCopy:
