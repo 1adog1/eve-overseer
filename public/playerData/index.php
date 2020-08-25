@@ -50,6 +50,10 @@
         filter: invert(100%) sepia(100%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(100%);
     }
     
+    .tooltip-inner {
+        text-align: left;
+    }
+    
 </style>
 
 <?php require $_SERVER['DOCUMENT_ROOT'] . "/../src/site/siteCore.php"; ?>
@@ -116,9 +120,9 @@
                             <div class="col-2 align-self-center">
                                 <div class="row">
                                     <div class="col-1 p-0">
-                                        <a href="#" class="img-fluid sorting" data-sort-by="Name" data-sort-order="Ascending"><img src="/resources/images/octicons/triangle-up.svg"></a>
+                                        <a href="#" class="img-fluid sorting" data-sort-by="Name" data-sort-order="Ascending"><img src="/resources/images/octicons/triangle-up-16.svg"></a>
                                         <br>
-                                        <a href="#" class="img-fluid sorting" data-sort-by="Name" data-sort-order="Descending"><img src="/resources/images/octicons/triangle-down.svg"></a>
+                                        <a href="#" class="img-fluid sorting" data-sort-by="Name" data-sort-order="Descending"><img src="/resources/images/octicons/triangle-down-16.svg"></a>
                                     </div>
                                     <div class="col-10 p-0 align-self-center">
                                         <strong>Name</strong>
@@ -128,9 +132,9 @@
                             <div class="col-1 align-self-center">
                                 <div class="row">
                                     <div class="col-2 p-0">
-                                        <a href="#" class="img-fluid sorting" data-sort-by="RecentAttended" data-sort-order="Ascending"><img src="/resources/images/octicons/triangle-up.svg"></a>
+                                        <a href="#" class="img-fluid sorting" data-sort-by="RecentAttended" data-sort-order="Ascending"><img src="/resources/images/octicons/triangle-up-16.svg"></a>
                                         <br>
-                                        <a href="#" class="img-fluid sorting" data-sort-by="RecentAttended" data-sort-order="Descending"><img src="/resources/images/octicons/triangle-down.svg"></a>
+                                        <a href="#" class="img-fluid sorting" data-sort-by="RecentAttended" data-sort-order="Descending"><img src="/resources/images/octicons/triangle-down-16.svg"></a>
                                     </div>
                                     <div class="col-10 align-self-center p-0">
                                         <strong>Attended (Recent)</strong>
@@ -140,9 +144,9 @@
                             <div class="col-1 align-self-center">
                                 <div class="row">
                                     <div class="col-2 p-0">
-                                        <a href="#" class="img-fluid sorting" data-sort-by="Attended" data-sort-order="Ascending"><img src="/resources/images/octicons/triangle-up.svg"></a>
+                                        <a href="#" class="img-fluid sorting" data-sort-by="Attended" data-sort-order="Ascending"><img src="/resources/images/octicons/triangle-up-16.svg"></a>
                                         <br>
-                                        <a href="#" class="img-fluid sorting" data-sort-by="Attended" data-sort-order="Descending"><img src="/resources/images/octicons/triangle-down.svg"></a>
+                                        <a href="#" class="img-fluid sorting" data-sort-by="Attended" data-sort-order="Descending"><img src="/resources/images/octicons/triangle-down-16.svg"></a>
                                     </div>
                                     <div class="col-10 align-self-center p-0">
                                         <strong>Attended</strong>
@@ -152,9 +156,9 @@
                             <div class="col-1 align-self-center">
                                 <div class="row">
                                     <div class="col-2 p-0">
-                                        <a href="#" class="img-fluid sorting" data-sort-by="RecentLed" data-sort-order="Ascending"><img src="/resources/images/octicons/triangle-up.svg"></a>
+                                        <a href="#" class="img-fluid sorting" data-sort-by="RecentLed" data-sort-order="Ascending"><img src="/resources/images/octicons/triangle-up-16.svg"></a>
                                         <br>
-                                        <a href="#" class="img-fluid sorting" data-sort-by="RecentLed" data-sort-order="Descending"><img src="/resources/images/octicons/triangle-down.svg"></a>
+                                        <a href="#" class="img-fluid sorting" data-sort-by="RecentLed" data-sort-order="Descending"><img src="/resources/images/octicons/triangle-down-16.svg"></a>
                                     </div>
                                     <div class="col-10 align-self-center p-0">
                                         <strong>Led (Recent)</strong>
@@ -164,9 +168,9 @@
                             <div class="col-1 align-self-center">
                                 <div class="row">
                                     <div class="col-2 p-0">
-                                        <a href="#" class="img-fluid sorting" data-sort-by="Led" data-sort-order="Ascending"><img src="/resources/images/octicons/triangle-up.svg"></a>
+                                        <a href="#" class="img-fluid sorting" data-sort-by="Led" data-sort-order="Ascending"><img src="/resources/images/octicons/triangle-up-16.svg"></a>
                                         <br>
-                                        <a href="#" class="img-fluid sorting" data-sort-by="Led" data-sort-order="Descending"><img src="/resources/images/octicons/triangle-down.svg"></a>
+                                        <a href="#" class="img-fluid sorting" data-sort-by="Led" data-sort-order="Descending"><img src="/resources/images/octicons/triangle-down-16.svg"></a>
                                     </div>
                                     <div class="col-10 align-self-center p-0">
                                         <strong>Led</strong>
@@ -176,9 +180,9 @@
                             <div class="col-2 align-self-center">
                                 <div class="row">
                                     <div class="col-1 p-0">
-                                        <a href="#" class="img-fluid sorting" data-sort-by="LastActive" data-sort-order="Ascending"><img src="/resources/images/octicons/triangle-up.svg"></a>
+                                        <a href="#" class="img-fluid sorting" data-sort-by="LastActive" data-sort-order="Ascending"><img src="/resources/images/octicons/triangle-up-16.svg"></a>
                                         <br>
-                                        <a href="#" class="img-fluid sorting" data-sort-by="LastActive" data-sort-order="Descending"><img src="/resources/images/octicons/triangle-down.svg"></a>
+                                        <a href="#" class="img-fluid sorting" data-sort-by="LastActive" data-sort-order="Descending"><img src="/resources/images/octicons/triangle-down-16.svg"></a>
                                     </div>
                                     <div class="col-10 align-self-center p-0">
                                         <strong>Last Active</strong>
@@ -191,7 +195,11 @@
                             <div class="col-1 align-self-center">
                                 <strong>FC?</strong>
                             </div>
-                            <div class="col-2">
+                            <div class="col-2 align-self-center">
+                                <div class="custom-control custom-switch float-right mr-2">
+                                    <input type="checkbox" class="custom-control-input" id="use_times">
+                                    <label class="custom-control-label" for="use_times"><strong>Show Times Instead</strong></label>
+                                </div>
                             </div>
                         </div>
                     </div>

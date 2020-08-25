@@ -26,6 +26,7 @@ Ever Overseer is a participation tracking application designed for use with [Bra
 * Ensure Apache is configured to allow https connections.
 * Ensure PHP is configured to allow `.user.ini` files. 
 * Set `/public` as Document Root in Apache.
+* Once the Webapp has started, use the Admin page as a Super Admin to configure core group permissions. 
 
 ## Checker Setup
 The checker is responsible for tracking fleet data in real time. 
@@ -37,7 +38,7 @@ The checker is responsible for tracking fleet data in real time.
 The cronjob is used to translate fleet stats into participation stats. It links players to core accounts and bases participation off this data. This can take several hours to run and so you should probably only run this once or twice a day. 
 * After setting up the `/config/config.ini` file and connecting to the webapp at least once, you can run `/cronjob/cronChecks.py` as a cronjob to update participation data. 
 
-## To Deploy the Checker and Cronjob to Seperate Servers
+## To Deploy the Checker and Cronjob to Separate Servers
 In the event that it's not easy to deploy the entire app to one server, the Python-Based Cronjob and Checker can be transferred to another server by following the instructions below:
 * Make sure to copy the `/config/config.ini` file along with the `/resources/data/geographicInformation.json` `/resources/data/aggregateTypes.json` and `/resources/data/TypeIDs.json` files somewhere python can access them after they've been setup.
 * Move the `/checker` and `/cronjob` folders to wherever you'll be running them from.

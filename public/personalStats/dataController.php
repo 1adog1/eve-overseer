@@ -11,12 +11,14 @@
 	checkForErrors();
 
     $PageMinimumAccessLevel = ["Super Admin", "HR", "Fleet Commander", "All"];
-
+	checkLastPage();
+	$_SESSION["CurrentPage"] = "Personal Stats";
+    
 	checkCookies();
     
     determineAccess($_SESSION["AccessRoles"], $PageMinimumAccessLevel, false);
     
-    $checkData = ["Status" => "Unknown", "Header Data" => [], "Dates" => [], "Ships" => [], "Timezones" => ["EUTZ" => 0, "USTZ" => 0, "AUTZ" => 0], "Roles" => ["Fleet" => 0, "Wing" => 0, "Squad" => 0], "Fleets" => []];
+    $checkData = ["Status" => "Unknown", "Time Period" => "Unknown", "Header Data" => [], "Dates" => [], "Ships" => [], "Timezones" => ["EUTZ" => 0, "USTZ" => 0, "AUTZ" => 0], "Roles" => ["Fleet" => 0, "Wing" => 0, "Squad" => 0], "Fleets" => []];
     
     function checkCharacterExists($characterID) {
         
@@ -84,7 +86,38 @@
             
             $rowLimit = (int)$maxTableRows;
             
-            $toPull = $GLOBALS['MainDatabase']->prepare("SELECT * FROM fleets ORDER BY starttime DESC LIMIT :limit");
+            if (!isset($_POST["Period"]) or (isset($_POST["Period"]) and htmlspecialchars($_POST["Period"]) == "Month")) {
+                
+                $checkData["Time Period"] = "Month";
+                $timePeriod = (time() - (2592000));
+                
+            }
+            elseif (isset($_POST["Period"]) and htmlspecialchars($_POST["Period"]) == "Week") {
+                
+                $checkData["Time Period"] = "Week";
+                $timePeriod = (time() - (604800));
+                
+            }
+            elseif (isset($_POST["Period"]) and htmlspecialchars($_POST["Period"]) == "Year") {
+                
+                $checkData["Time Period"] = "Year";
+                $timePeriod = (time() - (31536000));
+
+            }
+            elseif (isset($_POST["Period"]) and htmlspecialchars($_POST["Period"]) == "All") {
+                
+                $checkData["Time Period"] = "All";
+                $timePeriod = 0;
+
+            }
+            else {
+                
+                $timePeriod = (time() + (86400));
+                
+            }
+                        
+            $toPull = $GLOBALS['MainDatabase']->prepare("SELECT * FROM fleets WHERE starttime >= :starttime ORDER BY starttime DESC LIMIT :limit");
+            $toPull->bindParam(":starttime", $timePeriod, PDO::PARAM_INT);
             $toPull->bindParam(":limit", $rowLimit, PDO::PARAM_INT);
             
             if ($toPull->execute()) {
@@ -171,6 +204,7 @@
                 
                 $checkData["Status"] = "Error";
                 error_log("Database Error");
+                makeLogEntry("Page Error", $_SESSION["CurrentPage"] . " (Data Controller)", $_SESSION["Character Name"], "Database Error While Pulling Fleets");
                 
             }
             
@@ -178,8 +212,8 @@
         else {
             
             $checkData["Status"] = "Error";
-            
             error_log("Bad Action");
+            makeLogEntry("Page Error", $_SESSION["CurrentPage"] . " (Data Controller)", $_SESSION["Character Name"], "Bad Action");
             
         }
         
@@ -189,6 +223,7 @@
     else {
         
         error_log("Bad Method");
+        makeLogEntry("Page Error", $_SESSION["CurrentPage"] . " (Data Controller)", $_SESSION["Character Name"], "Bad Method");
         
         $checkData["Status"] = "Error";
         echo json_encode($checkData);

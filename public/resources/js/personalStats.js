@@ -1,5 +1,30 @@
 jQuery(document).ready(function () {
     populateData();
+    
+    $("#time_week").click(function() {
+        
+        populateData("Week");
+        
+    });
+    
+    $("#time_month").click(function() {
+        
+        populateData("Month");
+        
+    });
+    
+    $("#time_year").click(function() {
+        
+        populateData("Year");
+        
+    });
+    
+    $("#time_all").click(function() {
+        
+        populateData("All");
+        
+    });
+    
 });
 
 
@@ -121,7 +146,7 @@ function formatShips (incomingData) {
         var shipChart = google.visualization.arrayToDataTable(dataRows);
         
         var fullShips = new google.visualization.PieChart(document.getElementById('shipContainer'));
-        fullShips.draw(shipChart, {title: "Ship Usage (Hours)", titleTextStyle: {color: "white", fontSize: 28, bold: false}, pieHole: 0.4, sliceVisibilityThreshold: 0.03, pieSliceBorderColor: "transparent", backgroundColor: "transparent", legend: {textStyle: {color: "white"}}, height: 400, tooltip: {trigger: "selection"}, pieSliceText: "value"});
+        fullShips.draw(shipChart, {title: "Ship Usage (Hours)", titleTextStyle: {color: "white", fontSize: 28, bold: false}, pieHole: 0.4, sliceVisibilityThreshold: 0.01, pieSliceBorderColor: "transparent", backgroundColor: "transparent", legend: {textStyle: {color: "white"}}, height: 400, tooltip: {trigger: "selection"}, pieSliceText: "value"});
     
     }
     
@@ -380,22 +405,74 @@ function listFleets (incomingData) {
     
 }
 
-function populateData () {
+function cleanupPage (timePeriod) {
+    
+    $("#characterOverview").empty();
+    $("#fleetOverview").empty();
+    $("#calendarContainer").empty();
+    $("#shipContainer").empty();
+    $("#timezoneContainer").empty();
+    $("#rolesContainer").empty();
+    $("#previousFleets").empty();
+        
+    $(".time_nav").removeClass("active");
+    
+    if (timePeriod == "Week") {
+        
+        $("#time_week").addClass("active");
+        
+    }
+    else if (timePeriod == "Month") {
+        
+        $("#time_month").addClass("active");
+        
+    }
+    else if (timePeriod == "Year") {
+        
+        $("#time_year").addClass("active");
+        
+    }
+    else if (timePeriod == "All") {
+        
+        $("#time_all").addClass("active");
+        
+    }
+    
+    $("#statusIndicator").empty();
+    $("#statusIndicator").removeClass("spinner-border");
+    $("#statusIndicator").append(
+        $("<img>")
+            .css("height", "22px")
+            .css("width", "22px")
+            .addClass("status-image mt-2")
+            .attr("src", "/resources/images/octicons/check-24.svg")
+    );
+    $(".time_nav").removeClass("disabled");
+}
+
+function populateData (timePeriod = "Month") {
     
     var currentURL = new URL(window.location.href);
     var lookupURL = currentURL.searchParams.get("id");
+    
+    $(".time_nav").removeClass("active");
+    $(".time_nav").addClass("disabled");
+    $("#statusIndicator").empty();
+    $("#statusIndicator").addClass("spinner-border");
+    $("#calendarRow").attr('hidden', true);
+    $("#breakdownRow").attr('hidden', true);
 
     $.ajax({
         url: "dataController.php",
         type: "POST",
-        data: {"Action": "Get", "ID": lookupURL},
+        data: {"Action": "Get", "ID": lookupURL, "Period": timePeriod},
         mimeType: "application/json",
         dataType: 'json',
         success: function(result){
+            
+            cleanupPage(result["Time Period"]);
+            
             if (result["Status"] == "Data Found") {
-                
-                $("#calendarRow").removeAttr('hidden');
-                $("#breakdownRow").removeAttr('hidden');
 
                 topRow(result["Header Data"]);
                 formatCalendar(result["Dates"]);
@@ -403,6 +480,9 @@ function populateData () {
                 formatTimezones(result["Timezones"]);
                 formatRoles(result["Roles"]);
                 listFleets(result["Fleets"]);
+                
+                $("#calendarRow").removeAttr('hidden');
+                $("#breakdownRow").removeAttr('hidden');
 
             }
             else if (result["Status"] == "No Data") {
@@ -412,4 +492,5 @@ function populateData () {
             }
         }
     });
+    
 }

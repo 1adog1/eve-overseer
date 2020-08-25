@@ -12,7 +12,7 @@
         
 		<?php 
 		
-		$pageList = ["Personal Stats" => ["Required Roles" => ["Super Admin", "HR", "Fleet Commander", "All"], "Link" => "/personalStats/", "Need FC" => false], "Fleet Stats" => ["Required Roles" => ["Super Admin", "HR", "Fleet Commander"], "Link" => "/fleetStats/", "Need FC" => false], "Host Fleet" => ["Required Roles" => ["Super Admin", "Fleet Commander"], "Link" => "/hostFleet/", "Need FC" => true], "Player PAP" => ["Required Roles" => ["Super Admin", "HR"], "Link" => "/playerData/", "Need FC" => false], "Alliance PAP" => ["Required Roles" => ["Super Admin", "HR"], "Link" => "/allianceData/", "Need FC" => false], "Site Logs" => ["Required Roles" => ["Super Admin"], "Link" => "/logView/", "Need FC" => false]];
+		$pageList = ["Personal Stats" => ["Required Roles" => ["Super Admin", "HR", "Fleet Commander", "All"], "Link" => "/personalStats/", "Need FC" => false], "Fleet Stats" => ["Required Roles" => ["Super Admin", "Fleet Commander"], "Link" => "/fleetStats/", "Need FC" => false], "Host Fleet" => ["Required Roles" => ["Super Admin", "Fleet Commander"], "Link" => "/hostFleet/", "Need FC" => true], "Player PAP" => ["Required Roles" => ["Super Admin", "HR"], "Link" => "/playerData/", "Need FC" => false], "Alliance PAP" => ["Required Roles" => ["Super Admin", "HR"], "Link" => "/allianceData/", "Need FC" => false], "Admin" => ["Required Roles" => ["Super Admin"], "Link" => "/admin/", "Need FC" => false], "Site Logs" => ["Required Roles" => ["Super Admin"], "Link" => "/logView/", "Need FC" => false]];
 		
 		if ($_SESSION["AccessRoles"] != ["None"] and $_SESSION["AccessRoles"] != []) {
 			
@@ -80,9 +80,19 @@
                 
                     <?php 
                         if ($_SESSION["CharacterID"] != 0) {
-
-                            echo "
-                            <div class='h4 mt-2 mr-3'><strong>[" . $_SESSION["LoginType"] . "] " . $_SESSION["Character Name"] . "</strong></div>";
+                            
+                            if ($_SESSION["LoginType"] == "FC") {
+                                
+                                echo "
+                                <div class='h4 mt-2 mr-3'><img class='login-type-icon' src='/resources/images/octicons/broadcast-24.svg'><strong> " . $_SESSION["Character Name"] . "</strong></div>";
+                                
+                            }
+                            else {
+                                
+                                echo "
+                                <div class='h4 mt-2 mr-3'><img class='login-type-icon' src='/resources/images/octicons/person-24.svg'><strong> " . $_SESSION["Character Name"] . "</strong></div>";
+                                
+                            }
                         }
                     ?>				
                 

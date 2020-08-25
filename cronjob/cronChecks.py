@@ -75,6 +75,18 @@ def runChecks():
         startingTime = time.perf_counter()
 
         sq1Database = DatabaseConnector.connect(user=databaseInfo["DatabaseUsername"], password=databaseInfo["DatabasePassword"], host=databaseInfo["DatabaseServer"] , port=int(databaseInfo["DatabasePort"]), database=databaseInfo["DatabaseName"])
+        
+        fcGroups = [];
+        
+        roleCursor = sq1Database.cursor(buffered=True)
+        
+        roleStatement = ("SELECT * FROM roles WHERE isfc = 1")
+        roleCursor.execute(roleStatement)
+        
+        for (roleID, roleName, isFC, isHR) in roleCursor:
+            fcGroups.append(int(roleID))
+        
+        roleCursor.close()
 
         def writeToLogs(logType, logMessage):
         
@@ -208,7 +220,7 @@ def runChecks():
                         
                             accountData = json.loads(accountRequest.text)
                                                         
-                            masterDict["core-" + str(accountData["id"])] = {"Name":str(accountData["name"]), "Has Core":1, "Alts":[], "Fleets Attended":[fleetID], "Fleets Commanded":[], "Is FC":0, "Short Stats":{"Last Attended Fleet":0, "30 Days Attended":0, "30 Days Led":0, "Total Attended":0, "Total Led":0}}
+                            masterDict["core-" + str(accountData["id"])] = {"Name":str(accountData["name"]), "Has Core":1, "Alts":[], "Fleets Attended":[fleetID], "Fleets Commanded":[], "Is FC":0, "Short Stats":{"Last Attended Fleet":0, "30 Days Attended":0, "30 Days Time": 0, "30 Days Led":0, "Total Attended":0, "Total Time": 0, "Total Led":0, "Command Stats": {"Time Led": 0, "Fleet Command": 0, "Wing Command": 0, "Squad Command": 0}, "Recent Command Stats": {"Time Led": 0, "Fleet Command": 0, "Wing Command": 0, "Squad Command": 0}}}
                             
                             #Get Player Alts
                             for eachAlt in accountData["characters"]:
@@ -250,11 +262,9 @@ def runChecks():
                                 if str(groupsRequest.status_code) == "200":
                                 
                                     groupsData = json.loads(groupsRequest.text)
-                                    
-                                    fcGroups = coreInfo["FCGroups"].replace(" ", "").split(",")
-                                    
+                                                                        
                                     for eachGroup in groupsData:
-                                        if eachGroup["name"] in fcGroups:
+                                        if int(eachGroup["id"]) in fcGroups:
                                             masterDict["core-" + str(accountData["id"])]["Is FC"] = 1
                                 
                                     break
@@ -348,7 +358,7 @@ def runChecks():
                                     
                                     time.sleep(1)
                         
-                            masterDict["character-" + str(eachMember)] = {"Name":str(memberDict[eachMember]["name"]), "Has Core":0, "Alts":[altsData], "Fleets Attended":[fleetID], "Fleets Commanded":[], "Is FC":0, "Short Stats":{"Last Attended Fleet":0, "30 Days Attended":0, "30 Days Led":0, "Total Attended":0, "Total Led":0}}
+                            masterDict["character-" + str(eachMember)] = {"Name":str(memberDict[eachMember]["name"]), "Has Core":0, "Alts":[altsData], "Fleets Attended":[fleetID], "Fleets Commanded":[], "Is FC":0, "Short Stats":{"Last Attended Fleet":0, "30 Days Attended":0, "30 Days Time": 0, "30 Days Led":0, "Total Attended":0, "Total Time": 0, "Total Led":0, "Command Stats": {"Time Led": 0, "Fleet Command": 0, "Wing Command": 0, "Squad Command": 0}, "Recent Command Stats": {"Time Led": 0, "Fleet Command": 0, "Wing Command": 0, "Squad Command": 0}}}
                             
                             break
                         
@@ -365,31 +375,85 @@ def runChecks():
                 
                     #Update Total Attended
                     masterDict[eachMaster]["Short Stats"]["Total Attended"] += 1
-                
+                    
                     #Update 30 Days Attended
                     if fleetRecent:
                     
                         masterDict[eachMaster]["Short Stats"]["30 Days Attended"] += 1
-                
+                        
                     #Check if Newest Fleet
                     if int(startTime) > masterDictCopy[eachMaster]["Short Stats"]["Last Attended Fleet"]:
                     
                         masterDict[eachMaster]["Short Stats"]["Last Attended Fleet"] = int(startTime)
-                            
+                        
                     #Check if FC of This Fleet
                     for eachCheckAlt in masterDictCopy[eachMaster]["Alts"]:
-                        if str(eachCheckAlt["ID"]) == str(commanderID):
+                        if str(eachCheckAlt["ID"]) == str(commanderID) and eachCheckAlt["ID"] in memberDict:
                         
                             masterDict[eachMaster]["Fleets Commanded"].append(fleetID)
                             
                             masterDict[eachMaster]["Short Stats"]["Total Led"] += 1
+                            masterDict[eachMaster]["Short Stats"]["Command Stats"]["Time Led"] += memberDict[eachCheckAlt["ID"]]["time_in_fleet"]
                             
                             #Update 30 Days FCed
                             if fleetRecent:
                                 masterDict[eachMaster]["Short Stats"]["30 Days Led"] += 1
+                                masterDict[eachMaster]["Short Stats"]["Recent Command Stats"]["Time Led"] += memberDict[eachCheckAlt["ID"]]["time_in_fleet"]
                                 
                             break
-                                                    
+                            
+                    #Check for Times
+                    currentMaxTime = 0
+                    for eachCheckAlt in masterDictCopy[eachMaster]["Alts"]:
+                        if eachCheckAlt["ID"] in memberDict and memberDict[eachCheckAlt["ID"]]["time_in_fleet"] > currentMaxTime:
+                        
+                            currentMaxTime = memberDict[eachCheckAlt["ID"]]["time_in_fleet"]
+                            
+                    masterDict[eachMaster]["Short Stats"]["Total Time"] += currentMaxTime
+                    
+                    if fleetRecent:
+                        masterDict[eachMaster]["Short Stats"]["30 Days Time"] += currentMaxTime
+                        
+                    #Check for Command Positions
+                    alreadyFleet = False
+                    alreadyWing = False
+                    alreadySquad = False
+                    for eachCheckAlt in masterDictCopy[eachMaster]["Alts"]:
+                        if eachCheckAlt["ID"] in memberDict:
+                        
+                            if memberDict[eachCheckAlt["ID"]]["time_in_roles"]["Fleet Commander"] > 0:
+                                alreadyFleet = True
+                                
+                            elif memberDict[eachCheckAlt["ID"]]["time_in_roles"]["Wing Commander"] > 0:
+                                alreadyWing = True
+                                
+                            elif memberDict[eachCheckAlt["ID"]]["time_in_roles"]["Squad Commander"] > 0: 
+                                alreadySquad = True
+                                
+                    if alreadyFleet:
+                    
+                        masterDict[eachMaster]["Short Stats"]["Command Stats"]["Fleet Command"] += 1
+                        
+                        if fleetRecent:
+                        
+                            masterDict[eachMaster]["Short Stats"]["Recent Command Stats"]["Fleet Command"] += 1
+                            
+                    elif alreadyWing:
+                    
+                        masterDict[eachMaster]["Short Stats"]["Command Stats"]["Wing Command"] += 1
+                        
+                        if fleetRecent:
+                        
+                            masterDict[eachMaster]["Short Stats"]["Recent Command Stats"]["Wing Command"] += 1
+                            
+                    elif alreadySquad:
+                    
+                        masterDict[eachMaster]["Short Stats"]["Command Stats"]["Squad Command"] += 1
+                        
+                        if fleetRecent:
+                        
+                            masterDict[eachMaster]["Short Stats"]["Recent Command Stats"]["Squad Command"] += 1
+                            
         initialCursor.close()
         
         playerCounter = 0

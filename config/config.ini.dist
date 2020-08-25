@@ -3,9 +3,6 @@ AppID =
 AppSecret = 
 AppURL = 
 ;Please include a trailing / in the URL; for example https://neucore.com/
-FCGroups = group-1, group-2
-HRGroups = group-3, group-4
-;FC and HR Groups are sets of comma-separated NeuCore group names. No comma required for only one group name.
 
 [Authentication]
 ClientID = 

@@ -43,6 +43,13 @@
 	<meta property="og:url" content="<?php echo $siteURL; ?>">
 
 </head>
+<style>
+
+    .status-image {
+        filter: invert(100%) sepia(100%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(100%);
+    }
+    
+</style>
 
 <?php require $_SERVER['DOCUMENT_ROOT'] . "/../src/site/siteCore.php"; ?>
 
@@ -63,7 +70,7 @@
 
 		<div class="row" id="headerRow">
             
-            <div class="col-xl-4">
+            <div class="col-xl-4 mb-4">
 
 				<div class="card bg-dark">
 					<div class="card-header">
@@ -76,18 +83,52 @@
 
             </div>
             
-            <div class="col-xl-4">
-                
-                <br>
+            <div class="col-xl-4 mb-4">
+				<div class="card bg-dark">
+					<div class="card-header text-center">
+                    
+                        <h3>Time Period</h3>
 
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            
+                            <div class="col-10">
+                            
+                                <ul class="nav nav-pills nav-fill">
+                                    <li class="nav-item border-left border-right border-secondary rounded mr-1">
+                                        <a class="time_nav nav-link" id="time_week" href="#">Week</a>
+                                    </li>
+                                    <li class="nav-item border-left border-right border-secondary rounded mr-1">
+                                        <a class="time_nav nav-link" id="time_month" href="#">Month</a>
+                                    </li>
+                                    <li class="nav-item border-left border-right border-secondary rounded mr-1">
+                                        <a class="time_nav nav-link" id="time_year" href="#">Year</a>
+                                    </li>
+                                    <li class="nav-item border-left border-right border-secondary rounded mr-1">
+                                        <a class="time_nav nav-link" id="time_all" href="#">All Time</a>
+                                    </li>
+                                </ul>
+                                
+                            </div>
+                            <div class="col-2">
+                                <div class="w-100 h-100 border border-secondary rounded text-center align-self-center align-middle">
+                                    <span id="statusIndicator" class="spinner-border text-light mt-2" style="height: 22px; width: 22px;"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+				</div>
             </div>
             
-            <div class="col-xl-4">
+            <div class="col-xl-4 mb-4">
             
 				<div class="card bg-dark">
 					<div class="card-header">
+
                         <h3>Fleet Overview</h3>
-					</div>
+
+                    </div>
                     <div class="card-body" id="fleetOverview">
                     
                     </div>
@@ -166,7 +207,7 @@
 					</div>
                     <div class="card-body" style="max-height: 600px; overflow: auto;">
                     
-                        <div class="list-group" id="previousFleets">
+                        <div class="list-group">
                             <div class="card-header card text-white bg-secondary p-1 mt-1">
                                 <div class="row ml-2">
                                     <div class="col-5">
@@ -180,7 +221,10 @@
                                     </div>                                    
                                 </div>
                             </div>
-                        </div>                    
+                            <div id="previousFleets">
+                            
+                            </div>
+                        </div>
                     
                     </div>
 				</div>

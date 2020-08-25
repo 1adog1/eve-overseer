@@ -688,7 +688,7 @@ function addAlerts(incomingData) {
                     .attr("title", "Character never left a single system.")
                     .append(
                         $("<img>")
-                            .attr("src", "/resources/images/octicons/pulse.svg")
+                            .attr("src", "/resources/images/octicons/pulse-16.svg")
                     )
             );
             
@@ -703,7 +703,7 @@ function addAlerts(incomingData) {
                     .attr("title", "Character occupied a command position.")
                     .append(
                         $("<img>")
-                            .attr("src", "/resources/images/octicons/chevron-up.svg")
+                            .attr("src", "/resources/images/octicons/chevron-up-16.svg")
                     )
             );
             
@@ -718,7 +718,7 @@ function addAlerts(incomingData) {
                     .attr("title", "Character was in a different region from the rest of the fleet.")
                     .append(
                         $("<img>")
-                            .attr("src", "/resources/images/octicons/globe.svg")
+                            .attr("src", "/resources/images/octicons/globe-16.svg")
                     )
             );
             
@@ -791,7 +791,7 @@ function populateData (fleetID) {
                 $(".fleet-status").removeClass("spinner-border");
                 $("#status-" + fleetID).append(
                     $("<img>")
-                        .attr("src", "/resources/images/octicons/check.svg")
+                        .attr("src", "/resources/images/octicons/check-16.svg")
                 );
                 
             }
@@ -806,7 +806,7 @@ function populateData (fleetID) {
                 $(".fleet-status").removeClass("spinner-border");
                 $("#status-" + fleetID).append(
                     $("<img>")
-                        .attr("src", "/resources/images/octicons/alert.svg")
+                        .attr("src", "/resources/images/octicons/alert-16.svg")
                 );
                 
             }

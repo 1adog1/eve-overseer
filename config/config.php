@@ -7,8 +7,6 @@
     $appid = $configArray["AppID"];
     $appsecret = $configArray["AppSecret"];
     $appURL = $configArray["AppURL"];
-    $fcgroups = explode(",", str_replace(" ", "", $configArray["FCGroups"]));
-    $hrgroups = explode(",", str_replace(" ", "", $configArray["HRGroups"]));
 
 	//AUTHENTICATION CONFIGURATION
 	$clientid = $configArray["ClientID"];

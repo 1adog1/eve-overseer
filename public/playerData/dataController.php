@@ -11,7 +11,7 @@
 
     $PageMinimumAccessLevel = ["Super Admin", "HR"];
 	checkLastPage();
-	$_SESSION["CurrentPage"] = "PAPs";
+	$_SESSION["CurrentPage"] = "Player PAPs";
     
 	checkCookies();
     
@@ -37,7 +37,16 @@
                 
                 $shortStats = json_decode($pulledData["shortstats"], true);
                 
-                $checkData["Player List"][] = ["ID" => $pulledData["playerid"], "Name" => htmlspecialchars($pulledData["playername"]), "Recent Attended" => $shortStats["30 Days Attended"], "Recent Commanded" => $shortStats["30 Days Led"], "Total Attended" => $shortStats["Total Attended"], "Total Commanded" => $shortStats["Total Led"], "Last Attended Time" => $shortStats["Last Attended Fleet"], "Last Attended" => date("F jS, Y", $shortStats["Last Attended Fleet"]), "Has Core" => boolval($pulledData["hascore"]), "Is FC" => boolval($pulledData["isfc"])];
+                if ((htmlspecialchars($_POST["Times"])) === "true") {
+                                        
+                    $checkData["Player List"][] = ["ID" => $pulledData["playerid"], "Name" => htmlspecialchars($pulledData["playername"]), "Recent Attended" => $shortStats["30 Days Time"], "Recent Commanded" => $shortStats["Recent Command Stats"]["Time Led"], "Total Attended" => $shortStats["Total Time"], "Total Commanded" => $shortStats["Command Stats"]["Time Led"], "Last Attended Time" => $shortStats["Last Attended Fleet"], "Last Attended" => date("F jS, Y", $shortStats["Last Attended Fleet"]), "Command Stats" => $shortStats["Command Stats"], "Recent Command Stats" => $shortStats["Recent Command Stats"], "Has Core" => boolval($pulledData["hascore"]), "Is FC" => boolval($pulledData["isfc"])];
+                    
+                }
+                else {
+                
+                    $checkData["Player List"][] = ["ID" => $pulledData["playerid"], "Name" => htmlspecialchars($pulledData["playername"]), "Recent Attended" => $shortStats["30 Days Attended"], "Recent Commanded" => $shortStats["30 Days Led"], "Total Attended" => $shortStats["Total Attended"],"Total Commanded" => $shortStats["Total Led"], "Last Attended Time" => $shortStats["Last Attended Fleet"], "Last Attended" => date("F jS, Y", $shortStats["Last Attended Fleet"]), "Command Stats" => $shortStats["Command Stats"], "Recent Command Stats" => $shortStats["Recent Command Stats"], "Has Core" => boolval($pulledData["hascore"]), "Is FC" => boolval($pulledData["isfc"])];
+                
+                }
                 
                 $rowCounter ++;
                 
@@ -94,48 +103,152 @@
                     $checkData["Alt List"][] = ["ID" => (int)$eachAlt["ID"], "Name" => checkCache("Character", $eachAlt["ID"]), "Corp ID" => $corpID, "Corp Name" => $corpName, "Alliance ID" => $allianceID, "Alliance Name" => $allianceName];
                     
                 }
-                
-                error_log(json_encode($altIDList));
-                
+                                
             }
             
         }
         elseif (isset($_POST["Action"]) and $_POST["Action"] == "Filter") {
-            
+                        
             $checkData["Player List"] = [];
-            
+                        
             $toPull = $GLOBALS['MainDatabase']->query("SELECT playerid, playername, hascore, shortstats, isfc FROM players ORDER BY playername ASC");
             
             $checkData["Status"] = "No Data";
-            
             while ($pulledData = $toPull->fetch(PDO::FETCH_ASSOC)) {
                 
                 $shortStats = json_decode($pulledData["shortstats"], true);
                 
                 if (((htmlspecialchars($_POST["Name"]) === "false" or strpos(htmlspecialchars($pulledData["playername"]), htmlspecialchars($_POST["Name"])) !== false) and $shortStats["30 Days Led"] >= htmlspecialchars($_POST["Commanded"]) and $shortStats["30 Days Attended"] >= htmlspecialchars($_POST["Attended"]) and ((htmlspecialchars($_POST["Core"]) === "true" and boolval($pulledData["hascore"])) or htmlspecialchars($_POST["Core"]) === "false") and ((htmlspecialchars($_POST["FC"]) === "true" and boolval($pulledData["isfc"])) or htmlspecialchars($_POST["FC"]) === "false")) or htmlspecialchars($_POST["All"]) === "true") {
-            
+                    
                     $checkData["Status"] = "Data Found";
-                    
-                    $checkData["Player List"][] = ["ID" => $pulledData["playerid"], "Name" => htmlspecialchars($pulledData["playername"]), "Recent Attended" => $shortStats["30 Days Attended"], "Recent Commanded" => $shortStats["30 Days Led"], "Total Attended" => $shortStats["Total Attended"], "Total Commanded" => $shortStats["Total Led"], "Last Attended Time" => $shortStats["Last Attended Fleet"], "Last Attended" => date("F jS, Y", $shortStats["Last Attended Fleet"]), "Has Core" => boolval($pulledData["hascore"]), "Is FC" => boolval($pulledData["isfc"])];
-                    
-                    $rowCounter ++;
-                    
-                    if ($rowCounter >= $maxTableRows) {
-                        break;
+            
+                    if ((htmlspecialchars($_POST["Times"])) === "true") {
+                        
+                        $checkData["Player List"][] = ["ID" => $pulledData["playerid"], "Name" => htmlspecialchars($pulledData["playername"]), "Recent Attended" => $shortStats["30 Days Time"], "Recent Commanded" => $shortStats["Recent Command Stats"]["Time Led"], "Total Attended" => $shortStats["Total Time"], "Total Commanded" => $shortStats["Command Stats"]["Time Led"], "Last Attended Time" => $shortStats["Last Attended Fleet"], "Last Attended" => date("F jS, Y", $shortStats["Last Attended Fleet"]), "Command Stats" => $shortStats["Command Stats"], "Recent Command Stats" => $shortStats["Recent Command Stats"], "Has Core" => boolval($pulledData["hascore"]), "Is FC" => boolval($pulledData["isfc"])];
+                        
                     }
-                
+                    else {
+                    
+                        $checkData["Player List"][] = ["ID" => $pulledData["playerid"], "Name" => htmlspecialchars($pulledData["playername"]), "Recent Attended" => $shortStats["30 Days Attended"], "Recent Commanded" => $shortStats["30 Days Led"], "Total Attended" => $shortStats["Total Attended"],"Total Commanded" => $shortStats["Total Led"], "Last Attended Time" => $shortStats["Last Attended Fleet"], "Last Attended" => date("F jS, Y", $shortStats["Last Attended Fleet"]), "Command Stats" => $shortStats["Command Stats"], "Recent Command Stats" => $shortStats["Recent Command Stats"], "Has Core" => boolval($pulledData["hascore"]), "Is FC" => boolval($pulledData["isfc"])];
+                    
+                    }
+                                    
                 }
                                 
             }
             
-            $checkData["Counter"] = $rowCounter;
+            if ($_POST["Sort_By"] == "Name") {
+                if ($_POST["Sort_Order"] == "Ascending") {
+                    
+                    uasort($checkData["Player List"], function($a, $b) {
+                        return strcasecmp($a["Name"], $b["Name"]);
+                    });
+                    
+                }
+                elseif ($_POST["Sort_Order"] == "Descending") {
+                    
+                    uasort($checkData["Player List"], function($a, $b) {
+                        return strcasecmp($b["Name"], $a["Name"]);
+                    });
+                    
+                }
+            }
+            
+            elseif ($_POST["Sort_By"] == "RecentAttended") {
+                if ($_POST["Sort_Order"] == "Ascending") {
+                    
+                    uasort($checkData["Player List"], function($a, $b) {
+                        return $b["Recent Attended"] <=> $a["Recent Attended"];
+                    });
+                    
+                }
+                elseif ($_POST["Sort_Order"] == "Descending") {
+                    
+                    uasort($checkData["Player List"], function($a, $b) {
+                        return $a["Recent Attended"] <=> $b["Recent Attended"];
+                    });
+                    
+                }
+            }
+            
+            elseif ($_POST["Sort_By"] == "Attended") {
+                if ($_POST["Sort_Order"] == "Ascending") {
+                    
+                    uasort($checkData["Player List"], function($a, $b) {
+                        return $b["Total Attended"] <=> $a["Total Attended"];
+                    });
+                    
+                }
+                elseif ($_POST["Sort_Order"] == "Descending") {
+                    
+                    uasort($checkData["Player List"], function($a, $b) {
+                        return $a["Total Attended"] <=> $b["Total Attended"];
+                    });
+                    
+                }
+            }
+            
+            elseif ($_POST["Sort_By"] == "RecentLed") {
+                if ($_POST["Sort_Order"] == "Ascending") {
+                    
+                    uasort($checkData["Player List"], function($a, $b) {
+                        return $b["Recent Commanded"] <=> $a["Recent Commanded"];
+                    });
+                    
+                }
+                elseif ($_POST["Sort_Order"] == "Descending") {
+                    
+                    uasort($checkData["Player List"], function($a, $b) {
+                        return $a["Recent Commanded"] <=> $b["Recent Commanded"];
+                    });
+                    
+                }
+            }
+            
+            elseif ($_POST["Sort_By"] == "Led") {
+                if ($_POST["Sort_Order"] == "Ascending") {
+                    
+                    uasort($checkData["Player List"], function($a, $b) {
+                        return $b["Total Commanded"] <=> $a["Total Commanded"];
+                    });
+                    
+                }
+                elseif ($_POST["Sort_Order"] == "Descending") {
+                    
+                    uasort($checkData["Player List"], function($a, $b) {
+                        return $a["Total Commanded"] <=> $b["Total Commanded"];
+                    });
+                    
+                }
+            }
+            
+            elseif ($_POST["Sort_By"] == "LastActive") {
+                if ($_POST["Sort_Order"] == "Ascending") {
+                    
+                    uasort($checkData["Player List"], function($a, $b) {
+                        return $b["Last Attended Time"] <=> $a["Last Attended Time"];
+                    });
+                    
+                }
+                elseif ($_POST["Sort_Order"] == "Descending") {
+                    
+                    uasort($checkData["Player List"], function($a, $b) {
+                        return $a["Last Attended Time"] <=> $b["Last Attended Time"];
+                    });
+                    
+                }
+            }
+            
+            $checkData["Player List"] = array_slice($checkData["Player List"], 0, $maxTableRows);
+            
+            $checkData["Counter"] = count($checkData["Player List"]);
             
         }
         else {
             
-            $checkData["Status"] = "Error";
-            
+            $checkData["Status"] = "Error";            
             error_log("Bad Action");
+            makeLogEntry("Page Error", $_SESSION["CurrentPage"] . " (Data Controller)", $_SESSION["Character Name"], "Bad Action");
             
         }
         
@@ -145,6 +258,7 @@
     else {
         
         error_log("Bad Method");
+        makeLogEntry("Page Error", $_SESSION["CurrentPage"] . " (Data Controller)", $_SESSION["Character Name"], "Bad Method");
         
         $checkData["Status"] = "Error";
         echo json_encode($checkData);

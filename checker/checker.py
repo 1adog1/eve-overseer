@@ -381,6 +381,7 @@ def runChecks():
                 
                 if accessCode == "Bad Token":
                     print("Tracking was stopped for " + commanderName + " due to a bad token.")
+                    writeToLogs("Fleet Stopped", "Tracking was stopped for " + commanderName + " due to a bad token.")
                     stopTracking(fleetID)
                     
                 else:
@@ -389,6 +390,7 @@ def runChecks():
                     
                     if not fleetData:
                         print("Tracking was stopped for " + commanderName + " due to them not being in a fleet.")
+                        writeToLogs("Fleet Stopped", "Tracking was stopped for " + commanderName + " due to them not being in a fleet (Fleet Data).")
                         stopTracking(fleetID)
                     
                     elif "fleet_boss_id" in fleetData and str(fleetData["fleet_boss_id"]) == str(commanderID):
@@ -397,6 +399,7 @@ def runChecks():
                         
                         if not fleetStructure:
                             print("Tracking was stopped for " + commanderName + " due to them not being in a fleet.")
+                            writeToLogs("Fleet Stopped", "Tracking was stopped for " + commanderName + " due to them not being in a fleet (Fleet Structure).")
                             stopTracking(fleetID)
                             
                         else:
@@ -421,6 +424,7 @@ def runChecks():
                             
                             if not fleetMembers:
                                 print("Tracking was stopped for " + commanderName + " due to them not being in a fleet.")
+                                writeToLogs("Fleet Stopped", "Tracking was stopped for " + commanderName + " due to them not being in a fleet (Fleet Members).")
                                 stopTracking(fleetID)
                                 
                             else:
@@ -616,6 +620,7 @@ def runChecks():
                     
                     else:
                         print("Tracking was stopped for " + commanderName + " due to them no longer being the boss of a fleet.")
+                        writeToLogs("Fleet Stopped", "Tracking was stopped for " + commanderName + " due to them no longer being the boss of a fleet.")
                         stopTracking(fleetID)
             
             tokenCursor.close()

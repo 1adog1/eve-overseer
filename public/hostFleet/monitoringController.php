@@ -11,7 +11,9 @@
 	checkForErrors();
 
     $PageMinimumAccessLevel = ["Super Admin", "Fleet Commander"];
-
+	checkLastPage();
+	$_SESSION["CurrentPage"] = "Host Fleet";
+    
 	checkCookies();
     
     determineAccess($_SESSION["AccessRoles"], $PageMinimumAccessLevel, false);
@@ -104,9 +106,7 @@
                             $testStatus = $http_response_header[0];
                             
                             $fleetRequest = json_decode($fleetReturned,true);
-                            
-                            //error_log($fleetRequest["fleet_boss_id"] . " - " . $_SESSION["CharacterID"] . " - " . json_encode($testStatus));
-                            
+                                                        
                             if ($testStatus == "HTTP/1.1 200 OK" and $fleetRequest["fleet_boss_id"] == $_SESSION["CharacterID"]) {
                                 
                                 $pulledFleetID = $fleetRequest["fleet_id"];
@@ -120,9 +120,10 @@
                                 if (!empty($checkArrayData)) {
                                     
                                     $checkData["Status"] = "Stopped";
-                                    $checkData["Error"] = "This fleet has already had its data aggregated. Once this has occured the fleet can no longer be tracked.";
+                                    $checkData["Error"] = "This fleet has already had its data aggregated. Once this has occurred the fleet can no longer be tracked.";
                                     
                                     error_log("Fleet Already Recorded");
+                                    makeLogEntry("Page Error", $_SESSION["CurrentPage"] . " (Data Controller)", $_SESSION["Character Name"], "Tried to Restart a Fleet");
                                     
                                 }
                                 else {
@@ -152,6 +153,7 @@
                                 $checkData["Error"] = "You are not the boss of a fleet. Only fleet bosses can initiate tracking.";
                                 
                                 error_log("Not in Fleet or Not Fleet Boss");
+                                makeLogEntry("Page Error", $_SESSION["CurrentPage"] . " (Data Controller)", $_SESSION["Character Name"], "Tried to Start a Fleet While Not Boss");
                                 
                             }
                         
@@ -161,6 +163,7 @@
                             $checkData["Error"] = "Failed to get a new authentication code. Please try again. If this error persists please logout and back in.";
                             
                             error_log("Failed to Get Auth Code");
+                            makeLogEntry("Page Error", $_SESSION["CurrentPage"] . " (Data Controller)", $_SESSION["Character Name"], "Failed to Get Auth Code");
                             
                         }
 
@@ -170,6 +173,7 @@
                         $checkData["Error"] = "Somehow we don't have a refresh token on file for you.";
                         
                         error_log("No Commander Logged In");
+                        makeLogEntry("Page Error", $_SESSION["CurrentPage"] . " (Data Controller)", $_SESSION["Character Name"], "No Refresh Token");
                         
                     }
                     
@@ -179,6 +183,7 @@
                     $checkData["Error"] = "This fleet has already been marked for tracking.";
                     
                     error_log("Tracking Already Running");
+                    makeLogEntry("Page Error", $_SESSION["CurrentPage"] . " (Data Controller)", $_SESSION["Character Name"], "Tried to Track a Fleet That Was Already Tracking");
                     
                 }
             }
@@ -187,6 +192,7 @@
                 $checkData["Error"] = "Oi! Please don't mess with the form HTML!";
                 
                 error_log("HTML Error");
+                makeLogEntry("Page Error", $_SESSION["CurrentPage"] . " (Data Controller)", $_SESSION["Character Name"], "User Messed With Fleet Start Form HTML");
                 
             }
             
@@ -218,6 +224,7 @@
                 $checkData["Error"] = "There is no fleet currently being tracked.";
                 
                 error_log("No Tracking to Stop");
+                makeLogEntry("Page Error", $_SESSION["CurrentPage"] . " (Data Controller)", $_SESSION["Character Name"], "Tried to Stop a Fleet Not Being Tracked");
                 
             }
             
@@ -267,8 +274,8 @@
         else {
             
             $checkData["Status"] = "Error";
-            
             error_log("Bad Action");
+            makeLogEntry("Page Error", $_SESSION["CurrentPage"] . " (Data Controller)", $_SESSION["Character Name"], "Bad Action");
             
         }
         
@@ -278,6 +285,7 @@
     else {
         
         error_log("Bad Method");
+        makeLogEntry("Page Error", $_SESSION["CurrentPage"] . " (Data Controller)", $_SESSION["Character Name"], "Bad Method");
         
         $checkData["Status"] = "Error";
         echo json_encode($checkData);

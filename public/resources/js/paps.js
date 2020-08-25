@@ -11,6 +11,12 @@ jQuery(document).ready(function () {
         
     }
     
+    $("#use_times").click(function() {
+        
+        listData();
+        
+    });
+    
     $(".sorting").click(function() {
         
         filterPrecursor($(this).attr("data-sort-by"), $(this).attr("data-sort-order"));
@@ -52,7 +58,7 @@ jQuery(document).ready(function () {
             
         }
         
-        var filterOptions = {"Action": "Filter", "Name": nameToCheck, "Attended": attended , "Commanded": commanded, "Core": $("#core").is(':checked'), "FC": $("#fc").is(':checked'), "All": $("#all").is(':checked')};
+        var filterOptions = {"Action": "Filter", "Name": nameToCheck, "Attended": attended , "Commanded": commanded, "Core": $("#core").is(':checked'), "FC": $("#fc").is(':checked'), "All": $("#all").is(':checked'), "Times": $("#use_times").is(':checked'), "Sort By": sortBy, "Sort Order": sortOrder};
                 
         filterData(filterOptions, sortBy, sortOrder);
             
@@ -69,6 +75,27 @@ jQuery(document).ready(function () {
     });
     
 });
+
+function getFormattedMinutes(timeframe) {
+    
+    var totalMinutes = Math.floor(timeframe / 60);
+    var totalSeconds = Math.floor(timeframe % 60);
+    var totalTime = totalMinutes.toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false}) + "m " + totalSeconds.toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false}) + "s"
+    
+    return totalTime;
+
+}
+
+function getFormattedHours(timeframe) {
+    
+    var rawTime = timeframe / 3600;
+    var totalHours = Math.floor(rawTime);
+    var totalMinutes = Math.floor((rawTime - totalHours) * 60);
+    var totalTime = totalHours + "h " + totalMinutes.toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false}) + "m";
+    
+    return totalTime;
+    
+}
 
 function getAffiliations(getGraph = false, graphID = null) {
     
@@ -335,81 +362,192 @@ function graphAffiliations(incomingData, targetID) {
 }
 
 function listData() {
+    
+    var usingTimes = $("#use_times").is(':checked');
+    
+    $("#player-data").empty();
         
     $.ajax({
         url: "dataController.php",
         type: "POST",
-        data: {"Action": "List"},
+        data: {"Action": "List", "Times": usingTimes},
         mimeType: "application/json",
         dataType: 'json',
         success: function(result){
+                        
             if (result["Status"] == "Data Found") {
-                
+                                
                 for (eachMember of result["Player List"]) {
                                         
-                    $("#player-data").append(
-                        $("<a/>")
-                            .addClass("list-group-item list-group-item-action list-group-item-dark bg-dark border-secondary text-white p-1 mt-1 removable-item small")
-                            .attr("data-toggle", "collapse")
-                            .attr("href", "#extra-" + eachMember["ID"])
-                            .attr("id", "head-" + eachMember["ID"])
-                            .attr("aria-expanded", "false")
-                            .attr("aria-controls", "#extra-" + eachMember["ID"])
-                            .append(
-                                $("<div/>")
-                                    .addClass("row ml-2")
-                                    .append(
-                                        $("<div/>")
-                                            .addClass("col-2 p-0 text-left align-self-center")
-                                            .text(eachMember["Name"])
-                                    )
-                                    .append(
-                                        $("<div/>")
-                                            .addClass("col-1 p-0 align-self-center")
-                                            .text(eachMember["Recent Attended"])
-                                    )
-                                    .append(
-                                        $("<div/>")
-                                            .addClass("col-1 p-0 align-self-center")
-                                            .text(eachMember["Total Attended"])
-                                    )
-                                    .append(
-                                        $("<div/>")
-                                            .addClass("col-1 p-0 align-self-center")
-                                            .text(eachMember["Recent Commanded"])
-                                    )
-                                    .append(
-                                        $("<div/>")
-                                            .addClass("col-1 p-0 align-self-center")
-                                            .text(eachMember["Total Commanded"])
-                                    )
-                                    .append(
-                                        $("<div/>")
-                                            .addClass("col-2 p-0 align-self-center")
-                                            .text(eachMember["Last Attended"])
-                                    )
-                                    .append(
-                                        $("<div/>")
-                                            .addClass("col-1 align-self-center")
-                                            .text(eachMember["Has Core"])
-                                    )
-                                    .append(
-                                        $("<div/>")
-                                            .addClass("col-1 align-self-center")
-                                            .text(eachMember["Is FC"])
-                                    )
-                                    .append(
-                                        $("<div/>")
-                                            .addClass("col-2 align-self-center text-center")
-                                            .append(
-                                                $("<btn/>")
-                                                    .addClass("btn btn-sm btn-primary a-player")
-                                                    .attr("id", eachMember["ID"])
-                                                    .text("Get Alts")
-                                            )
-                                    )
-                            )
-                    );
+                    if (usingTimes) {
+                        
+                        $("#player-data").append(
+                            $("<a/>")
+                                .addClass("list-group-item list-group-item-action list-group-item-dark bg-dark border-secondary text-white p-1 mt-1 removable-item small")
+                                .attr("data-toggle", "collapse")
+                                .attr("href", "#extra-" + eachMember["ID"])
+                                .attr("id", "head-" + eachMember["ID"])
+                                .attr("aria-expanded", "false")
+                                .attr("aria-controls", "#extra-" + eachMember["ID"])
+                                .append(
+                                    $("<div/>")
+                                        .addClass("row ml-2")
+                                        .append(
+                                            $("<div/>")
+                                                .addClass("col-2 p-0 text-left align-self-center")
+                                                .text(eachMember["Name"])
+                                        )
+                                        .append(
+                                            $("<div/>")
+                                                .addClass("col-1 p-0 align-self-center")
+                                                .text(getFormattedHours(eachMember["Recent Attended"]))
+                                        )
+                                        .append(
+                                            $("<div/>")
+                                                .addClass("col-1 p-0 align-self-center")
+                                                .text(getFormattedHours(eachMember["Total Attended"]))
+
+                                        )
+                                        .append(
+                                            $("<div/>")
+                                                .addClass("col-1 p-0 align-self-center")
+                                                .append(
+                                                    $("<a/>")
+                                                        .addClass("text-white text-left")
+                                                        .attr("data-toggle", "tooltip")
+                                                        .attr("title", "<b>Fleet Command:</b> " + eachMember["Recent Command Stats"]["Fleet Command"] + "<br><b>Wing Command:</b> " + eachMember["Recent Command Stats"]["Wing Command"] + "<br><b>Squad Command:</b> " + eachMember["Recent Command Stats"]["Squad Command"])
+                                                        .attr("href", "#")
+                                                        .text(getFormattedHours(eachMember["Recent Commanded"]))
+                                                        .css("border-bottom", "1px dotted")
+                                                )
+                                        )
+                                        .append(
+                                            $("<div/>")
+                                                .addClass("col-1 p-0 align-self-center")
+                                                .append(
+                                                    $("<a/>")
+                                                        .addClass("text-white text-left")
+                                                        .attr("data-toggle", "tooltip")
+                                                        .attr("title", "<b>Fleet Command:</b> " + eachMember["Command Stats"]["Fleet Command"] + "<br><b>Wing Command:</b> " + eachMember["Command Stats"]["Wing Command"] + "<br><b>Squad Command:</b> " + eachMember["Command Stats"]["Squad Command"])
+                                                        .attr("href", "#")
+                                                        .text(getFormattedHours(eachMember["Total Commanded"]))
+                                                        .css("border-bottom", "1px dotted")
+                                                )
+                                        )
+                                        .append(
+                                            $("<div/>")
+                                                .addClass("col-2 p-0 align-self-center")
+                                                .text(eachMember["Last Attended"])
+                                        )
+                                        .append(
+                                            $("<div/>")
+                                                .addClass("col-1 align-self-center")
+                                                .text(eachMember["Has Core"])
+                                        )
+                                        .append(
+                                            $("<div/>")
+                                                .addClass("col-1 align-self-center")
+                                                .text(eachMember["Is FC"])
+                                        )
+                                        .append(
+                                            $("<div/>")
+                                                .addClass("col-2 align-self-center text-center")
+                                                .append(
+                                                    $("<btn/>")
+                                                        .addClass("btn btn-sm btn-primary a-player")
+                                                        .attr("id", eachMember["ID"])
+                                                        .text("Get Alts")
+                                                )
+                                        )
+                                )
+                        );
+                        
+                    }
+                    else {
+                    
+                        $("#player-data").append(
+                            $("<a/>")
+                                .addClass("list-group-item list-group-item-action list-group-item-dark bg-dark border-secondary text-white p-1 mt-1 removable-item small")
+                                .attr("data-toggle", "collapse")
+                                .attr("href", "#extra-" + eachMember["ID"])
+                                .attr("id", "head-" + eachMember["ID"])
+                                .attr("aria-expanded", "false")
+                                .attr("aria-controls", "#extra-" + eachMember["ID"])
+                                .append(
+                                    $("<div/>")
+                                        .addClass("row ml-2")
+                                        .append(
+                                            $("<div/>")
+                                                .addClass("col-2 p-0 text-left align-self-center")
+                                                .text(eachMember["Name"])
+                                        )
+                                        .append(
+                                            $("<div/>")
+                                                .addClass("col-1 p-0 align-self-center")
+                                                .text(eachMember["Recent Attended"])
+                                        )
+                                        .append(
+                                            $("<div/>")
+                                                .addClass("col-1 p-0 align-self-center")
+                                                .text(eachMember["Total Attended"])
+
+                                        )
+                                        .append(
+                                            $("<div/>")
+                                                .addClass("col-1 p-0 align-self-center")
+                                                .append(
+                                                    $("<a/>")
+                                                        .addClass("text-white text-left")
+                                                        .attr("data-toggle", "tooltip")
+                                                        .attr("title", "<b>Fleet Command:</b> " + eachMember["Recent Command Stats"]["Fleet Command"] + "<br><b>Wing Command:</b> " + eachMember["Recent Command Stats"]["Wing Command"] + "<br><b>Squad Command:</b> " + eachMember["Recent Command Stats"]["Squad Command"])
+                                                        .attr("href", "#")
+                                                        .text(eachMember["Recent Commanded"])
+                                                        .css("border-bottom", "1px dotted")
+                                                )
+                                        )
+                                        .append(
+                                            $("<div/>")
+                                                .addClass("col-1 p-0 align-self-center")
+                                                .append(
+                                                    $("<a/>")
+                                                        .addClass("text-white text-left")
+                                                        .attr("data-toggle", "tooltip")
+                                                        .attr("title", "<b>Fleet Command:</b> " + eachMember["Command Stats"]["Fleet Command"] + "<br><b>Wing Command:</b> " + eachMember["Command Stats"]["Wing Command"] + "<br><b>Squad Command:</b> " + eachMember["Command Stats"]["Squad Command"])
+                                                        .attr("href", "#")
+                                                        .text(eachMember["Total Commanded"])
+                                                        .css("border-bottom", "1px dotted")
+                                                )
+                                        )
+                                        .append(
+                                            $("<div/>")
+                                                .addClass("col-2 p-0 align-self-center")
+                                                .text(eachMember["Last Attended"])
+                                        )
+                                        .append(
+                                            $("<div/>")
+                                                .addClass("col-1 align-self-center")
+                                                .text(eachMember["Has Core"])
+                                        )
+                                        .append(
+                                            $("<div/>")
+                                                .addClass("col-1 align-self-center")
+                                                .text(eachMember["Is FC"])
+                                        )
+                                        .append(
+                                            $("<div/>")
+                                                .addClass("col-2 align-self-center text-center")
+                                                .append(
+                                                    $("<btn/>")
+                                                        .addClass("btn btn-sm btn-primary a-player")
+                                                        .attr("id", eachMember["ID"])
+                                                        .text("Get Alts")
+                                                )
+                                        )
+                                )
+                        );
+                    
+                    }
+                    
                     $("#player-data").append(
                         $("<div/>")
                             .addClass("collapse card border-secondary bg-dark ml-4 mt-1 p-1 removable-item")
@@ -448,8 +586,10 @@ function listData() {
                                     .attr("id", "data-" + eachMember["ID"])
                             )
                     );
+                    
                 }
                 
+                $("[data-toggle='tooltip']").tooltip({html: true, boundary: "window", trigger: "hover", placement: "right"});
                 $("#counting_container").text(result["Counter"] + " Account(s) Loaded");
                 
             }
@@ -471,173 +611,177 @@ function filterData(filterOptions, sortBy, sortOrder) {
         success: function(result){
             if (result["Status"] == "Data Found") {
                 
-                if (sortBy == "Name") {
-                    if (sortOrder == "Ascending") {
-                        
-                        result["Player List"].sort(function(a, b){
-                            return a["Name"].localeCompare(b["Name"]);
-                        });
-                        
-                    }
-                    if (sortOrder == "Descending") {
-                        
-                        result["Player List"].sort(function(a, b){
-                            return b["Name"].localeCompare(a["Name"]);
-                        });
-                        
-                    }
-                }
-                
-                if (sortBy == "RecentAttended") {
-                    if (sortOrder == "Ascending") {
-                        
-                        result["Player List"].sort(function(a, b){
-                            return b["Recent Attended"] - a["Recent Attended"];
-                        });
-                        
-                    }
-                    if (sortOrder == "Descending") {
-                        
-                        result["Player List"].sort(function(a, b){
-                            return a["Recent Attended"] - b["Recent Attended"];
-                        });
-                        
-                    }
-                }
-                
-                if (sortBy == "Attended") {
-                    if (sortOrder == "Ascending") {
-                        
-                        result["Player List"].sort(function(a, b){
-                            return b["Total Attended"] - a["Total Attended"];
-                        });
-                        
-                    }
-                    if (sortOrder == "Descending") {
-                        
-                        result["Player List"].sort(function(a, b){
-                            return a["Total Attended"] - b["Total Attended"];
-                        });
-                        
-                    }
-                }
-                
-                if (sortBy == "RecentLed") {
-                    if (sortOrder == "Ascending") {
-                        
-                        result["Player List"].sort(function(a, b){
-                            return b["Recent Commanded"] - a["Recent Commanded"];
-                        });
-                        
-                    }
-                    if (sortOrder == "Descending") {
-                        
-                        result["Player List"].sort(function(a, b){
-                            return a["Recent Commanded"] - b["Recent Commanded"];
-                        });
-                        
-                    }
-                }
-                
-                if (sortBy == "Led") {
-                    if (sortOrder == "Ascending") {
-                        
-                        result["Player List"].sort(function(a, b){
-                            return b["Total Commanded"] - a["Total Commanded"];
-                        });
-                        
-                    }
-                    if (sortOrder == "Descending") {
-                        
-                        result["Player List"].sort(function(a, b){
-                            return a["Total Commanded"] - b["Total Commanded"];
-                        });
-                        
-                    }
-                }
-                
-                if (sortBy == "LastActive") {
-                    if (sortOrder == "Ascending") {
-                        
-                        result["Player List"].sort(function(a, b){
-                            return b["Last Attended Time"] - a["Last Attended Time"];
-                        });
-                        
-                    }
-                    if (sortOrder == "Descending") {
-                        
-                        result["Player List"].sort(function(a, b){
-                            return a["Last Attended Time"] - b["Last Attended Time"];
-                        });
-                        
-                    }
-                }
-                
                 for (eachMember of result["Player List"]) {
-                                        
-                    $("#player-data").append(
-                        $("<a/>")
-                            .addClass("list-group-item list-group-item-action list-group-item-dark bg-dark border-secondary text-white p-1 mt-1 removable-item small")
-                            .attr("data-toggle", "collapse")
-                            .attr("href", "#extra-" + eachMember["ID"])
-                            .attr("id", "head-" + eachMember["ID"])
-                            .attr("aria-expanded", "false")
-                            .attr("aria-controls", "#extra-" + eachMember["ID"])
-                            .append(
-                                $("<div/>")
-                                    .addClass("row ml-2")
-                                    .append(
-                                        $("<div/>")
-                                            .addClass("col-2 p-0 text-left align-self-center")
-                                            .text(eachMember["Name"])
-                                    )
-                                    .append(
-                                        $("<div/>")
-                                            .addClass("col-1 p-0 align-self-center")
-                                            .text(eachMember["Recent Attended"])
-                                    )
-                                    .append(
-                                        $("<div/>")
-                                            .addClass("col-1 p-0 align-self-center")
-                                            .text(eachMember["Total Attended"])
-                                    )
-                                    .append(
-                                        $("<div/>")
-                                            .addClass("col-1 p-0 align-self-center")
-                                            .text(eachMember["Recent Commanded"])
-                                    )
-                                    .append(
-                                        $("<div/>")
-                                            .addClass("col-1 p-0 align-self-center")
-                                            .text(eachMember["Total Commanded"])
-                                    )
-                                    .append(
-                                        $("<div/>")
-                                            .addClass("col-2 p-0 align-self-center")
-                                            .text(eachMember["Last Attended"])
-                                    )
-                                    .append(
-                                        $("<div/>")
-                                            .addClass("col-1 align-self-center")
-                                            .text(eachMember["Has Core"])
-                                    )
-                                    .append(
-                                        $("<div/>")
-                                            .addClass("col-1 align-self-center")
-                                            .text(eachMember["Is FC"])
-                                    )
-                                    .append(
-                                        $("<div/>")
-                                            .addClass("col-2 align-self-center text-center")
-                                            .append(
-                                                $("<btn/>")
-                                                    .addClass("btn btn-sm btn-primary a-player")
-                                                    .attr("id", eachMember["ID"])
-                                                    .text("Get Alts")
-                                            )
-                                    )
-                            )
-                    );
+                    
+                    if (filterOptions["Times"]) {
+                        
+                        $("#player-data").append(
+                            $("<a/>")
+                                .addClass("list-group-item list-group-item-action list-group-item-dark bg-dark border-secondary text-white p-1 mt-1 removable-item small")
+                                .attr("data-toggle", "collapse")
+                                .attr("href", "#extra-" + eachMember["ID"])
+                                .attr("id", "head-" + eachMember["ID"])
+                                .attr("aria-expanded", "false")
+                                .attr("aria-controls", "#extra-" + eachMember["ID"])
+                                .append(
+                                    $("<div/>")
+                                        .addClass("row ml-2")
+                                        .append(
+                                            $("<div/>")
+                                                .addClass("col-2 p-0 text-left align-self-center")
+                                                .text(eachMember["Name"])
+                                        )
+                                        .append(
+                                            $("<div/>")
+                                                .addClass("col-1 p-0 align-self-center")
+                                                .text(getFormattedHours(eachMember["Recent Attended"]))
+                                        )
+                                        .append(
+                                            $("<div/>")
+                                                .addClass("col-1 p-0 align-self-center")
+                                                .text(getFormattedHours(eachMember["Total Attended"]))
+
+                                        )
+                                        .append(
+                                            $("<div/>")
+                                                .addClass("col-1 p-0 align-self-center")
+                                                .append(
+                                                    $("<a/>")
+                                                        .addClass("text-white text-left")
+                                                        .attr("data-toggle", "tooltip")
+                                                        .attr("title", "<b>Fleet Command:</b> " + eachMember["Recent Command Stats"]["Fleet Command"] + "<br><b>Wing Command:</b> " + eachMember["Recent Command Stats"]["Wing Command"] + "<br><b>Squad Command:</b> " + eachMember["Recent Command Stats"]["Squad Command"])
+                                                        .attr("href", "#")
+                                                        .text(getFormattedHours(eachMember["Recent Commanded"]))
+                                                        .css("border-bottom", "1px dotted")
+                                                )
+                                        )
+                                        .append(
+                                            $("<div/>")
+                                                .addClass("col-1 p-0 align-self-center")
+                                                .append(
+                                                    $("<a/>")
+                                                        .addClass("text-white text-left")
+                                                        .attr("data-toggle", "tooltip")
+                                                        .attr("title", "<b>Fleet Command:</b> " + eachMember["Command Stats"]["Fleet Command"] + "<br><b>Wing Command:</b> " + eachMember["Command Stats"]["Wing Command"] + "<br><b>Squad Command:</b> " + eachMember["Command Stats"]["Squad Command"])
+                                                        .attr("href", "#")
+                                                        .text(getFormattedHours(eachMember["Total Commanded"]))
+                                                        .css("border-bottom", "1px dotted")
+                                                )
+                                        )
+                                        .append(
+                                            $("<div/>")
+                                                .addClass("col-2 p-0 align-self-center")
+                                                .text(eachMember["Last Attended"])
+                                        )
+                                        .append(
+                                            $("<div/>")
+                                                .addClass("col-1 align-self-center")
+                                                .text(eachMember["Has Core"])
+                                        )
+                                        .append(
+                                            $("<div/>")
+                                                .addClass("col-1 align-self-center")
+                                                .text(eachMember["Is FC"])
+                                        )
+                                        .append(
+                                            $("<div/>")
+                                                .addClass("col-2 align-self-center text-center")
+                                                .append(
+                                                    $("<btn/>")
+                                                        .addClass("btn btn-sm btn-primary a-player")
+                                                        .attr("id", eachMember["ID"])
+                                                        .text("Get Alts")
+                                                )
+                                        )
+                                )
+                        );
+                        
+                    }
+                    else {
+                    
+                        $("#player-data").append(
+                            $("<a/>")
+                                .addClass("list-group-item list-group-item-action list-group-item-dark bg-dark border-secondary text-white p-1 mt-1 removable-item small")
+                                .attr("data-toggle", "collapse")
+                                .attr("href", "#extra-" + eachMember["ID"])
+                                .attr("id", "head-" + eachMember["ID"])
+                                .attr("aria-expanded", "false")
+                                .attr("aria-controls", "#extra-" + eachMember["ID"])
+                                .append(
+                                    $("<div/>")
+                                        .addClass("row ml-2")
+                                        .append(
+                                            $("<div/>")
+                                                .addClass("col-2 p-0 text-left align-self-center")
+                                                .text(eachMember["Name"])
+                                        )
+                                        .append(
+                                            $("<div/>")
+                                                .addClass("col-1 p-0 align-self-center")
+                                                .text(eachMember["Recent Attended"])
+                                        )
+                                        .append(
+                                            $("<div/>")
+                                                .addClass("col-1 p-0 align-self-center")
+                                                .text(eachMember["Total Attended"])
+
+                                        )
+                                        .append(
+                                            $("<div/>")
+                                                .addClass("col-1 p-0 align-self-center")
+                                                .append(
+                                                    $("<a/>")
+                                                        .addClass("text-white text-left")
+                                                        .attr("data-toggle", "tooltip")
+                                                        .attr("title", "<b>Fleet Command:</b> " + eachMember["Recent Command Stats"]["Fleet Command"] + "<br><b>Wing Command:</b> " + eachMember["Recent Command Stats"]["Wing Command"] + "<br><b>Squad Command:</b> " + eachMember["Recent Command Stats"]["Squad Command"])
+                                                        .attr("href", "#")
+                                                        .text(eachMember["Recent Commanded"])
+                                                        .css("border-bottom", "1px dotted")
+                                                )
+                                        )
+                                        .append(
+                                            $("<div/>")
+                                                .addClass("col-1 p-0 align-self-center")
+                                                .append(
+                                                    $("<a/>")
+                                                        .addClass("text-white text-left")
+                                                        .attr("data-toggle", "tooltip")
+                                                        .attr("title", "<b>Fleet Command:</b> " + eachMember["Command Stats"]["Fleet Command"] + "<br><b>Wing Command:</b> " + eachMember["Command Stats"]["Wing Command"] + "<br><b>Squad Command:</b> " + eachMember["Command Stats"]["Squad Command"])
+                                                        .attr("href", "#")
+                                                        .text(eachMember["Total Commanded"])
+                                                        .css("border-bottom", "1px dotted")
+                                                )
+                                        )
+                                        .append(
+                                            $("<div/>")
+                                                .addClass("col-2 p-0 align-self-center")
+                                                .text(eachMember["Last Attended"])
+                                        )
+                                        .append(
+                                            $("<div/>")
+                                                .addClass("col-1 align-self-center")
+                                                .text(eachMember["Has Core"])
+                                        )
+                                        .append(
+                                            $("<div/>")
+                                                .addClass("col-1 align-self-center")
+                                                .text(eachMember["Is FC"])
+                                        )
+                                        .append(
+                                            $("<div/>")
+                                                .addClass("col-2 align-self-center text-center")
+                                                .append(
+                                                    $("<btn/>")
+                                                        .addClass("btn btn-sm btn-primary a-player")
+                                                        .attr("id", eachMember["ID"])
+                                                        .text("Get Alts")
+                                                )
+                                        )
+                                )
+                        );
+                    
+                    }
+                    
                     $("#player-data").append(
                         $("<div/>")
                             .addClass("collapse card border-secondary bg-dark ml-4 mt-1 p-1 removable-item")
@@ -676,8 +820,10 @@ function filterData(filterOptions, sortBy, sortOrder) {
                                     .attr("id", "data-" + eachMember["ID"])
                             )
                     );
+                    
                 }
                 
+                $("[data-toggle='tooltip']").tooltip({html: true, boundary: "window", trigger: "hover", placement: "right"});
                 $("#counting_container").text(result["Counter"] + " Account(s) Loaded");
                 
             }

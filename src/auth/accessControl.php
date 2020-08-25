@@ -48,25 +48,9 @@ if (checkTableExists($GLOBALS['MainDatabase'], "corporations") === false) {
 	$GLOBALS['MainDatabase']->exec("CREATE TABLE corporations (corporationid TEXT, corporationname TEXT, shortstats LONGTEXT, represented BIGINT, members BIGINT)");
 }
 
-/*
-memberstats column:
-character_id : {
-    "name": aggregateSquad["Character Name"],
-    "corp_id": aggregateSquad["Corporation ID"],
-    "corp_name": aggregateSquad["Corporation Name"],
-    "alliance_id": aggregateSquad["Alliance ID"],
-    "alliance_name": aggregateSquad["Alliance Name"],
-    "time_in_fleet": 0,
-    "join_time": snapshotTimestamp,
-    "time_in_roles": {
-        "Fleet Commander": 0,
-        "Wing Commander": 0,
-        "Squad Commander": 0,
-        "Squad Member": 0
-    },
-    "time_in_ships": {}
+if (checkTableExists($GLOBALS['MainDatabase'], "roles") === false) {
+	$GLOBALS['MainDatabase']->exec("CREATE TABLE roles (roleid BIGINT, rolename TEXT, isfc INT, ishr INT)");
 }
-*/
 
 function checkLastPage() {
 	if (isset($_SESSION["CurrentPage"])) {
@@ -81,6 +65,29 @@ function checkForHR($CharacterID) {
 
     require $_SERVER['DOCUMENT_ROOT'] . "/../config/config.php";
     
+    $hrgroups = [];
+    
+    $toRoleCheck = $GLOBALS['MainDatabase']->prepare("SELECT * FROM roles WHERE ishr = 1");
+    
+    if ($toRoleCheck->execute()) {
+        
+        while ($roleData = $toRoleCheck->fetch(PDO::FETCH_ASSOC)) {
+            
+                
+            $hrgroups[] = (int)$roleData["roleid"];
+                
+            
+        }
+        
+    }
+    else {
+        
+        $checkData["Status"] = "Error";
+        error_log("Database Error");
+        makeLogEntry("Page Error", "Access Control", $_SESSION["Character Name"], "Database Error While Pulling Roles");
+        
+    }
+            
     $hrFound = false;
     
     $neucoreToken = base64_encode($appid . ":" . $appsecret);
@@ -100,7 +107,7 @@ function checkForHR($CharacterID) {
         
         foreach ($fleetRequest as $throwaway => $eachGroup) {
             
-            if (in_array($eachGroup["name"], $hrgroups)) {
+            if (in_array($eachGroup["id"], $hrgroups)) {
                 
                 $hrFound = true;
                 
@@ -118,6 +125,27 @@ function checkForFC($CharacterID) {
     
     require $_SERVER['DOCUMENT_ROOT'] . "/../config/config.php";
     
+    $fcgroups = [];
+    
+    $toRoleCheck = $GLOBALS['MainDatabase']->prepare("SELECT * FROM roles WHERE isfc = 1");
+    
+    if ($toRoleCheck->execute()) {
+        
+        while ($roleData = $toRoleCheck->fetch(PDO::FETCH_ASSOC)) {
+                            
+            $fcgroups[] = (int)$roleData["roleid"];
+                            
+        }
+        
+    }
+    else {
+        
+        $checkData["Status"] = "Error";
+        error_log("Database Error");
+        makeLogEntry("Page Error", "Access Control", $_SESSION["Character Name"], "Database Error While Pulling Roles");
+        
+    }
+            
     $fcFound = false;
     
     $neucoreToken = base64_encode($appid . ":" . $appsecret);
@@ -137,7 +165,7 @@ function checkForFC($CharacterID) {
         
         foreach ($fleetRequest as $throwaway => $eachGroup) {
             
-            if (in_array($eachGroup["name"], $fcgroups)) {
+            if (in_array($eachGroup["id"], $fcgroups)) {
                 
                 $fcFound = true;
                 

@@ -11,7 +11,7 @@
 
     $PageMinimumAccessLevel = ["Super Admin", "HR"];
 	checkLastPage();
-	$_SESSION["CurrentPage"] = "PAPs";
+	$_SESSION["CurrentPage"] = "Alliance PAP";
     
 	checkCookies();
     
@@ -53,8 +53,8 @@
         else {
             
             $checkData["Status"] = "Error";
-            
             error_log("Bad Action");
+            makeLogEntry("Page Error", $_SESSION["CurrentPage"] . " (Data Controller)", $_SESSION["Character Name"], "Bad Action");
             
         }
         
@@ -64,6 +64,7 @@
     else {
         
         error_log("Bad Method");
+        makeLogEntry("Page Error", $_SESSION["CurrentPage"] . " (Data Controller)", $_SESSION["Character Name"], "Bad Method");
         
         $checkData["Status"] = "Error";
         echo json_encode($checkData);

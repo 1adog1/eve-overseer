@@ -11,7 +11,9 @@
 	checkForErrors();
 
     $PageMinimumAccessLevel = ["Super Admin", "HR", "Fleet Commander"];
-
+	checkLastPage();
+	$_SESSION["CurrentPage"] = "Fleet Stats";
+    
 	checkCookies();
     
     determineAccess($_SESSION["AccessRoles"], $PageMinimumAccessLevel, false);
@@ -100,6 +102,7 @@
                 $checkData["Status"] = "Error";
                 
                 error_log("No Fleet Found");
+                makeLogEntry("Page Error", $_SESSION["CurrentPage"] . " (Data Controller)", $_SESSION["Character Name"], "Tried to Pull a Fleet That Does Not Exist");
                 
             }
             
@@ -135,7 +138,8 @@
             else {
                 
                 $checkData["Status"] = "Error";
-                error_log("Database Query Failed");
+                error_log("Database Error");
+                makeLogEntry("Page Error", $_SESSION["CurrentPage"] . " (Data Controller)", $_SESSION["Character Name"], "Database Error While Listing Fleets");
                 
             }
         }
@@ -159,6 +163,7 @@
                 $checkData["Status"] = "Error";
                 
                 error_log("Insufficient Permissions");
+                makeLogEntry("Page Error", $_SESSION["CurrentPage"] . " (Data Controller)", $_SESSION["Character Name"], "Tried to Delete Fleet Without Permissions");
                 
             }
             
@@ -166,8 +171,8 @@
         else {
             
             $checkData["Status"] = "Error";
-            
             error_log("Bad Action");
+            makeLogEntry("Page Error", $_SESSION["CurrentPage"] . " (Data Controller)", $_SESSION["Character Name"], "Bad Action");
             
         }
         
@@ -177,6 +182,7 @@
     else {
         
         error_log("Bad Method");
+        makeLogEntry("Page Error", $_SESSION["CurrentPage"] . " (Data Controller)", $_SESSION["Character Name"], "Bad Method");
         
         $checkData["Status"] = "Error";
         echo json_encode($checkData);

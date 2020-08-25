@@ -72,10 +72,20 @@
 							<input type="checkbox" class="custom-control-input" name="u_database" value="true" id="u_database"> 
 							<label class="custom-control-label" for="u_database">User Database Edits</label>
 						</div>
-
+                        
 						<div class="custom-control custom-checkbox">
-							<input type="checkbox" class="custom-control-input" name="search" value="true" id="search"> 
-							<label class="custom-control-label" for="search">User Searches</label>
+							<input type="checkbox" class="custom-control-input" name="checker_errors" value="true" id="checker_errors"> 
+							<label class="custom-control-label" for="checker_errors">Checker Errors</label>
+						</div>
+                        
+						<div class="custom-control custom-checkbox">
+							<input type="checkbox" class="custom-control-input" name="cronjob" value="true" id="cronjob"> 
+							<label class="custom-control-label" for="cronjob">Cronjob</label>
+						</div>
+                        
+						<div class="custom-control custom-checkbox">
+							<input type="checkbox" class="custom-control-input" name="tracking" value="true" id="tracking"> 
+							<label class="custom-control-label" for="tracking">Fleet Tracking</label>
 						</div>
 
 						<div class="custom-control custom-checkbox">
@@ -87,6 +97,7 @@
 							<input type="checkbox" class="custom-control-input" name="p_errors" value="true" id="p_errors"> 
 							<label class="custom-control-label" for="p_errors">Page Errors</label>
 						</div>
+                        
 					</div>
 					
 					
@@ -115,15 +126,15 @@
 				<br>
 				<h2 class="ColumnHeader">Log Entries</h2>
 				<hr>
-				<table style="width: 100%;">
+				<table class="w-100 small">
 					<tr>
-						<th align="center">Timestamp</th>
-						<th align="center">Type</th>
-						<th align="center">Page</th>
-						<th align="center">Actor</th>
-						<th align="center">Details</th>
-						<th align="center">Real IP Address</th>
-						<th align="center">Forwarded IP Address</th>
+						<th class="col-2" align="center">Timestamp</th>
+						<th class="col-1" align="center">Type</th>
+						<th class="col-1" align="center">Page</th>
+						<th class="col-1" align="center">Actor</th>
+						<th class="col-5" align="center">Details</th>
+						<th class="col-1" align="center">Real IP Address</th>
+						<th class="col-1" align="center">Forwarded IP Address</th>
 					</tr>
 				<?php
 				

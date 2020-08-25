@@ -114,9 +114,13 @@ function topRow(incomingData, startTime) {
 
 function shipBreakdown(incomingData) {
     
+    var filterTrash = $("#trash_filter").is(':checked');
+    
     var ships = {};
     
     if (incomingData["Fleet"]["Has Commander"]) {
+        
+        var bossSystem = incomingData["Fleet"]["System"];
         
         if (incomingData["Fleet"]["Ship Class ID"] in ships) {
             ships[incomingData["Fleet"]["Ship Class ID"]]["Count"]++;
@@ -137,53 +141,65 @@ function shipBreakdown(incomingData) {
     for (wingData of incomingData["Fleet"]["Wings"]){
         if (wingData["Has Commander"]) {
             
-            if (wingData["Ship Class ID"] in ships) {
-                ships[wingData["Ship Class ID"]]["Count"]++;
-            }
-            else {
-                ships[wingData["Ship Class ID"]] = {"Count": 1, "Name": wingData["Ship Class"], "Ships": {}};
-            }
+            if (!filterTrash || !incomingData["Fleet"]["Has Commander"] || (filterTrash && incomingData["Fleet"]["Has Commander"] && wingData["System"] == bossSystem)) {
             
-            if (wingData["Ship ID"] in ships[wingData["Ship Class ID"]]["Ships"]) {
-                ships[wingData["Ship Class ID"]]["Ships"][wingData["Ship ID"]]["Count"]++;
-            }
-            else {
-                ships[wingData["Ship Class ID"]]["Ships"][wingData["Ship ID"]] = {"Count": 1, "Name": wingData["Ship Name"]};
+                if (wingData["Ship Class ID"] in ships) {
+                    ships[wingData["Ship Class ID"]]["Count"]++;
+                }
+                else {
+                    ships[wingData["Ship Class ID"]] = {"Count": 1, "Name": wingData["Ship Class"], "Ships": {}};
+                }
+                
+                if (wingData["Ship ID"] in ships[wingData["Ship Class ID"]]["Ships"]) {
+                    ships[wingData["Ship Class ID"]]["Ships"][wingData["Ship ID"]]["Count"]++;
+                }
+                else {
+                    ships[wingData["Ship Class ID"]]["Ships"][wingData["Ship ID"]] = {"Count": 1, "Name": wingData["Ship Name"]};
+                }
+            
             }
             
         }
         for (squadData of wingData["Squads"]) {
             if (squadData["Has Commander"]) {
+                
+                if (!filterTrash || !incomingData["Fleet"]["Has Commander"] || (filterTrash && incomingData["Fleet"]["Has Commander"] && squadData["System"] == bossSystem)) {
 
-                if (squadData["Ship Class ID"] in ships) {
-                    ships[squadData["Ship Class ID"]]["Count"]++;
-                }
-                else {
-                    ships[squadData["Ship Class ID"]] = {"Count": 1, "Name": squadData["Ship Class"], "Ships": {}};
-                }
+                    if (squadData["Ship Class ID"] in ships) {
+                        ships[squadData["Ship Class ID"]]["Count"]++;
+                    }
+                    else {
+                        ships[squadData["Ship Class ID"]] = {"Count": 1, "Name": squadData["Ship Class"], "Ships": {}};
+                    }
 
-                if (squadData["Ship ID"] in ships[squadData["Ship Class ID"]]["Ships"]) {
-                    ships[squadData["Ship Class ID"]]["Ships"][squadData["Ship ID"]]["Count"]++;
-                }
-                else {
-                    ships[squadData["Ship Class ID"]]["Ships"][squadData["Ship ID"]] = {"Count": 1, "Name": squadData["Ship Name"]};
+                    if (squadData["Ship ID"] in ships[squadData["Ship Class ID"]]["Ships"]) {
+                        ships[squadData["Ship Class ID"]]["Ships"][squadData["Ship ID"]]["Count"]++;
+                    }
+                    else {
+                        ships[squadData["Ship Class ID"]]["Ships"][squadData["Ship ID"]] = {"Count": 1, "Name": squadData["Ship Name"]};
+                    }
+                
                 }
 
             }
             for (memberData of squadData["Members"]) {
+                
+                if (!filterTrash || !incomingData["Fleet"]["Has Commander"] || (filterTrash && incomingData["Fleet"]["Has Commander"] && memberData["System"] == bossSystem)) {
 
-                if (memberData["Ship Class ID"] in ships) {
-                    ships[memberData["Ship Class ID"]]["Count"]++;
-                }
-                else {
-                    ships[memberData["Ship Class ID"]] = {"Count": 1, "Name": memberData["Ship Class"], "Ships": {}};
-                }
+                    if (memberData["Ship Class ID"] in ships) {
+                        ships[memberData["Ship Class ID"]]["Count"]++;
+                    }
+                    else {
+                        ships[memberData["Ship Class ID"]] = {"Count": 1, "Name": memberData["Ship Class"], "Ships": {}};
+                    }
 
-                if (memberData["Ship ID"] in ships[memberData["Ship Class ID"]]["Ships"]) {
-                    ships[memberData["Ship Class ID"]]["Ships"][memberData["Ship ID"]]["Count"]++;
-                }
-                else {
-                    ships[memberData["Ship Class ID"]]["Ships"][memberData["Ship ID"]] = {"Count": 1, "Name": memberData["Ship Name"]};
+                    if (memberData["Ship ID"] in ships[memberData["Ship Class ID"]]["Ships"]) {
+                        ships[memberData["Ship Class ID"]]["Ships"][memberData["Ship ID"]]["Count"]++;
+                    }
+                    else {
+                        ships[memberData["Ship Class ID"]]["Ships"][memberData["Ship ID"]] = {"Count": 1, "Name": memberData["Ship Name"]};
+                    }
+                
                 }
                 
             }
@@ -735,9 +751,9 @@ function populateData () {
                         .text("Stop Monitoring")
                 );
                 
-                $("#fleet_name").attr("disabled", "disabled");
-                $("#fleet_srp").attr("disabled", "disabled");
-                $("#Voltron").attr("disabled", "disabled"); 
+                $("#fleet_name").prop("disabled", true)
+                $("#fleet_srp").prop("disabled", true)
+                $("#Voltron").prop("disabled", true) 
                 
                 if (result["Found Data"]) {
                     
@@ -762,9 +778,9 @@ function populateData () {
                         .text("Start Monitoring")
                 );
                 
-                $("#fleet_name").removeAttr("disabled");
-                $("#fleet_srp").removeAttr("disabled");
-                $("#Voltron").removeAttr("disabled");
+                $("#fleet_name").prop("disabled", false)
+                $("#fleet_srp").prop("disabled", false)
+                $("#Voltron").prop("disabled", false)
 
                 $("#fleet_boss").empty();
                 $("#member_count").empty();

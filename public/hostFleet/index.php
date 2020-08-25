@@ -141,8 +141,19 @@
 		<div class="row" id="detailRow" hidden>
 			<div class="col-xl-3">
 				<div class="card bg-dark mt-4">
-					<div class="card-header">
+					<div class="card-header row">
+                        <div class="col-xl-6">
                         Ship Breakdown
+                        </div>
+                        <div class="form-group col-xl-6">
+                        
+                            <div class="custom-control custom-switch align-self-center float-right">
+                                <input type="checkbox" class="custom-control-input" id="trash_filter" value="true">
+                                <label class="custom-control-label" for="trash_filter"><small>Only Ships With FC</small></label>
+                            </div>
+                            
+                        </div>
+                        
 					</div>
 					<div class="card-body">
                         <ul class="list-group" id="ship_breakdown">

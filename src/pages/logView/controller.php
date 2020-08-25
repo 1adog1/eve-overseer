@@ -63,21 +63,6 @@ function checkFilter($logDetails) {
 
 			}
 		}
-
-		if (isset($_POST["search"]) and $_POST["search"] == "true") {
-			if ($logDetails["type"] == "User Search"){
-
-				if (($dateFilter === true and $logDetails["timestamp"] <= $endDate and $logDetails["timestamp"] >= $startDate) or $dateFilter === false) {
-					
-					if ((isset($_POST["CharacterName"]) and htmlspecialchars($_POST["CharacterName"]) != "" and strpos($logDetails["actor"], htmlspecialchars($_POST["CharacterName"])) !== false) or (!isset($_POST["CharacterName"]) or htmlspecialchars($_POST["CharacterName"]) == "")) {
-						
-						$toShow = true;
-						
-					}
-				}
-
-			}
-		}
 		
 		if (isset($_POST["s_database"]) and $_POST["s_database"] == "true") {
 			if ($logDetails["type"] == "Automated Database Edit" or $logDetails["type"] == "Automated Database Creation" or $logDetails["type"] == "Outside Database Posted"){
@@ -96,6 +81,51 @@ function checkFilter($logDetails) {
 
 		if (isset($_POST["u_database"]) and $_POST["u_database"] == "true") {
 			if ($logDetails["type"] == "User Database Edit"){
+
+				if (($dateFilter === true and $logDetails["timestamp"] <= $endDate and $logDetails["timestamp"] >= $startDate) or $dateFilter === false) {
+					
+					if ((isset($_POST["CharacterName"]) and htmlspecialchars($_POST["CharacterName"]) != "" and strpos($logDetails["actor"], htmlspecialchars($_POST["CharacterName"])) !== false) or (!isset($_POST["CharacterName"]) or htmlspecialchars($_POST["CharacterName"]) == "")) {
+						
+						$toShow = true;
+						
+					}
+				}
+
+			}
+		}
+        
+		if (isset($_POST["checker_errors"]) and $_POST["checker_errors"] == "true") {
+			if ($logDetails["type"] == "Checker Error"){
+
+				if (($dateFilter === true and $logDetails["timestamp"] <= $endDate and $logDetails["timestamp"] >= $startDate) or $dateFilter === false) {
+					
+					if ((isset($_POST["CharacterName"]) and htmlspecialchars($_POST["CharacterName"]) != "" and strpos($logDetails["actor"], htmlspecialchars($_POST["CharacterName"])) !== false) or (!isset($_POST["CharacterName"]) or htmlspecialchars($_POST["CharacterName"]) == "")) {
+						
+						$toShow = true;
+						
+					}
+				}
+
+			}
+		}
+        
+		if (isset($_POST["cronjob"]) and $_POST["cronjob"] == "true") {
+			if ($logDetails["type"] == "Cronjob Error" or $logDetails["type"] == "Analysis Complete"){
+
+				if (($dateFilter === true and $logDetails["timestamp"] <= $endDate and $logDetails["timestamp"] >= $startDate) or $dateFilter === false) {
+					
+					if ((isset($_POST["CharacterName"]) and htmlspecialchars($_POST["CharacterName"]) != "" and strpos($logDetails["actor"], htmlspecialchars($_POST["CharacterName"])) !== false) or (!isset($_POST["CharacterName"]) or htmlspecialchars($_POST["CharacterName"]) == "")) {
+						
+						$toShow = true;
+						
+					}
+				}
+
+			}
+		}
+        
+		if (isset($_POST["tracking"]) and $_POST["tracking"] == "true") {
+			if ($logDetails["type"] == "Tracking Started" or $logDetails["type"] == "Tracking Concluded" or $logDetails["type"] == "Fleet Stopped"){
 
 				if (($dateFilter === true and $logDetails["timestamp"] <= $endDate and $logDetails["timestamp"] >= $startDate) or $dateFilter === false) {
 					
