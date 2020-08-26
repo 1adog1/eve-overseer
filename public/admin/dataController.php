@@ -43,6 +43,8 @@
                 
                 foreach ($appData["groups"] as $throwaway => $eachGroup) {
                     
+                    $knownGroups[] = (int)$eachGroup["id"];
+                    
                     $toCheck = $GLOBALS['MainDatabase']->prepare("SELECT * FROM roles WHERE roleid = :roleid");
                     $toCheck->bindParam(":roleid", $eachGroup["id"], PDO::PARAM_INT);
                     
@@ -54,8 +56,6 @@
                         while ($checkedData = $toCheck->fetch(PDO::FETCH_ASSOC)) {
                             
                             $roleFound = True;
-                            
-                            $knownGroups[] = $eachGroup["id"];
                             
                             if ($eachGroup["name"] == $checkedData["rolename"]) {
                                 
@@ -102,7 +102,7 @@
                     
                     while ($pulledData = $toPull->fetch(PDO::FETCH_ASSOC)) {
                         
-                        if (in_array($pulledData["roleid"], $knownGroups)) {
+                        if (in_array((int)$pulledData["roleid"], $knownGroups)) {
                             
                             $checkData["Status"] = "Data Found";
                         
