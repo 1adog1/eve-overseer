@@ -54,6 +54,10 @@
         text-align: left;
     }
     
+    href {
+        color: inherit;
+    }
+    
 </style>
 
 <?php require $_SERVER['DOCUMENT_ROOT'] . "/../src/site/siteCore.php"; ?>
@@ -79,6 +83,20 @@
                 <div class="form-group">
                     <label for="CharacterName">Account Name</label>
                     <input type="text" name="CharacterName" class="form-control" id="CharacterName">
+                </div>
+                
+                <div class="form-group">
+                    <label for="AllianceName">Alliance</label>
+                    <select class="form-control" id="AllianceName">
+                    
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="CorporationName">Corporation</label>
+                    <select class="form-control" id="CorporationName">
+                    
+                    </select>
                 </div>
                 
                 <div class="form-group">
@@ -113,7 +131,8 @@
 				<br>
 				<h2 class="ColumnHeader">Player Data</h2>
 				<hr>
-                <div class="small text-right text-muted font-weight-bold font-italic" id="counting_container">0 Account(s) Loaded</div>
+                <div class="small text-right text-white font-weight-bold font-italic" id="counting_container">0 Account(s) Loaded</div>
+                <div class="small text-right text-warning font-weight-bold font-italic" id="failing_container">0 Account(s) Failing Minimums</div>
                 <div class="list-group text-left">
                     <div class="list-group-item list-group-item-dark bg-dark border-secondary text-white p-1 mt-1 small">
                         <div class="row ml-2">

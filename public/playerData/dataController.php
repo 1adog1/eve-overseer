@@ -23,37 +23,90 @@
     
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
         
-        if (isset($_POST["Action"]) and $_POST["Action"] == "List") {
+        if (isset($_POST["Action"]) and $_POST["Action"] == "getGroups") {
+            
+            $checkData["Alliances"] = [];
+            $checkData["Corporations"] = [];
+            
+            $pullAlliances = $GLOBALS['MainDatabase']->query("SELECT allianceid, alliancename FROM alliances");
+            
+            while ($pulledAllianceData = $pullAlliances->fetch(PDO::FETCH_ASSOC)) {
+                
+                if ($pulledAllianceData["allianceid"] !== "0") {
+                    $checkData["Alliances"][] = ["Name" => $pulledAllianceData["alliancename"], "ID" => $pulledAllianceData["allianceid"]];
+                }
+                
+            }
+            
+            $pullCorporations = $GLOBALS['MainDatabase']->query("SELECT corporationid, corporationname FROM corporations");
+            
+            while ($pulledCorporationData = $pullCorporations->fetch(PDO::FETCH_ASSOC)) {
+                
+                $checkData["Corporations"][] = ["Name" => $pulledCorporationData["corporationname"], "ID" => $pulledCorporationData["corporationid"]];
+                
+            }
+            
+            usort($checkData["Alliances"], function($a, $b) {
+                return strcasecmp($a["Name"], $b["Name"]);
+            });
+            
+            usort($checkData["Corporations"], function($a, $b) {
+                return strcasecmp($a["Name"], $b["Name"]);
+            });
+            
+            $checkData["Status"] = "Success";
+            
+        }
+        elseif (isset($_POST["Action"]) and $_POST["Action"] == "List") {
             
             $checkData["Player List"] = [];
+            $checkData["Fail Counter"] = 0;
             
-            $toPull = $GLOBALS['MainDatabase']->query("SELECT playerid, playername, hascore, shortstats, isfc FROM players ORDER BY playername ASC");
-            
-            $checkData["Status"] = "No Data";
-            
-            while ($pulledData = $toPull->fetch(PDO::FETCH_ASSOC)) {
+            if ((htmlspecialchars($_POST["Times"])) === "true") {
                 
-                $checkData["Status"] = "Data Found";
+                $toPull = $GLOBALS['MainDatabase']->query("SELECT playerid, playername, hascore, recentattendedtime, totalattendedtime, recentcommandedtime, totalcommandedtime, shortstats, isfc FROM players ORDER BY playername ASC");
                 
-                $shortStats = json_decode($pulledData["shortstats"], true);
+                $checkData["Status"] = "No Data";
                 
-                if ((htmlspecialchars($_POST["Times"])) === "true") {
-                                        
-                    $checkData["Player List"][] = ["ID" => $pulledData["playerid"], "Name" => htmlspecialchars($pulledData["playername"]), "Recent Attended" => $shortStats["30 Days Time"], "Recent Commanded" => $shortStats["Recent Command Stats"]["Time Led"], "Total Attended" => $shortStats["Total Time"], "Total Commanded" => $shortStats["Command Stats"]["Time Led"], "Last Attended Time" => $shortStats["Last Attended Fleet"], "Last Attended" => date("F jS, Y", $shortStats["Last Attended Fleet"]), "Command Stats" => $shortStats["Command Stats"], "Recent Command Stats" => $shortStats["Recent Command Stats"], "Has Core" => boolval($pulledData["hascore"]), "Is FC" => boolval($pulledData["isfc"])];
+                while ($pulledData = $toPull->fetch(PDO::FETCH_ASSOC)) {
                     
+                    $checkData["Status"] = "Data Found";
+                    
+                    $shortStats = json_decode($pulledData["shortstats"], true);
+                                                                
+                    $checkData["Player List"][] = ["ID" => $pulledData["playerid"], "Name" => htmlspecialchars($pulledData["playername"]), "Recent Attended" => $pulledData["recentattendedtime"], "Recent Commanded" => $pulledData["recentcommandedtime"], "Total Attended" => $pulledData["totalattendedtime"], "Total Commanded" => $pulledData["totalcommandedtime"], "Last Attended Time" => $shortStats["Last Attended Fleet"], "Last Attended" => date("F jS, Y", $shortStats["Last Attended Fleet"]), "Command Stats" => $shortStats["Command Stats"], "Recent Command Stats" => $shortStats["Recent Command Stats"], "Has Core" => boolval($pulledData["hascore"]), "Is FC" => boolval($pulledData["isfc"])];
+                    
+                    $rowCounter ++;
+                    
+                    if ($rowCounter >= $maxTableRows) {
+                        break;
+                    }
+                                    
                 }
-                else {
                 
-                    $checkData["Player List"][] = ["ID" => $pulledData["playerid"], "Name" => htmlspecialchars($pulledData["playername"]), "Recent Attended" => $shortStats["30 Days Attended"], "Recent Commanded" => $shortStats["30 Days Led"], "Total Attended" => $shortStats["Total Attended"],"Total Commanded" => $shortStats["Total Led"], "Last Attended Time" => $shortStats["Last Attended Fleet"], "Last Attended" => date("F jS, Y", $shortStats["Last Attended Fleet"]), "Command Stats" => $shortStats["Command Stats"], "Recent Command Stats" => $shortStats["Recent Command Stats"], "Has Core" => boolval($pulledData["hascore"]), "Is FC" => boolval($pulledData["isfc"])];
+            }
+            else {
                 
+                $toPull = $GLOBALS['MainDatabase']->query("SELECT playerid, playername, hascore, recentattendedfleets, totalattendedfleets, shortstats, recentcommandedfleets, totalcommandedfleets, isfc FROM players ORDER BY playername ASC");
+                
+                $checkData["Status"] = "No Data";
+                
+                while ($pulledData = $toPull->fetch(PDO::FETCH_ASSOC)) {
+                    
+                    $checkData["Status"] = "Data Found";
+                    
+                    $shortStats = json_decode($pulledData["shortstats"], true);
+                    
+                    $checkData["Player List"][] = ["ID" => $pulledData["playerid"], "Name" => htmlspecialchars($pulledData["playername"]), "Recent Attended" => $pulledData["recentattendedfleets"], "Recent Commanded" => $pulledData["recentcommandedfleets"], "Total Attended" => $pulledData["totalattendedfleets"],"Total Commanded" => $pulledData["totalcommandedfleets"], "Last Attended Time" => $shortStats["Last Attended Fleet"], "Last Attended" => date("F jS, Y", $shortStats["Last Attended Fleet"]), "Command Stats" => $shortStats["Command Stats"], "Recent Command Stats" => $shortStats["Recent Command Stats"], "Has Core" => boolval($pulledData["hascore"]), "Is FC" => boolval($pulledData["isfc"])];
+                                        
+                    $rowCounter ++;
+                    
+                    if ($rowCounter >= $maxTableRows) {
+                        break;
+                    }
+                                    
                 }
                 
-                $rowCounter ++;
-                
-                if ($rowCounter >= $maxTableRows) {
-                    break;
-                }
-                                
             }
             
             $checkData["Counter"] = $rowCounter;
@@ -110,33 +163,69 @@
         elseif (isset($_POST["Action"]) and $_POST["Action"] == "Filter") {
                         
             $checkData["Player List"] = [];
-                        
-            $toPull = $GLOBALS['MainDatabase']->query("SELECT playerid, playername, hascore, shortstats, isfc FROM players ORDER BY playername ASC");
+            $checkData["Fail Counter"] = 0;
             
-            $checkData["Status"] = "No Data";
-            while ($pulledData = $toPull->fetch(PDO::FETCH_ASSOC)) {
+            if ((htmlspecialchars($_POST["Times"])) === "true") {
                 
-                $shortStats = json_decode($pulledData["shortstats"], true);
+                $toPull = $GLOBALS['MainDatabase']->query("SELECT playerid, playername, hascore, playercorps, playeralliances, recentattendedfleets, recentattendedtime, totalattendedtime, recentcommandedfleets, recentcommandedtime, totalcommandedtime, shortstats, isfc FROM players ORDER BY playername ASC");
                 
-                if (((htmlspecialchars($_POST["Name"]) === "false" or strpos(htmlspecialchars($pulledData["playername"]), htmlspecialchars($_POST["Name"])) !== false) and $shortStats["30 Days Led"] >= htmlspecialchars($_POST["Commanded"]) and $shortStats["30 Days Attended"] >= htmlspecialchars($_POST["Attended"]) and ((htmlspecialchars($_POST["Core"]) === "true" and boolval($pulledData["hascore"])) or htmlspecialchars($_POST["Core"]) === "false") and ((htmlspecialchars($_POST["FC"]) === "true" and boolval($pulledData["isfc"])) or htmlspecialchars($_POST["FC"]) === "false")) or htmlspecialchars($_POST["All"]) === "true") {
+                $checkData["Status"] = "No Data";
+                while ($pulledData = $toPull->fetch(PDO::FETCH_ASSOC)) {
                     
-                    $checkData["Status"] = "Data Found";
-            
-                    if ((htmlspecialchars($_POST["Times"])) === "true") {
+                    $shortStats = json_decode($pulledData["shortstats"], true);
+                    $playerCorporations = json_decode($pulledData["playercorps"]);
+                    $playerAlliances = json_decode($pulledData["playeralliances"]);
+                    
+                    if (((htmlspecialchars($_POST["Name"]) === "false" or strpos(htmlspecialchars($pulledData["playername"]), htmlspecialchars($_POST["Name"])) !== false) and (htmlspecialchars($_POST["Alliance"]) === "false" or in_array(htmlspecialchars($_POST["Alliance"]), $playerAlliances)) and (htmlspecialchars($_POST["Corporation"]) === "false" or in_array(htmlspecialchars($_POST["Corporation"]), $playerCorporations)) and ((htmlspecialchars($_POST["Core"]) === "true" and boolval($pulledData["hascore"])) or htmlspecialchars($_POST["Core"]) === "false") and ((htmlspecialchars($_POST["FC"]) === "true" and boolval($pulledData["isfc"])) or htmlspecialchars($_POST["FC"]) === "false")) or htmlspecialchars($_POST["All"]) === "true") {
                         
-                        $checkData["Player List"][] = ["ID" => $pulledData["playerid"], "Name" => htmlspecialchars($pulledData["playername"]), "Recent Attended" => $shortStats["30 Days Time"], "Recent Commanded" => $shortStats["Recent Command Stats"]["Time Led"], "Total Attended" => $shortStats["Total Time"], "Total Commanded" => $shortStats["Command Stats"]["Time Led"], "Last Attended Time" => $shortStats["Last Attended Fleet"], "Last Attended" => date("F jS, Y", $shortStats["Last Attended Fleet"]), "Command Stats" => $shortStats["Command Stats"], "Recent Command Stats" => $shortStats["Recent Command Stats"], "Has Core" => boolval($pulledData["hascore"]), "Is FC" => boolval($pulledData["isfc"])];
+                        $checkData["Status"] = "Data Found";
+
+                        $failsStandard = false;
                         
-                    }
-                    else {
-                    
-                        $checkData["Player List"][] = ["ID" => $pulledData["playerid"], "Name" => htmlspecialchars($pulledData["playername"]), "Recent Attended" => $shortStats["30 Days Attended"], "Recent Commanded" => $shortStats["30 Days Led"], "Total Attended" => $shortStats["Total Attended"],"Total Commanded" => $shortStats["Total Led"], "Last Attended Time" => $shortStats["Last Attended Fleet"], "Last Attended" => date("F jS, Y", $shortStats["Last Attended Fleet"]), "Command Stats" => $shortStats["Command Stats"], "Recent Command Stats" => $shortStats["Recent Command Stats"], "Has Core" => boolval($pulledData["hascore"]), "Is FC" => boolval($pulledData["isfc"])];
-                    
+                        if ($pulledData["recentcommandedfleets"] < htmlspecialchars($_POST["Commanded"]) or $pulledData["recentattendedfleets"] < htmlspecialchars($_POST["Attended"])) {
+                            
+                            $failsStandard = true;
+                            
+                        }
+
+                        $checkData["Player List"][] = ["ID" => $pulledData["playerid"], "Name" => htmlspecialchars($pulledData["playername"]), "Recent Attended" => $pulledData["recentattendedtime"], "Recent Commanded" => $pulledData["recentcommandedtime"], "Total Attended" => $pulledData["totalattendedtime"], "Total Commanded" => $pulledData["totalcommandedtime"], "Last Attended Time" => $shortStats["Last Attended Fleet"], "Last Attended" => date("F jS, Y", $shortStats["Last Attended Fleet"]), "Command Stats" => $shortStats["Command Stats"], "Recent Command Stats" => $shortStats["Recent Command Stats"], "Has Core" => boolval($pulledData["hascore"]), "Is FC" => boolval($pulledData["isfc"]), "Fails Standard" => $failsStandard];
+                                        
                     }
                                     
                 }
-                                
+                
             }
-            
+            else {
+                
+                $toPull = $GLOBALS['MainDatabase']->query("SELECT playerid, playername, hascore, playercorps, playeralliances, recentattendedfleets, totalattendedfleets, shortstats, recentcommandedfleets, totalcommandedfleets, isfc FROM players ORDER BY playername ASC");
+                
+                $checkData["Status"] = "No Data";
+                while ($pulledData = $toPull->fetch(PDO::FETCH_ASSOC)) {
+                    
+                    $shortStats = json_decode($pulledData["shortstats"], true);
+                    $playerCorporations = json_decode($pulledData["playercorps"]);
+                    $playerAlliances = json_decode($pulledData["playeralliances"]);
+                    
+                    if (((htmlspecialchars($_POST["Name"]) === "false" or strpos(htmlspecialchars($pulledData["playername"]), htmlspecialchars($_POST["Name"])) !== false) and (htmlspecialchars($_POST["Alliance"]) === "false" or in_array(htmlspecialchars($_POST["Alliance"]), $playerAlliances)) and (htmlspecialchars($_POST["Corporation"]) === "false" or in_array(htmlspecialchars($_POST["Corporation"]), $playerCorporations)) and ((htmlspecialchars($_POST["Core"]) === "true" and boolval($pulledData["hascore"])) or htmlspecialchars($_POST["Core"]) === "false") and ((htmlspecialchars($_POST["FC"]) === "true" and boolval($pulledData["isfc"])) or htmlspecialchars($_POST["FC"]) === "false")) or htmlspecialchars($_POST["All"]) === "true") {
+                        
+                        $checkData["Status"] = "Data Found";
+                        
+                        $failsStandard = false;
+                        
+                        if ($pulledData["recentcommandedfleets"] < htmlspecialchars($_POST["Commanded"]) or $pulledData["recentattendedfleets"] < htmlspecialchars($_POST["Attended"])) {
+                            
+                            $failsStandard = true;
+                            
+                        }
+                        
+                        $checkData["Player List"][] = ["ID" => $pulledData["playerid"], "Name" => htmlspecialchars($pulledData["playername"]), "Recent Attended" => $pulledData["recentattendedfleets"], "Recent Commanded" => $pulledData["recentcommandedfleets"], "Total Attended" => $pulledData["totalattendedfleets"],"Total Commanded" => $pulledData["totalcommandedfleets"], "Last Attended Time" => $shortStats["Last Attended Fleet"], "Last Attended" => date("F jS, Y", $shortStats["Last Attended Fleet"]), "Command Stats" => $shortStats["Command Stats"], "Recent Command Stats" => $shortStats["Recent Command Stats"], "Has Core" => boolval($pulledData["hascore"]), "Is FC" => boolval($pulledData["isfc"]), "Fails Standard" => $failsStandard];
+
+                    }
+                                    
+                }
+                
+            }
+                        
             if ($_POST["Sort_By"] == "Name") {
                 if ($_POST["Sort_Order"] == "Ascending") {
                     
@@ -242,6 +331,9 @@
             $checkData["Player List"] = array_slice($checkData["Player List"], 0, $maxTableRows);
             
             $checkData["Counter"] = count($checkData["Player List"]);
+            $checkData["Fail Counter"] = count(array_filter($checkData["Player List"], function($a) {
+                return $a["Fails Standard"] == true;
+            }));
             
         }
         else {

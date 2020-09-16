@@ -1,6 +1,6 @@
 jQuery(document).ready(function () {
     populateData();
-    setInterval(populateData, 5000);
+    setInterval(populateData, 10000);
 });
 
 function startMonitoring() {

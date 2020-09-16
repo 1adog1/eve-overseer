@@ -37,7 +37,7 @@ if (checkTableExists($GLOBALS['MainDatabase'], "fleets") === false) {
 }
 
 if (checkTableExists($GLOBALS['MainDatabase'], "players") === false) {
-	$GLOBALS['MainDatabase']->exec("CREATE TABLE players (playerid TEXT, playername TEXT, hascore INT, playeralts LONGTEXT, attendedfleets LONGTEXT, shortstats LONGTEXT, commandedfleets LONGTEXT, isfc INT)");
+	$GLOBALS['MainDatabase']->exec("CREATE TABLE players (playerid TEXT, playername TEXT, hascore INT, playercorps LONGTEXT, playeralliances LONGTEXT, playeralts LONGTEXT, recentattendedfleets LONGTEXT, recentattendedtime BIGINT, totalattendedfleets BIGINT, totalattendedtime BIGINT, attendedfleets LONGTEXT, shortstats LONGTEXT, recentcommandedfleets BIGINT, recentcommandedtime BIGINT, totalcommandedfleets BIGINT, totalcommandedtime BIGINT, commandedfleets LONGTEXT, isfc INT)");
 }
 
 if (checkTableExists($GLOBALS['MainDatabase'], "alliances") === false) {

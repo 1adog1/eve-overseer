@@ -2,6 +2,7 @@ jQuery(document).ready(function () {
     
     if (pageName == "Player Data") {
         
+        setupGroups();
         listData();
         
     }
@@ -58,7 +59,29 @@ jQuery(document).ready(function () {
             
         }
         
-        var filterOptions = {"Action": "Filter", "Name": nameToCheck, "Attended": attended , "Commanded": commanded, "Core": $("#core").is(':checked'), "FC": $("#fc").is(':checked'), "All": $("#all").is(':checked'), "Times": $("#use_times").is(':checked'), "Sort By": sortBy, "Sort Order": sortOrder};
+        if ($("#AllianceName").val() === "") {
+            
+            var allianceToCheck = false;
+            
+        }
+        else {
+            
+            var allianceToCheck = $("#AllianceName").val();
+            
+        }
+        
+        if ($("#CorporationName").val() === "") {
+            
+            var corpToCheck = false;
+            
+        }
+        else {
+            
+            var corpToCheck = $("#CorporationName").val();
+            
+        }
+        
+        var filterOptions = {"Action": "Filter", "Name": nameToCheck, "Alliance": allianceToCheck, "Corporation": corpToCheck, "Attended": attended , "Commanded": commanded, "Core": $("#core").is(':checked'), "FC": $("#fc").is(':checked'), "All": $("#all").is(':checked'), "Times": $("#use_times").is(':checked'), "Sort By": sortBy, "Sort Order": sortOrder};
                 
         filterData(filterOptions, sortBy, sortOrder);
             
@@ -361,6 +384,53 @@ function graphAffiliations(incomingData, targetID) {
         
 }
 
+function setupGroups() {
+    
+    $("#AllianceName").empty();
+    $("#CorporationName").empty();
+    
+    $("#AllianceName").append(
+        $("<option/>")
+            .attr("value", "")
+    );
+    $("#CorporationName").append(
+        $("<option/>")
+            .attr("value", "")
+    );
+
+    $.ajax({
+        url: "dataController.php",
+        type: "POST",
+        data: {"Action": "getGroups"},
+        mimeType: "application/json",
+        dataType: 'json',
+        success: function(result){
+            
+            for (eachAlliance of result["Alliances"]) {
+                
+                $("#AllianceName").append(
+                    $("<option/>")
+                        .attr("value", eachAlliance["ID"])
+                        .text(eachAlliance["Name"])
+                );
+                
+            }
+            
+            for (eachCorporation of result["Corporations"]) {
+                
+                $("#CorporationName").append(
+                    $("<option/>")
+                        .attr("value", eachCorporation["ID"])
+                        .text(eachCorporation["Name"])
+                );
+                
+            }
+            
+        }
+    });
+    
+}
+
 function listData() {
     
     var usingTimes = $("#use_times").is(':checked');
@@ -413,7 +483,7 @@ function listData() {
                                                 .addClass("col-1 p-0 align-self-center")
                                                 .append(
                                                     $("<a/>")
-                                                        .addClass("text-white text-left")
+                                                        .addClass("text-reset text-left")
                                                         .attr("data-toggle", "tooltip")
                                                         .attr("title", "<b>Fleet Command:</b> " + eachMember["Recent Command Stats"]["Fleet Command"] + "<br><b>Wing Command:</b> " + eachMember["Recent Command Stats"]["Wing Command"] + "<br><b>Squad Command:</b> " + eachMember["Recent Command Stats"]["Squad Command"])
                                                         .attr("href", "#")
@@ -426,7 +496,7 @@ function listData() {
                                                 .addClass("col-1 p-0 align-self-center")
                                                 .append(
                                                     $("<a/>")
-                                                        .addClass("text-white text-left")
+                                                        .addClass("text-reset text-left")
                                                         .attr("data-toggle", "tooltip")
                                                         .attr("title", "<b>Fleet Command:</b> " + eachMember["Command Stats"]["Fleet Command"] + "<br><b>Wing Command:</b> " + eachMember["Command Stats"]["Wing Command"] + "<br><b>Squad Command:</b> " + eachMember["Command Stats"]["Squad Command"])
                                                         .attr("href", "#")
@@ -497,7 +567,7 @@ function listData() {
                                                 .addClass("col-1 p-0 align-self-center")
                                                 .append(
                                                     $("<a/>")
-                                                        .addClass("text-white text-left")
+                                                        .addClass("text-reset text-left")
                                                         .attr("data-toggle", "tooltip")
                                                         .attr("title", "<b>Fleet Command:</b> " + eachMember["Recent Command Stats"]["Fleet Command"] + "<br><b>Wing Command:</b> " + eachMember["Recent Command Stats"]["Wing Command"] + "<br><b>Squad Command:</b> " + eachMember["Recent Command Stats"]["Squad Command"])
                                                         .attr("href", "#")
@@ -510,7 +580,7 @@ function listData() {
                                                 .addClass("col-1 p-0 align-self-center")
                                                 .append(
                                                     $("<a/>")
-                                                        .addClass("text-white text-left")
+                                                        .addClass("text-reset text-left")
                                                         .attr("data-toggle", "tooltip")
                                                         .attr("title", "<b>Fleet Command:</b> " + eachMember["Command Stats"]["Fleet Command"] + "<br><b>Wing Command:</b> " + eachMember["Command Stats"]["Wing Command"] + "<br><b>Squad Command:</b> " + eachMember["Command Stats"]["Squad Command"])
                                                         .attr("href", "#")
@@ -587,10 +657,18 @@ function listData() {
                             )
                     );
                     
+                    if (eachMember["Fails Standard"]) {
+                        
+                        $("#head-" + eachMember["ID"]).removeClass("text-white");
+                        $("#head-" + eachMember["ID"]).addClass("text-warning");
+                        
+                    }
+                    
                 }
                 
                 $("[data-toggle='tooltip']").tooltip({html: true, boundary: "window", trigger: "hover", placement: "right"});
                 $("#counting_container").text(result["Counter"] + " Account(s) Loaded");
+                $("#failing_container").text(result["Fail Counter"] + " Account(s) Failing Minimums");
                 
             }
         }
@@ -647,7 +725,7 @@ function filterData(filterOptions, sortBy, sortOrder) {
                                                 .addClass("col-1 p-0 align-self-center")
                                                 .append(
                                                     $("<a/>")
-                                                        .addClass("text-white text-left")
+                                                        .addClass("text-reset text-left")
                                                         .attr("data-toggle", "tooltip")
                                                         .attr("title", "<b>Fleet Command:</b> " + eachMember["Recent Command Stats"]["Fleet Command"] + "<br><b>Wing Command:</b> " + eachMember["Recent Command Stats"]["Wing Command"] + "<br><b>Squad Command:</b> " + eachMember["Recent Command Stats"]["Squad Command"])
                                                         .attr("href", "#")
@@ -660,7 +738,7 @@ function filterData(filterOptions, sortBy, sortOrder) {
                                                 .addClass("col-1 p-0 align-self-center")
                                                 .append(
                                                     $("<a/>")
-                                                        .addClass("text-white text-left")
+                                                        .addClass("text-reset text-left")
                                                         .attr("data-toggle", "tooltip")
                                                         .attr("title", "<b>Fleet Command:</b> " + eachMember["Command Stats"]["Fleet Command"] + "<br><b>Wing Command:</b> " + eachMember["Command Stats"]["Wing Command"] + "<br><b>Squad Command:</b> " + eachMember["Command Stats"]["Squad Command"])
                                                         .attr("href", "#")
@@ -731,7 +809,7 @@ function filterData(filterOptions, sortBy, sortOrder) {
                                                 .addClass("col-1 p-0 align-self-center")
                                                 .append(
                                                     $("<a/>")
-                                                        .addClass("text-white text-left")
+                                                        .addClass("text-reset text-left")
                                                         .attr("data-toggle", "tooltip")
                                                         .attr("title", "<b>Fleet Command:</b> " + eachMember["Recent Command Stats"]["Fleet Command"] + "<br><b>Wing Command:</b> " + eachMember["Recent Command Stats"]["Wing Command"] + "<br><b>Squad Command:</b> " + eachMember["Recent Command Stats"]["Squad Command"])
                                                         .attr("href", "#")
@@ -744,7 +822,7 @@ function filterData(filterOptions, sortBy, sortOrder) {
                                                 .addClass("col-1 p-0 align-self-center")
                                                 .append(
                                                     $("<a/>")
-                                                        .addClass("text-white text-left")
+                                                        .addClass("text-reset text-left")
                                                         .attr("data-toggle", "tooltip")
                                                         .attr("title", "<b>Fleet Command:</b> " + eachMember["Command Stats"]["Fleet Command"] + "<br><b>Wing Command:</b> " + eachMember["Command Stats"]["Wing Command"] + "<br><b>Squad Command:</b> " + eachMember["Command Stats"]["Squad Command"])
                                                         .attr("href", "#")
@@ -821,14 +899,23 @@ function filterData(filterOptions, sortBy, sortOrder) {
                             )
                     );
                     
+                    if (eachMember["Fails Standard"]) {
+                        
+                        $("#head-" + eachMember["ID"]).removeClass("text-white");
+                        $("#head-" + eachMember["ID"]).addClass("text-warning");
+                        
+                    }
+                    
                 }
                 
                 $("[data-toggle='tooltip']").tooltip({html: true, boundary: "window", trigger: "hover", placement: "right"});
                 $("#counting_container").text(result["Counter"] + " Account(s) Loaded");
-                
+                $("#failing_container").text(result["Fail Counter"] + " Account(s) Failing Minimums");
+
             }
             if (result["Status"] == "No Data") {
                 $("#counting_container").text(result["Counter"] + " Account(s) Loaded");
+                $("#failing_container").text(result["Fail Counter"] + " Account(s) Failing Minimums");
             }
         }
     });    
