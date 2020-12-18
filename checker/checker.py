@@ -95,7 +95,7 @@ def runChecks():
         aggregateQuery = ("SELECT tracking.* FROM tracking WHERE status=%s AND fleetid NOT IN(SELECT fleetid FROM fleets)")
         aggregateCursor.execute(aggregateQuery, ("Stopped",))
         
-        for (fleetID, fleetName, SRPLevel, commanderID, commanderName, startTime, fleetStatus) in aggregateCursor:
+        for (fleetID, fleetName, SRPLevel, commanderID, commanderName, startTime, fleetStatus, sharing, shareKey, sharingWith) in aggregateCursor:
             aggregateDataCursor = sq1Database.cursor(buffered=True)
         
             aggregateDataQuery = ("SELECT * FROM snapshots WHERE fleetid=%s ORDER BY timestamp ASC")
@@ -365,7 +365,7 @@ def runChecks():
         
         trackingActive = False
         
-        for (fleetID, fleetName, SRPLevel, commanderID, commanderName, startTime, fleetStatus) in pullCursor:
+        for (fleetID, fleetName, SRPLevel, commanderID, commanderName, startTime, fleetStatus, sharing, shareKey, sharingWith) in pullCursor:
         
             print("Starting checks of " + commanderName + "'s fleet...")
             

@@ -53,14 +53,24 @@
 	<meta property="og:url" content="<?php echo $siteURL; ?>">
 
 </head>
+<style>
+
+    .close-tab {
+        filter: invert(49%) sepia(7%) saturate(563%) hue-rotate(167deg) brightness(91%) contrast(88%);
+    }
+    
+    .close-tab:hover {
+        filter: invert(44%) sepia(80%) saturate(4919%) hue-rotate(333deg) brightness(87%) contrast(98%);
+    }
+
+</style>
 
 <?php require $_SERVER['DOCUMENT_ROOT'] . "/../src/site/siteCore.php"; ?>
 
 <body class="background">
 	<div class="container-fluid">
     
-        <h1 class="text-center mt-3">Fleet Hosting</h1>
-        <hr>
+        <br>
         
         <noscript>
             <div class="alert alert-danger text-center">
@@ -74,119 +84,145 @@
         <div id="errorContainer">
         
         </div>
-        <div class="row">
-        
-            <div id="name_selection" class="form-group col-xl-4">
-            
-                <label for="fleet_name">Fleet Name</label>
-                <input type="text" class="form-control" id="fleet_name">
-            
-            </div>
-            <div id="srp_selection" class="form-group col-xl-3">
+        <ul class="nav nav-tabs" id="fleetTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <a class="nav-link active" id="main-tab" data-toggle="tab" href="#main-pane" role="tab" aria-controls="main-pane" aria-selected="true">Your Fleet</a>
+            </li>
+            <li class="nav-item" id="new-share-button">
+                <a class="nav-link new-shared" href="#" role="tab">+</a>
+            </li>
+        </ul>
+        <div class="tab-content mt-4" id="fleet-contents">
+            <div class="tab-pane fade show active" id="main-pane" role="tabpanel" aria-labelledby="main-tab">
+                <div class="row">
+                
+                    <div id="name_selection" class="form-group col-xl-4">
+                    
+                        <label for="fleet_name">Fleet Name</label>
+                        <input type="text" class="form-control" id="fleet_name">
+                        
+                    </div>
+                    <div id="srp_selection" class="form-group col-xl-3">
 
-                <label for="fleet_srp">SRP Level</label>
-                <select class="form-control" id="fleet_srp">
-                
-                    <option value="Fun">Fun Fleet</option>
-                    <option value="Stratop">Stratop</option>
-                    <option value="CTA">CTA</option>
-                    <option value="Save">Save Fleet</option>
-                    <option value="ADM">ADM Fleet</option>
-                
-                </select>
-                
-            </div>
-            <div id="voltron_selection" class="form-group col-xl-1 d-flex">
-            
-                <div class="custom-control custom-checkbox align-self-center mt-4">
-                    <input type="checkbox" class="custom-control-input" id="Voltron" value="true">
-                    <label class="custom-control-label" for="Voltron">Coalition Fleet</label>
-                </div>
-                
-            </div>
-            <div class="form-group col-xl-4 mt-2">
-            
-                <label for="toggle_button_container"></label>
-                <div id="toggle_button_container">
-                
-                </div>
-                
-            </div>
-        
-        </div>
-        <br>
-		<div class="row" id="overviewRow" hidden>
-			<div class="col-xl-4">			
-				<div class="card bg-dark">
-					<div class="card-header" id="fleet_boss">
-                        Fleet Boss: 
-					</div>
-				</div>
-			</div>
-			<div class="col-xl-4">			
-				<div class="card bg-dark">
-					<div class="card-header" id="member_count">
-                        Fleet Members: 
-					</div>
-				</div>
-			</div>
-			<div class="col-xl-4">			
-				<div class="card bg-dark">
-					<div class="card-header" id="fleet_started">
-                        Fleet Started: 
-					</div>
-				</div>
-			</div>
-		</div>
-		<div class="row" id="detailRow" hidden>
-			<div class="col-xl-3">
-				<div class="card bg-dark mt-4">
-					<div class="card-header row">
-                        <div class="col-xl-6">
-                        Ship Breakdown
-                        </div>
-                        <div class="form-group col-xl-6">
+                        <label for="fleet_srp">SRP Level</label>
+                        <select class="form-control" id="fleet_srp">
                         
-                            <div class="custom-control custom-switch align-self-center float-right">
-                                <input type="checkbox" class="custom-control-input" id="trash_filter" value="true">
-                                <label class="custom-control-label" for="trash_filter"><small>Only Ships With FC</small></label>
+                            <option value="Fun">Fun Fleet</option>
+                            <option value="Stratop">Stratop</option>
+                            <option value="CTA">CTA</option>
+                            <option value="Save">Save Fleet</option>
+                            <option value="ADM">ADM Fleet</option>
+                        
+                        </select>
+                        
+                    </div>
+                    <div id="voltron_selection" class="form-group col-xl-1">
+                    
+                        <div class="custom-control custom-checkbox align-self-center mt-4">
+                            <input type="checkbox" class="custom-control-input" id="Voltron" value="true">
+                            <label class="custom-control-label" for="Voltron">Coalition Fleet</label>
+                        </div>
+                        <div class="custom-control custom-checkbox align-self-center">
+                            <input type="checkbox" class="custom-control-input" id="Sharing" value="true">
+                            <label class="custom-control-label" for="Sharing">Allow Sharing</label>
+                        </div>
+                        
+                    </div>
+                    <div class="form-group col-xl-2">
+                    
+                        <div id="shareKeyContainer" hidden>
+                        
+                            <label for="share_key">Share Key</label>
+                            <input type="text" class="form-control" id="share_key" readonly>
+                        
+                        </div>
+                        
+                    </div>
+                    <div class="form-group col-xl-2 mt-2">
+                    
+                        <label for="toggle_button_container"></label>
+                        <div id="toggle_button_container">
+                        
+                        </div>
+                        
+                    </div>
+                
+                </div>
+                <br>
+                <div class="row" id="overviewRow_main" hidden>
+                    <div class="col-xl-4">			
+                        <div class="card bg-dark">
+                            <div class="card-header" id="fleet_boss_main">
+                                Fleet Boss: 
                             </div>
-                            
                         </div>
-                        
-					</div>
-					<div class="card-body">
-                        <ul class="list-group" id="ship_breakdown">
-                        
-                        </ul>
-					</div>
-				</div>
-			</div>
-			<div class="col-xl-3">			
-				<div class="card bg-dark mt-4">
-					<div class="card-header">
-                        Affiliation Breakdown
-					</div>
-					<div class="card-body">
-                        <ul class="list-group" id="affiliation_breakdown">
-                        
-                        </ul>
-					</div>
-				</div>
-			</div>
-			<div class="col-xl-6">
-				<div class="card bg-dark mt-4">
-					<div class="card-header">
-                        Fleet Overview
-					</div>
-					<div class="card-body">
-                        <ul class="list-group" id="fleet_overview">
-                        
-                        </ul>
-					</div>
-				</div>
-			</div>
-		</div>
+                    </div>
+                    <div class="col-xl-4">			
+                        <div class="card bg-dark">
+                            <div class="card-header" id="member_count_main">
+                                Fleet Members: 
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-4">			
+                        <div class="card bg-dark">
+                            <div class="card-header" id="fleet_started_main">
+                                Fleet Started: 
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row" id="detailRow_main" hidden>
+                    <div class="col-xl-3">
+                        <div class="card bg-dark mt-4">
+                            <div class="card-header row">
+                                <div class="col-xl-6">
+                                Ship Breakdown
+                                </div>
+                                <div class="form-group col-xl-6">
+                                
+                                    <div class="custom-control custom-switch align-self-center float-right">
+                                        <input type="checkbox" class="custom-control-input" id="trash_filter_main" value="true">
+                                        <label class="custom-control-label" for="trash_filter_main"><small>Only Ships With FC</small></label>
+                                    </div>
+                                    
+                                </div>
+                                
+                            </div>
+                            <div class="card-body">
+                                <ul class="list-group" id="ship_breakdown_main">
+                                
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3">			
+                        <div class="card bg-dark mt-4">
+                            <div class="card-header">
+                                Affiliation Breakdown
+                            </div>
+                            <div class="card-body">
+                                <ul class="list-group" id="affiliation_breakdown_main">
+                                
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-6">
+                        <div class="card bg-dark mt-4">
+                            <div class="card-header">
+                                Fleet Overview
+                            </div>
+                            <div class="card-body">
+                                <ul class="list-group" id="fleet_overview_main">
+                                
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 	</div>
 </body>
 

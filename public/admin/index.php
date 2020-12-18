@@ -11,7 +11,7 @@
 
     $PageMinimumAccessLevel = ["Super Admin"];
 	checkLastPage();
-	$_SESSION["CurrentPage"] = "Site Administration";
+	$_SESSION["CurrentPage"] = "Admin";
 
 	checkCookies();
     
@@ -116,7 +116,7 @@
                     
                     </div>
                 </div>
-            </div>        
+            </div>
         </div>
         
 	</div>

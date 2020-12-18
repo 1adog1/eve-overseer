@@ -157,11 +157,33 @@ function listAffiliations(incomingData) {
     
     for (eachAlliance of allianceKeys) {
         
-        allianceData = incomingData[eachAlliance];
+        var allianceData = incomingData[eachAlliance];
+        
+        if (allianceData["Represented"] === 0) {
+            
+            var allianceKnownPapRatio = "N/A";
+            
+        }
+        else {
+            
+            var allianceKnownPapRatio = (allianceData["Short Stats"]["Recent PAP Count"] / allianceData["Represented"]).toFixed(2);
+            
+        }
+        
+        if (allianceData["Short Stats"]["Active Members"] === 0) {
+            
+            var allianceActivePapRatio = "N/A";
+            
+        }
+        else {
+            
+            var allianceActivePapRatio = (allianceData["Short Stats"]["Recent PAP Count"] / allianceData["Short Stats"]["Active Members"]).toFixed(2);
+            
+        }
         
         $("#affiliation-data").append(
             $("<a/>")
-                .addClass("list-group-item list-group-item-action list-group-item-dark bg-dark border-secondary text-white p-1 mt-1 an-alliance")
+                .addClass("list-group-item list-group-item-action list-group-item-dark bg-dark border-secondary text-white p-1 mt-2 an-alliance")
                 .attr("data-toggle", "collapse")
                 .attr("href", "#corps-" + eachAlliance)
                 .attr("id", "head-" + eachAlliance)
@@ -175,66 +197,96 @@ function listAffiliations(incomingData) {
                 })
                 .append(
                     $("<div/>")
-                        .addClass("row ml-2")
+                        .addClass("row ml-0 mr-0")
                         .append(
                             $("<div/>")
-                                .addClass("col-1 p-0 text-left align-self-center")
+                                .addClass("col-1 p-1 text-left align-self-center")
                                 .append(
                                     $("<img>")
-                                        .addClass("img-fluid")
+                                        .addClass("img-fluid ml-2")
                                         .attr("src", " https://images.evetech.net/alliances/" + eachAlliance + "/logo?size=32")
                                 )
                         )
                         .append(
                             $("<div/>")
-                                .addClass("col-3 p-0 align-self-center")
+                                .addClass("col-3 p-1 align-self-center")
                                 .text(allianceData["Name"])
                         )
                         .append(
                             $("<div/>")
-                                .addClass("col-3 p-0 align-self-center")
+                                .addClass("col-1 p-1 align-self-center")
                                 .text(allianceData["Short Stats"]["Active Members"])
                         )
                         .append(
                             $("<div/>")
-                                .addClass("col-3 p-0 align-self-center")
+                                .addClass("col-1 p-1 align-self-center")
                                 .text(allianceData["Represented"])
+                        )
+                        .append(
+                            $("<div/>")
+                                .addClass("col-2 p-1 align-self-center")
+                                .text(allianceActivePapRatio)
+                        )
+                        .append(
+                            $("<div/>")
+                                .addClass("col-2 p-1 align-self-center")
+                                .text(allianceKnownPapRatio)
+                        )
+                        .append(
+                            $("<div/>")
+                                .addClass("col-2 p-1 align-self-center")
+                                .text(allianceData["Short Stats"]["PAP Count"] + " (" + allianceData["Short Stats"]["Recent PAP Count"] + ")")
                         )
                 )
         )
         .append(
             $("<div/>")
-                .addClass("collapse ml-4 mt-1 small")
+                .addClass("collapse ml-4 mt-2 small")
                 .attr("id", "corps-" + eachAlliance)
                 .append(
                     $("<div/>")
                         .addClass("list-group-item list-group-item-dark bg-dark border-secondary text-white p-1")
                         .append(
                             $("<div/>")
-                                .addClass("row ml-2")
+                                .addClass("row ml-0 mr-0")
                                 .append(
                                     $("<div/>")
-                                        .addClass("col-1 p-0 font-weight-bold text-left align-self-center")
+                                        .addClass("col-1 p-1 font-weight-bold text-left align-self-center")
                                 )
                                 .append(
                                     $("<div/>")
-                                        .addClass("col-3 p-0 font-weight-bold align-self-center")
+                                        .addClass("col-2 p-1 font-weight-bold align-self-center")
                                         .text("Corporation Name")
                                 )
                                 .append(
                                     $("<div/>")
-                                        .addClass("col-2 p-0 font-weight-bold align-self-center")
-                                        .text("Active Members")
+                                        .addClass("col-1 p-1 font-weight-bold align-self-center")
+                                        .text("Active")
                                 )
                                 .append(
                                     $("<div/>")
-                                        .addClass("col-2 p-0 font-weight-bold align-self-center")
-                                        .text("Known Members")
+                                        .addClass("col-1 p-1 font-weight-bold align-self-center")
+                                        .text("Known")
                                 )
                                 .append(
                                     $("<div/>")
-                                        .addClass("col-2 p-0 font-weight-bold align-self-center")
-                                        .text("Total Members")
+                                        .addClass("col-1 p-1 font-weight-bold align-self-center")
+                                        .text("Total")
+                                )
+                                .append(
+                                    $("<div/>")
+                                        .addClass("col-2 p-1 font-weight-bold align-self-center")
+                                        .text("Recent PAPs ÷ Active")
+                                )
+                                .append(
+                                    $("<div/>")
+                                        .addClass("col-2 p-1 font-weight-bold align-self-center")
+                                        .text("Recent PAPs ÷ Known")
+                                )
+                                .append(
+                                    $("<div/>")
+                                        .addClass("col-2 p-1 font-weight-bold align-self-center")
+                                        .text("PAPs (Recent)")
                                 )
                         )
                 )
@@ -255,40 +307,77 @@ function listAffiliations(incomingData) {
             
             corporationData = incomingData[eachAlliance]["Corporation Data"][eachCorporation];
             
+            if (corporationData["Represented"] === 0) {
+                
+                var corporationKnownPapRatio = "N/A";
+                
+            }
+            else {
+                
+                var corporationKnownPapRatio = (corporationData["Short Stats"]["Recent PAP Count"] / corporationData["Represented"]).toFixed(2);
+                
+            }
+            
+            if (corporationData["Short Stats"]["Active Members"] === 0) {
+                
+                var corporationActivePapRatio = "N/A";
+                
+            }
+            else {
+                
+                var corporationActivePapRatio = (corporationData["Short Stats"]["Recent PAP Count"] / corporationData["Short Stats"]["Active Members"]).toFixed(2);
+                
+            }
+            
             $("#corp-data-" + eachAlliance).append(
                 $("<div/>")
                     .addClass("list-group-item list-group-item-dark bg-dark border-secondary text-white p-1 mt-1")
                     .append(
                         $("<div/>")
-                            .addClass("row ml-2")
+                            .addClass("row ml-0 mr-0")
                             .append(
                                 $("<div/>")
-                                    .addClass("col-1 p-0 text-left align-self-center")
+                                    .addClass("col-1 p-1 text-left align-self-center")
                                     .append(
                                         $("<img>")
-                                            .addClass("img-fluid")
+                                            .addClass("img-fluid ml-2")
                                             .attr("src", " https://images.evetech.net/corporations/" + eachCorporation + "/logo?size=32")
                                     )
                             )
                             .append(
                                 $("<div/>")
-                                    .addClass("col-3 p-0 align-self-center")
+                                    .addClass("col-2 p-1 align-self-center")
                                     .text(corporationData["Name"])
                             )
                             .append(
                                 $("<div/>")
-                                    .addClass("col-2 p-0 align-self-center")
+                                    .addClass("col-1 p-1 align-self-center")
                                     .text(corporationData["Short Stats"]["Active Members"])
                             )
                             .append(
                                 $("<div/>")
-                                    .addClass("col-2 p-0 align-self-center")
+                                    .addClass("col-1 p-1 align-self-center")
                                     .text(corporationData["Represented"])
                             )
                             .append(
                                 $("<div/>")
-                                    .addClass("col-2 p-0 align-self-center")
+                                    .addClass("col-1 p-1 align-self-center")
                                     .text(corporationData["Members"])
+                            )
+                            .append(
+                                $("<div/>")
+                                    .addClass("col-2 p-1 align-self-center")
+                                    .text(corporationActivePapRatio)
+                            )
+                            .append(
+                                $("<div/>")
+                                    .addClass("col-2 p-1 align-self-center")
+                                    .text(corporationKnownPapRatio)
+                            )
+                            .append(
+                                $("<div/>")
+                                    .addClass("col-2 p-1 align-self-center")
+                                    .text(corporationData["Short Stats"]["PAP Count"] + " (" + corporationData["Short Stats"]["Recent PAP Count"] + ")")
                             )
                     )
             );
@@ -298,6 +387,14 @@ function listAffiliations(incomingData) {
             var unknownMembers = Math.max(0, corporationData["Members"] - corporationData["Represented"]);
             
         }
+        
+        $("#corps-" + eachAlliance).append(
+            $("<a/>")
+                .addClass("btn btn-outline-danger btn-large btn-block mt-2")
+                .attr("href", "download?alliance=" + eachAlliance)
+                .attr("target", "_blank")
+                .text("Download " + allianceData["Name"] + " Data as CSV")
+        )
     
     }
 }
@@ -307,81 +404,69 @@ function graphAffiliations(incomingData, targetID) {
     $("#affiliation-overview").empty();
 
     google.charts.load("current", {packages:["corechart"]});
-        
-    var allianceKeys = Object.keys(incomingData);
     
-    allianceKeys.sort(function(a, b){
-        return incomingData[b]["Represented"] - incomingData[a]["Represented"];
-    });
-    
-    for (eachAlliance of allianceKeys) {
+    if (targetID in incomingData) {
         
-        if (eachAlliance == targetID) {
+        var dataRows = [["Ticker", "Active Members", {role: "tooltip"}, "Known Members", {role: "tooltip"}, "Unknown Members", {role: "tooltip"}]];
         
-            var dataRows = [["Ticker", "Active Members", {role: "tooltip"}, "Known Members", {role: "tooltip"}, "Unknown Members", {role: "tooltip"}]];
+        allianceData = incomingData[targetID];
+        
+        $("#affiliation-overview").append(
+            $("<div/>")
+                .addClass("card bg-dark border-secondary p-0 mt-3")
+                .append(
+                    $("<div/>")
+                        .addClass("card-header")
+                        .append(
+                            $("<h4/>")
+                                .addClass("p-0 m-0")
+                                .text(allianceData["Name"])
+                        )
+                )
+                .append(
+                    $("<div/>")
+                        .addClass("card-body p-0")
+                        .attr("id", "graph-" + targetID)
+                )
+        );
+        
+        var corporationKeys = Object.keys(incomingData[targetID]["Corporation Data"]);
+        
+        corporationKeys.sort(function(a, b){
             
-            allianceData = incomingData[eachAlliance];
+            return incomingData[targetID]["Corporation Data"][b]["Represented"] - incomingData[targetID]["Corporation Data"][a]["Represented"];
             
-            $("#affiliation-overview").append(
-                $("<div/>")
-                    .addClass("card bg-dark border-secondary p-0 mt-3")
-                    .append(
-                        $("<div/>")
-                            .addClass("card-header")
-                            .append(
-                                $("<h4/>")
-                                    .addClass("p-0 m-0")
-                                    .text(allianceData["Name"])
-                            )
-                    )
-                    .append(
-                        $("<div/>")
-                            .addClass("card-body p-0")
-                            .attr("id", "graph-" + eachAlliance)
-                    )
-            );
+        });
+        
+        for (eachCorporation of corporationKeys) {
             
-            var corporationKeys = Object.keys(incomingData[eachAlliance]["Corporation Data"]);
+            corporationData = incomingData[targetID]["Corporation Data"][eachCorporation];
             
-            corporationKeys.sort(function(a, b){
-                return incomingData[eachAlliance]["Corporation Data"][b]["Represented"] - incomingData[eachAlliance]["Corporation Data"][a]["Represented"];
-            });
+            var activeMembers = Math.max(0, corporationData["Short Stats"]["Active Members"]);
+            var knownMembers = Math.max(0, corporationData["Represented"] - corporationData["Short Stats"]["Active Members"]);
+            var unknownMembers = Math.max(0, corporationData["Members"] - corporationData["Represented"]);
             
-            for (eachCorporation of corporationKeys) {
-                
-                corporationData = incomingData[eachAlliance]["Corporation Data"][eachCorporation];
-                
-                var activeMembers = Math.max(0, corporationData["Short Stats"]["Active Members"]);
-                var knownMembers = Math.max(0, corporationData["Represented"] - corporationData["Short Stats"]["Active Members"]);
-                var unknownMembers = Math.max(0, corporationData["Members"] - corporationData["Represented"]);
-                
-                var activeText = corporationData["Name"] + " \nActive Members: " + activeMembers;
-                var knownText = corporationData["Name"] + " \nKnown Members: " + knownMembers;
-                var unknownText = corporationData["Name"] + " \nUnknown Members: " + unknownMembers;
-                            
-                dataRows.push([corporationData["Short Stats"]["Ticker"], activeMembers, activeText, knownMembers, knownText, unknownMembers, unknownText]);
-            }
-            
-            google.charts.setOnLoadCallback(setupBarChart);
-
-            function setupBarChart() {
-                
-                var barChart = new google.visualization.arrayToDataTable(dataRows);
+            var activeText = corporationData["Name"] + " \nActive Members: " + activeMembers;
+            var knownText = corporationData["Name"] + " \nKnown Members: " + knownMembers;
+            var unknownText = corporationData["Name"] + " \nUnknown Members: " + unknownMembers;
                         
-                var fullBar = new google.visualization.BarChart(document.getElementById("graph-" + eachAlliance));
-                
-                var chartOptions = {allowHtml: true, chartArea: {width: "65%", top: "5%",left: "10%"}, height: (60 + (dataRows.length * 30)), titlePosition: "none", isStacked: "relative", backgroundColor: "transparent", hAxis: {format: "percent", textStyle: {fontSize: 12, color: "white"}}, vAxis: {textStyle: {fontSize: 12, color: "white"}}, tooltip: {textStyle: {fontSize: 12}, isHtml: true}, legend: {textStyle: {fontSize: 14, color: "white"}}, colors: ["green", "orange", "red"]};
-                
-                fullBar.draw(barChart, chartOptions);
-                
-            }
-            
-            break;
-        
+            dataRows.push([corporationData["Short Stats"]["Ticker"], activeMembers, activeText, knownMembers, knownText, unknownMembers, unknownText]);
         }
-    
-    }
         
+        google.charts.setOnLoadCallback(setupBarChart);
+
+        function setupBarChart() {
+            
+            var barChart = new google.visualization.arrayToDataTable(dataRows);
+                    
+            var fullBar = new google.visualization.BarChart(document.getElementById("graph-" + targetID));
+            
+            var chartOptions = {allowHtml: true, chartArea: {width: "85%", top: "5%",left: "10%"}, height: (60 + (dataRows.length * 30)), titlePosition: "none", isStacked: "relative", backgroundColor: "transparent", hAxis: {format: "percent", textStyle: {fontSize: 12, color: "white"}}, vAxis: {textStyle: {fontSize: 12, color: "white"}}, tooltip: {textStyle: {fontSize: 12}, isHtml: true}, legend: {textStyle: {fontSize: 14, color: "white"}, position: "bottom"}, colors: ["green", "orange", "red"]};
+            
+            fullBar.draw(barChart, chartOptions);
+            
+        }
+    }
 }
 
 function setupGroups() {
@@ -434,6 +519,13 @@ function setupGroups() {
 function listData() {
     
     var usingTimes = $("#use_times").is(':checked');
+    
+    if (usingTimes === true) {
+        $("#exportTimes").attr("value", "true");
+    }
+    else {
+        $("#exportTimes").attr("value", "false");
+    }
     
     $("#player-data").empty();
         

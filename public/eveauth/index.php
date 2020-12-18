@@ -46,7 +46,9 @@
 								
 				if (isset($response["Scopes"]) and strpos($response["Scopes"], "esi-fleets.read_fleet.v1") !== false and strpos($response["Scopes"], "esi-fleets.write_fleet.v1") !== false) {
                     
-                    if (checkForFC($response["CharacterID"]) or in_array($response["CharacterID"], $superadmins)) {
+                    getCharacterCore($response["CharacterID"]);
+                    
+                    if (checkForFC($response["CharacterID"], $_SESSION["CoreData"]["Groups"]) or in_array($response["CharacterID"], $superadmins)) {
 					
                         $_SESSION["CharacterID"] = $response["CharacterID"];
                         $_SESSION["LoginType"] = "FC";

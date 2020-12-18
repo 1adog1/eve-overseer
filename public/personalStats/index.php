@@ -56,8 +56,7 @@
 <body class="background">
 	<div class="container-fluid">
     
-        <h1 class="text-center mt-3">Personal Statistics</h1>
-        <hr>
+        <br>
         
         <noscript>
             <div class="alert alert-danger text-center">

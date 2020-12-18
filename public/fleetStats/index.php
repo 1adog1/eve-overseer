@@ -64,8 +64,7 @@
 <body class="background">
 	<div class="container-fluid">
     
-        <h1 class="text-center mt-3">Fleet Statistics</h1>
-        <hr>
+        <br>
                 
         <noscript>
             <div class="alert alert-danger text-center">

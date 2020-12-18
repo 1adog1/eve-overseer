@@ -63,7 +63,23 @@
             $approvedSRP = ["Fun", "Stratop", "CTA", "Save", "ADM"];
             
             $fleetName = htmlspecialchars($_POST["Name"]);
-            
+                        
+            if (isset($_POST["Sharing"]) and htmlspecialchars($_POST["Sharing"]) == "true") {
+                
+                $dataSharing = 1;
+                $bytes = random_bytes(8);
+                $sharingKey = bin2hex($bytes);
+                $sharedWith = json_encode([]);
+                
+            }
+            else {
+                
+                $dataSharing = 0;
+                $sharingKey = null;
+                $sharedWith = null;
+                
+            }
+                        
             if (in_array(htmlspecialchars($_POST["SRP"]), $approvedSRP)) {
                 
                 if (isset($_POST["Voltron"]) and htmlspecialchars($_POST["Voltron"]) == "true") {
@@ -130,7 +146,7 @@
                                     
                                     $throwawayValue = "Test";
                                                     
-                                    $toInsert = $GLOBALS['MainDatabase']->prepare("INSERT INTO tracking (fleetid, fleetname, srplevel, commanderid, commandername, starttime, status) VALUES (:fleetid, :fleetname, :srplevel, :commanderid, :commandername, :starttime, :status)");
+                                    $toInsert = $GLOBALS['MainDatabase']->prepare("INSERT INTO tracking (fleetid, fleetname, srplevel, commanderid, commandername, starttime, status, sharing, sharekey, sharingwith) VALUES (:fleetid, :fleetname, :srplevel, :commanderid, :commandername, :starttime, :status, :sharing, :sharekey, :sharingwith)");
                                     $toInsert->bindParam(":fleetid", $pulledFleetID);
                                     $toInsert->bindParam(":fleetname", $fleetName);
                                     $toInsert->bindParam(":srplevel", $fleetSRP);
@@ -138,6 +154,9 @@
                                     $toInsert->bindParam(":commandername", $_SESSION["Character Name"]);
                                     $toInsert->bindParam(":starttime", $currentTime);
                                     $toInsert->bindParam(":status", $newStatus);
+                                    $toInsert->bindParam(":sharing", $dataSharing);
+                                    $toInsert->bindParam(":sharekey", $sharingKey, PDO::PARAM_STR);
+                                    $toInsert->bindParam(":sharingwith", $sharedWith, PDO::PARAM_STR);
                                     
                                     $toInsert->execute();
                                     
@@ -229,6 +248,61 @@
             }
             
         }
+        elseif (isset($_POST["Action"]) and $_POST["Action"] == "Subscribe") {
+            
+            if (isset($_POST["Key"])) {
+            
+                $pullStatus = "Active";
+                $pullShare = 1;
+                $pullKey = htmlspecialchars($_POST["Key"]);
+                
+                $toPull = $GLOBALS['MainDatabase']->prepare("SELECT * FROM tracking WHERE sharing=:sharing AND sharekey=:sharekey AND status=:status");
+                $toPull->bindParam(":sharing", $pullShare);
+                $toPull->bindParam(":sharekey", $pullKey);
+                $toPull->bindParam(":status", $pullStatus);
+                $toPull->execute();
+                $pulledArrayData = $toPull->fetchAll();
+                            
+                if (!empty($pulledArrayData)) {
+                    
+                    $newShareList = json_decode($pulledArrayData[0]["sharingwith"]);
+                    
+                    if (!in_array($_SESSION["CharacterID"], $newShareList)) {
+                        
+                        $newShareList[] = $_SESSION["CharacterID"];
+                        
+                        $updatedShareList = json_encode($newShareList);
+                        
+                        $toUpdate = $GLOBALS['MainDatabase']->prepare("UPDATE tracking SET sharingwith=:sharingwith WHERE sharekey=:sharekey");
+                        $toUpdate->bindParam(":sharingwith", $updatedShareList);
+                        $toUpdate->bindParam(":sharekey", $pullKey);
+                        
+                        $toUpdate->execute();
+                        
+                        makeLogEntry("User Database Edit", $_SESSION["CurrentPage"] . " (Data Controller)", $_SESSION["Character Name"], $_SESSION["CharacterID"] . " has subscribed to data for the fleet " . $pulledArrayData[0]["fleetid"] . ".");
+                        
+                    }
+                    
+                    $checkData["Status"] = "Data Found";
+                    $checkData["Fleet Name"] = htmlspecialchars($pulledArrayData[0]["fleetname"]);
+                    
+                }
+                else {
+                    
+                    $checkData["Status"] = "Error";
+                    $checkData["Error"] = "The share key does not correspond to an active fleet.";
+                    
+                }
+            
+            }
+            else {
+                
+                $checkData["Status"] = "Error";
+                $checkData["Error"] = "No share key provided.";
+                
+            }
+            
+        }
         elseif (isset($_POST["Action"]) and $_POST["Action"] == "Update") {
 
             $pullStatus = "Active";
@@ -247,6 +321,8 @@
             else {
                                 
                 $checkData["Status"] = "Active";
+                $checkData["Sharing"] = boolval($pulledArrayData[0]["sharing"]);
+                $checkData["Sharing Key"] = $pulledArrayData[0]["sharekey"];
 
                 $dataToCheck = $pulledArrayData[0]["fleetid"];
                 
@@ -265,6 +341,57 @@
                 else {
                     
                     $checkData["Found Data"] = false;
+                    
+                }
+                
+            }
+            
+            $checkData["Shared Data"] = [];
+            
+            if (isset($_POST["Shared_Fleets"])) {
+                
+                $sharedFleets = json_decode($_POST["Shared_Fleets"]);
+                
+                foreach ($sharedFleets as $eachID) {
+                    
+                    $pullStatus = "Active";
+                    $pullShare = 1;
+                    $pullKey = htmlspecialchars($eachID);
+                    
+                    $toPull = $GLOBALS['MainDatabase']->prepare("SELECT * FROM tracking WHERE sharing=:sharing AND sharekey=:sharekey AND status=:status");
+                    $toPull->bindParam(":sharing", $pullShare);
+                    $toPull->bindParam(":sharekey", $pullKey);
+                    $toPull->bindParam(":status", $pullStatus);
+                    $toPull->execute();
+                    $pulledArrayData = $toPull->fetchAll();
+                                
+                    if (!empty($pulledArrayData)) {
+                        
+                        $shareSubs = json_decode($pulledArrayData[0]["sharingwith"]);
+                        
+                        if (in_array($_SESSION["CharacterID"], $shareSubs)) {
+                        
+                            $toQuery = $GLOBALS['MainDatabase']->prepare("SELECT * FROM snapshots WHERE fleetid=:fleetid ORDER BY timestamp DESC LIMIT 1");
+                            $toQuery->bindParam(":fleetid", $pulledArrayData[0]["fleetid"]);
+                            $toQuery->execute();
+                            $queryArrayData = $toQuery->fetchAll();
+                            
+                            if (!empty($queryArrayData)) {
+                                
+                                $checkData["Shared Data"][$pullKey]["Start Date"] = date("F jS, Y - H:i:s", $pulledArrayData[0]["starttime"]);
+                                $checkData["Shared Data"][$pullKey]["Data"] = json_decode($queryArrayData[0]["fleetmembers"], true);
+                                $checkData["Shared Data"][$pullKey]["Status"] = "Active";
+                                
+                            }
+                            else {
+                                
+                                $checkData["Shared Data"][$pullKey]["Status"] = "Stopped";
+                                
+                            }
+                        
+                        }
+                        
+                    }
                     
                 }
                 

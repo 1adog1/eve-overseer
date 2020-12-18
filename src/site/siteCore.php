@@ -23,12 +23,24 @@
 					if (in_array($roles, $_SESSION["AccessRoles"])) {
                         
                         if (($pageInfo["Need FC"] === true and $_SESSION["LoginType"] == "FC") or ($pageInfo["Need FC"] === false)) {
+                            if ($_SESSION["CurrentPage"] == $pageTitle) {
 						
-                            echo "
-                            <li class='nav-item'>
-                                <a class='nav-link' href='" . $pageInfo["Link"] . "'>" . $pageTitle . "</a>
-                            </li>
-                            ";
+                                echo "
+                                <li class='nav-item'>
+                                    <a class='nav-link active' href='" . $pageInfo["Link"] . "'>" . $pageTitle . "</a>
+                                </li>
+                                ";
+                            
+                            }
+                            else {
+                                
+                                echo "
+                                <li class='nav-item'>
+                                    <a class='nav-link' href='" . $pageInfo["Link"] . "'>" . $pageTitle . "</a>
+                                </li>
+                                ";
+                                
+                            }
                             
                             break;
                             

@@ -25,7 +25,7 @@ if (checkTableExists($GLOBALS['MainDatabase'], "logs") === false) {
 }
 
 if (checkTableExists($GLOBALS['MainDatabase'], "tracking") === false) {
-	$GLOBALS['MainDatabase']->exec("CREATE TABLE tracking (fleetid TEXT, fleetname TEXT, srplevel TEXT, commanderid BIGINT, commandername TEXT, starttime BIGINT, status TEXT)");
+	$GLOBALS['MainDatabase']->exec("CREATE TABLE tracking (fleetid TEXT, fleetname TEXT, srplevel TEXT, commanderid BIGINT, commandername TEXT, starttime BIGINT, status TEXT, sharing INT, sharekey TEXT, sharingwith LONGTEXT)");
 }
 
 if (checkTableExists($GLOBALS['MainDatabase'], "snapshots") === false) {
@@ -61,9 +61,57 @@ function checkLastPage() {
 	}	
 }
 
-function checkForHR($CharacterID) {
-
+function getCharacterCore($CharacterID) {
+    
     require $_SERVER['DOCUMENT_ROOT'] . "/../config/config.php";
+    
+    $_SESSION["CoreData"] = ["Has Core" => false, "Name" => null, "ID" => null, "Groups" => []];
+    
+    $neucoreToken = base64_encode($appid . ":" . $appsecret);
+    
+    $mainRequestURL = $appURL . "api/app/v1/player/" . $CharacterID;
+    
+    $mainRequestOptions = ["http" => ["method" => "GET", "header" => ["Content-Type:application/json", "Authorization: Bearer " . $neucoreToken], "ignore_errors" => true]];
+    $mainRequestContext = stream_context_create($mainRequestOptions);
+    
+    $mainReturned = file_get_contents($mainRequestURL, false, $mainRequestContext);
+    
+    $mainStatusCode = $http_response_header[0];
+    
+    if (strpos($mainStatusCode, "200") !== false) {
+        
+        $mainData = json_decode($mainReturned, true);
+        
+        $_SESSION["CoreData"]["Has Core"] = true;
+        $_SESSION["CoreData"]["Name"] = htmlspecialchars($mainData["name"]);
+        $_SESSION["CoreData"]["ID"] = htmlspecialchars($mainData["id"]);
+    
+        $groupsRequestURL = $appURL . "api/app/v2/groups/" . $CharacterID;
+        
+        $groupsRequestOptions = ["http" => ["method" => "GET", "header" => ["Content-Type:application/json", "Authorization: Bearer " . $neucoreToken]]];
+        $groupsRequestContext = stream_context_create($groupsRequestOptions);
+        
+        $groupsReturned = @file_get_contents($groupsRequestURL, false, $groupsRequestContext);
+        
+        $groupsStatusCode = $http_response_header[0];
+            
+        if (strpos($groupsStatusCode, "200") !== false) {
+            
+            $groupsDecoded = json_decode($groupsReturned, true);
+            
+            foreach ($groupsDecoded as $throwaway => $eachGroup) {
+                
+                $_SESSION["CoreData"]["Groups"][] = $eachGroup["id"];
+                
+            }
+            
+        }
+        
+    }
+        
+}
+
+function checkForHR($CharacterID, $coreGroups) {
     
     $hrgroups = [];
     
@@ -89,29 +137,12 @@ function checkForHR($CharacterID) {
     }
             
     $hrFound = false;
-    
-    $neucoreToken = base64_encode($appid . ":" . $appsecret);
-
-    $requestURL = $appURL . "api/app/v2/groups/" . $CharacterID;
-    
-    $requestOptions = ["http" => ["method" => "GET", "header" => ["Content-Type:application/json", "Authorization: Bearer " . $neucoreToken]]];
-    $requestContext = stream_context_create($requestOptions);
-    
-    $groupsReturned = @file_get_contents($requestURL, false, $requestContext);
-    
-    $statusCode = $http_response_header[0];
         
-    if (strpos($statusCode, "200") !== false) {
+    foreach ($coreGroups as $eachGroup) {
         
-        $fleetRequest = json_decode($groupsReturned,true);
-        
-        foreach ($fleetRequest as $throwaway => $eachGroup) {
+        if (in_array($eachGroup, $hrgroups)) {
             
-            if (in_array($eachGroup["id"], $hrgroups)) {
-                
-                $hrFound = true;
-                
-            }
+            $hrFound = true;
             
         }
         
@@ -121,9 +152,7 @@ function checkForHR($CharacterID) {
 
 }
 
-function checkForFC($CharacterID) {
-    
-    require $_SERVER['DOCUMENT_ROOT'] . "/../config/config.php";
+function checkForFC($CharacterID, $coreGroups) {
     
     $fcgroups = [];
     
@@ -147,29 +176,12 @@ function checkForFC($CharacterID) {
     }
             
     $fcFound = false;
-    
-    $neucoreToken = base64_encode($appid . ":" . $appsecret);
-
-    $requestURL = $appURL . "api/app/v2/groups/" . $CharacterID;
-    
-    $requestOptions = ["http" => ["method" => "GET", "header" => ["Content-Type:application/json", "Authorization: Bearer " . $neucoreToken]]];
-    $requestContext = stream_context_create($requestOptions);
-    
-    $groupsReturned = @file_get_contents($requestURL, false, $requestContext);
-    
-    $statusCode = $http_response_header[0];
         
-    if (strpos($statusCode, "200") !== false) {
+    foreach ($coreGroups as $eachGroup) {
         
-        $fleetRequest = json_decode($groupsReturned,true);
-        
-        foreach ($fleetRequest as $throwaway => $eachGroup) {
+        if (in_array($eachGroup, $fcgroups)) {
             
-            if (in_array($eachGroup["id"], $fcgroups)) {
-                
-                $fcFound = true;
-                
-            }
+            $fcFound = true;
             
         }
         
@@ -277,11 +289,13 @@ function checkCookies() {
 			$_SESSION["AccessRoles"][] = "Super Admin";
 		}
         
-		if (checkForFC($_SESSION["CharacterID"])) {
+        getCharacterCore($_SESSION["CharacterID"]);
+        
+		if (checkForFC($_SESSION["CharacterID"], $_SESSION["CoreData"]["Groups"])) {
 			$_SESSION["AccessRoles"][] = "Fleet Commander";
 		}
         
-		if (checkForHR($_SESSION["CharacterID"])) {
+		if (checkForHR($_SESSION["CharacterID"], $_SESSION["CoreData"]["Groups"])) {
 			$_SESSION["AccessRoles"][] = "HR";
 		}
 		

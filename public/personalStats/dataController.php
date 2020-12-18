@@ -115,10 +115,55 @@
                 $timePeriod = (time() + (86400));
                 
             }
-                        
-            $toPull = $GLOBALS['MainDatabase']->prepare("SELECT * FROM fleets WHERE starttime >= :starttime ORDER BY starttime DESC LIMIT :limit");
-            $toPull->bindParam(":starttime", $timePeriod, PDO::PARAM_INT);
-            $toPull->bindParam(":limit", $rowLimit, PDO::PARAM_INT);
+            
+            if ($_SESSION["CoreData"]["Has Core"] === true) {
+                $idToPull = "core-" . $_SESSION["CoreData"]["ID"];
+            }
+            else {
+                $idToPull = "character-" . $_SESSION["CharacterID"];
+            }
+            
+            $toQuery = $GLOBALS['MainDatabase']->prepare("SELECT attendedfleets FROM players WHERE playerid=:playerid");
+            $toQuery->bindParam(":playerid", $idToPull);
+            
+            if ($toQuery->execute()) {
+                
+                $attendedArray = $toQuery->fetchColumn();
+                
+                if ($attendedArray) {
+                    
+                    $fleetsToCheck = json_decode($attendedArray);
+                    
+                }
+                else {
+                    
+                    $fleetsToCheck = [];
+                    
+                }
+                
+            }
+            
+            if (count($fleetsToCheck) > 0) {
+                
+                $whereStatement = (" AND fleetid IN (" . implode(", ", array_fill(0, count($fleetsToCheck), "?")) . ")");
+                
+            }
+            else {
+                
+                $whereStatement = "";
+                
+            }
+            
+            $toPull = $GLOBALS['MainDatabase']->prepare("SELECT * FROM fleets WHERE starttime >= ?" . $whereStatement . " ORDER BY starttime DESC LIMIT ?");
+            $toPull->bindParam(1, $timePeriod, PDO::PARAM_INT);
+            
+            $tempCounter = 2;
+            foreach ($fleetsToCheck as $eachFleetID) {
+                
+                $toPull->bindValue($tempCounter++, $eachFleetID, PDO::PARAM_INT);
+            }
+            
+            $toPull->bindParam($tempCounter, $rowLimit, PDO::PARAM_INT);
             
             if ($toPull->execute()) {
                 

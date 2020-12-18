@@ -60,24 +60,33 @@
         </noscript>
         
         <div class="row">
-            <div class="col-xl-7">
+            <div class="col-xl-8">
 				<br>
 				<h2 class="ColumnHeader">Alliance Breakdown</h2>
 				<hr>
                 <div class="small text-right text-white font-italic">Click an alliance to view its corporations and generate an overview graph.</div>
                 <div class="list-group text-left">
                     <div class="list-group-item list-group-item-dark bg-dark border-secondary text-white p-1 mt-1">
-                        <div class="row ml-2">
-                            <div class="col-1 p-0 align-self-center">
+                        <div class="row ml-0 mr-0">
+                            <div class="col-1 p-1 align-self-center">
                             </div>
-                            <div class="col-3 p-0 align-self-center">
+                            <div class="col-3 p-1 align-self-center">
                                 <strong>Alliance Name</strong>
                             </div>
-                            <div class="col-3 p-0 align-self-center">
-                                <strong>Active Members</strong>
+                            <div class="col-1 p-1 align-self-center">
+                                <strong>Active</strong>
                             </div>
-                            <div class="col-3 p-0 align-self-center">
-                                <strong>Known Members</strong>
+                            <div class="col-1 p-1 align-self-center">
+                                <strong>Known</strong>
+                            </div>
+                            <div class="col-2 p-1 align-self-center">
+                                <strong>Recent PAPs ÷ Active</strong>
+                            </div>
+                            <div class="col-2 p-1 align-self-center">
+                                <strong>Recent PAPs ÷ Known</strong>
+                            </div>
+                            <div class="col-2 p-1 align-self-center">
+                                <strong>PAPs (Recent)</strong>
                             </div>
                         </div>
                     </div>
@@ -86,7 +95,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-xl-5">
+            <div class="col-xl-4">
 				<br>
 				<h2 class="ColumnHeader">Alliance Overview</h2>
 				<hr>

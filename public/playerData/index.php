@@ -11,7 +11,7 @@
 
     $PageMinimumAccessLevel = ["Super Admin", "HR"];
 	checkLastPage();
-	$_SESSION["CurrentPage"] = "Player PAPs";
+	$_SESSION["CurrentPage"] = "Player PAP";
 
 	checkCookies();
     
@@ -80,51 +80,59 @@
 				<h2 class="ColumnHeader">Filter Players</h2>
 				<hr>
                 
-                <div class="form-group">
-                    <label for="CharacterName">Account Name</label>
-                    <input type="text" name="CharacterName" class="form-control" id="CharacterName">
-                </div>
-                
-                <div class="form-group">
-                    <label for="AllianceName">Alliance</label>
-                    <select class="form-control" id="AllianceName">
+                <form action="download" method="post" target="_blank">
+                    <div class="form-group">
+                        <label for="CharacterName">Account Name</label>
+                        <input type="text" name="CharacterName" class="form-control" id="CharacterName">
+                    </div>
                     
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label for="CorporationName">Corporation</label>
-                    <select class="form-control" id="CorporationName">
+                    <div class="form-group">
+                        <label for="AllianceName">Alliance</label>
+                        <select class="form-control" name="AllianceName" id="AllianceName">
+                        
+                        </select>
+                    </div>
                     
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label for="attended">Minimum Attended (30 Days)</label>
-                    <input type="text" name="attended" class="form-control" id="attended">
-                </div>
-                
-                <div class="form-group">
-                    <label for="commanded">Minimum Commanded (30 Days)</label>
-                    <input type="text" name="commanded" class="form-control" id="commanded">
-                </div>
+                    <div class="form-group">
+                        <label for="CorporationName">Corporation</label>
+                        <select class="form-control" name="CorporationName" id="CorporationName">
+                        
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="attended">Minimum Attended (30 Days)</label>
+                        <input type="text" name="attended" class="form-control" id="attended">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="commanded">Minimum Commanded (30 Days)</label>
+                        <input type="text" name="commanded" class="form-control" id="commanded">
+                    </div>
 
-                <div class="form-group">
-                    <div class="custom-control custom-checkbox">
-                        <input type="checkbox" class="custom-control-input" name="core" value="true" id="core"> 
-                        <label class="custom-control-label" for="core">Core Only</label>
+                    <div class="form-group">
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" name="core" value="true" id="core"> 
+                            <label class="custom-control-label" for="core">Core Only</label>
+                        </div>
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" name="fc" value="true" id="fc"> 
+                            <label class="custom-control-label" for="fc">FC Only</label>
+                        </div>
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" name="all" value="true" id="all"> 
+                            <label class="custom-control-label" for="all">Show All</label>
+                        </div>
                     </div>
-                    <div class="custom-control custom-checkbox">
-                        <input type="checkbox" class="custom-control-input" name="fc" value="true" id="fc"> 
-                        <label class="custom-control-label" for="fc">FC Only</label>
-                    </div>
-                    <div class="custom-control custom-checkbox">
-                        <input type="checkbox" class="custom-control-input" name="all" value="true" id="all"> 
-                        <label class="custom-control-label" for="all">Show All</label>
-                    </div>
-                </div>
-
-                <input id="start_filter" class="btn btn-dark btn-large btn-block" type="submit" value="Filter">
+                    
+                    <input type="hidden" id="exportTimes" name="exportTimes" value="false">
+                    
+                    <input type="submit" class="btn btn-outline-danger btn-large btn-block" value="Download Data as CSV">
+                </form>
+                
+                <br>
+                
+                <button id="start_filter" class="btn btn-outline-success btn-large btn-block">Filter Data</button>
 			
 			</div>
 			<div class="col-xl-9">

@@ -11,7 +11,7 @@
 
     $PageMinimumAccessLevel = ["Super Admin", "HR"];
 	checkLastPage();
-	$_SESSION["CurrentPage"] = "Player PAPs";
+	$_SESSION["CurrentPage"] = "Player PAP";
     
 	checkCookies();
     
