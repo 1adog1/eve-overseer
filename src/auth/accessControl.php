@@ -326,7 +326,7 @@ function checkCookies() {
             $_SESSION["AccessRoles"][] = "HR";
         }
         
-        if (checkForCEO($_SESSION["CharacterID"], $_SESSION["CorporationID"])) {
+        if (in_array($_SESSION["AllianceID"], $ceoalliances) and checkForCEO($_SESSION["CharacterID"], $_SESSION["CorporationID"])) {
             $_SESSION["AccessRoles"][] = "CEO";
         }
         

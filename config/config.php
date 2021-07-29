@@ -27,6 +27,7 @@
     //SITE CONFIGURATION
     $siteURL = $configArray["SiteURL"];
     $superadmins = explode(",", str_replace(" ", "", $configArray["SuperAdmins"]));
+    $ceoalliances = explode(",", str_replace(" ", "", $configArray["approvedAlliancesForCEOs"]));
     $sessiontime = $configArray["SessionTime"];
     $maxTableRows = $configArray["MaxTableRows"];
     $storeVisitorIPs = $configArray["StoreVisitorIPs"];

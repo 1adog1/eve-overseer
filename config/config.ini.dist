@@ -27,6 +27,8 @@ SiteURL =
 ;Please do NOT include a trailing / in the Site URL; for example https://localhost:8080
 SuperAdmins = 123456789, 987654321
 ;Super Admins is a set of comma-separated character IDs in integer form. No comma required for only one group name.
+approvedAlliancesForCEOs = 123456789, 987654321
+;Approved Alliances For CEOs is a set of comma-separated alliance IDs in integer form. Any CEOs in these alliances will be able to view PAP data for their corporations. No comma required for only one group name.
 SessionTime = 43200
 ;Session Time is an integer of seconds after logging in that a character's session will be invalidated.
 MaxTableRows = 2500
