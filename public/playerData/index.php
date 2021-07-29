@@ -1,47 +1,47 @@
 <?php
-	session_start();
+    session_start();
 
-	require $_SERVER['DOCUMENT_ROOT'] . "/../src/auth/accessControl.php";
-	
-	configureErrorChecking();
+    require $_SERVER['DOCUMENT_ROOT'] . "/../src/auth/accessControl.php";
+    
+    configureErrorChecking();
 
-	require $_SERVER['DOCUMENT_ROOT'] . "/../config/config.php";
-	
-	checkForErrors();
+    require $_SERVER['DOCUMENT_ROOT'] . "/../config/config.php";
+    
+    checkForErrors();
 
     $PageMinimumAccessLevel = ["Super Admin", "HR", "CEO"];
-	checkLastPage();
-	$_SESSION["CurrentPage"] = "Player PAP";
+    checkLastPage();
+    $_SESSION["CurrentPage"] = "Player PAP";
 
-	checkCookies();
+    checkCookies();
     
     determineAccess($_SESSION["AccessRoles"], $PageMinimumAccessLevel);
-	
-	$characterImageLink = "https://images.evetech.net/characters/" . $_SESSION["CharacterID"] . "/portrait";
-	
+    
+    $characterImageLink = "https://images.evetech.net/characters/" . $_SESSION["CharacterID"] . "/portrait";
+    
 ?>
 
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Player Participation</title>
-	<link rel="stylesheet" href="../resources/stylesheets/styleMasterSheet.css">
-	<link rel="icon" href="../resources/images/favicon.ico">
-	
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link rel="stylesheet" href="../resources/bootstrap/css/bootstrap.css">
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
-	<script src="../resources/bootstrap/js/bootstrap.bundle.js"></script>
+    <title>Player Participation</title>
+    <link rel="stylesheet" href="../resources/stylesheets/styleMasterSheet.css">
+    <link rel="icon" href="../resources/images/favicon.ico">
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../resources/bootstrap/css/bootstrap.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+    <script src="../resources/bootstrap/js/bootstrap.bundle.js"></script>
     
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script>var pageName = "Player Data";</script>
     <script src="../resources/js/paps.js"></script>
-	
-	<meta property="og:title" content="Player Participation">
-	<meta property="og:description" content="The Overseer Website">
-	<meta property="og:type" content="website">
-	<meta property="og:url" content="<?php echo $siteURL; ?>">
+    
+    <meta property="og:title" content="Player Participation">
+    <meta property="og:description" content="The Overseer Website">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="<?php echo $siteURL; ?>">
 
 </head>
 <style>
@@ -63,7 +63,7 @@
 <?php require $_SERVER['DOCUMENT_ROOT'] . "/../src/site/siteCore.php"; ?>
 
 <body class="background">
-	<div class="container-fluid">
+    <div class="container-fluid">
         
         <noscript>
             <div class="alert alert-danger text-center">
@@ -75,10 +75,10 @@
         </noscript>
         
         <div class="row">
-			<div class="col-xl-3">
-				<br>
-				<h2 class="ColumnHeader">Filter Players</h2>
-				<hr>
+            <div class="col-xl-3">
+                <br>
+                <h2 class="ColumnHeader">Filter Players</h2>
+                <hr>
                 
                 <form action="download" method="post" target="_blank">
                     <div class="form-group">
@@ -133,12 +133,12 @@
                 <br>
                 
                 <button id="start_filter" class="btn btn-outline-success btn-large btn-block">Filter Data</button>
-			
-			</div>
-			<div class="col-xl-9">
-				<br>
-				<h2 class="ColumnHeader">Player Data</h2>
-				<hr>
+            
+            </div>
+            <div class="col-xl-9">
+                <br>
+                <h2 class="ColumnHeader">Player Data</h2>
+                <hr>
                 <div class="small text-right text-white font-weight-bold font-italic" id="counting_container">0 Account(s) Loaded</div>
                 <div class="small text-right text-warning font-weight-bold font-italic" id="failing_container">0 Account(s) Failing Minimums</div>
                 <div class="list-group text-left">
@@ -235,10 +235,10 @@
                     </div>
                 </div>
                 
-			</div>
-		</div>
+            </div>
+        </div>
 
-	</div>
+    </div>
 </body>
 
 <?php require $_SERVER['DOCUMENT_ROOT'] . "/../src/site/footer.php"; ?>

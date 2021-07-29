@@ -1,5 +1,5 @@
 <nav class="navbar navbar-expand-xl bg-dark navbar-dark sticky-top">
-	
+    
     <a class="navbar-brand" href="/">Eve Overseer</a>
 
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -8,23 +8,23 @@
     
     <div class="collapse navbar-collapse" id="navbarNav">
     
-		<ul class="navbar-nav">
+        <ul class="navbar-nav">
         
-		<?php 
-		
-		$pageList = ["Personal Stats" => ["Required Roles" => ["Super Admin", "HR", "Fleet Commander", "All"], "Link" => "/personalStats/", "Need FC" => false], "Fleet Stats" => ["Required Roles" => ["Super Admin", "Fleet Commander"], "Link" => "/fleetStats/", "Need FC" => false], "Host Fleet" => ["Required Roles" => ["Super Admin", "Fleet Commander"], "Link" => "/hostFleet/", "Need FC" => true], "Player PAP" => ["Required Roles" => ["Super Admin", "HR", "CEO"], "Link" => "/playerData/", "Need FC" => false], "Alliance PAP" => ["Required Roles" => ["Super Admin", "HR", "CEO"], "Link" => "/allianceData/", "Need FC" => false], "Admin" => ["Required Roles" => ["Super Admin"], "Link" => "/admin/", "Need FC" => false], "Site Logs" => ["Required Roles" => ["Super Admin"], "Link" => "/logView/", "Need FC" => false]];
-		
-		if ($_SESSION["AccessRoles"] != ["None"] and $_SESSION["AccessRoles"] != []) {
-			
-			foreach ($pageList as $pageTitle => $pageInfo) {
-				
-				foreach ($pageInfo["Required Roles"] as $throwaway => $roles) {
-					
-					if (in_array($roles, $_SESSION["AccessRoles"])) {
+        <?php 
+        
+        $pageList = ["Personal Stats" => ["Required Roles" => ["Super Admin", "HR", "Fleet Commander", "All"], "Link" => "/personalStats/", "Need FC" => false], "Fleet Stats" => ["Required Roles" => ["Super Admin", "Fleet Commander"], "Link" => "/fleetStats/", "Need FC" => false], "Host Fleet" => ["Required Roles" => ["Super Admin", "Fleet Commander"], "Link" => "/hostFleet/", "Need FC" => true], "Player PAP" => ["Required Roles" => ["Super Admin", "HR", "CEO"], "Link" => "/playerData/", "Need FC" => false], "Alliance PAP" => ["Required Roles" => ["Super Admin", "HR", "CEO"], "Link" => "/allianceData/", "Need FC" => false], "Admin" => ["Required Roles" => ["Super Admin"], "Link" => "/admin/", "Need FC" => false], "Site Logs" => ["Required Roles" => ["Super Admin"], "Link" => "/logView/", "Need FC" => false]];
+        
+        if ($_SESSION["AccessRoles"] != ["None"] and $_SESSION["AccessRoles"] != []) {
+            
+            foreach ($pageList as $pageTitle => $pageInfo) {
+                
+                foreach ($pageInfo["Required Roles"] as $throwaway => $roles) {
+                    
+                    if (in_array($roles, $_SESSION["AccessRoles"])) {
                         
                         if (($pageInfo["Need FC"] === true and $_SESSION["LoginType"] == "FC") or ($pageInfo["Need FC"] === false)) {
                             if ($_SESSION["CurrentPage"] == $pageTitle) {
-						
+                        
                                 echo "
                                 <li class='nav-item'>
                                     <a class='nav-link active' href='" . $pageInfo["Link"] . "'>" . $pageTitle . "</a>
@@ -44,19 +44,19 @@
                             
                             break;
                             
-						}
+                        }
                         
-					}
-					
-				}
-				
-			}
-			
-		}
-		
-		?>
-		
-		
+                    }
+                    
+                }
+                
+            }
+            
+        }
+        
+        ?>
+        
+        
         </ul>
     
         <ul class="navbar-nav ml-auto">
@@ -74,7 +74,7 @@
                 <strong>Fleet Commander Login</strong>
                 <a href="https://login.eveonline.com/oauth/authorize?response_type=code&redirect_uri=<?php echo $clientredirect; ?>&client_id=<?php echo $clientid; ?>&scope=<?php echo $clientscopes; ?>&state=<?php echo $_SESSION["UniqueState"]; ?>">
                     <img class="LoginImage" src="../../resources/images/sso_image.png">
-                </a>		
+                </a>        
             </li>
             
             
@@ -106,7 +106,7 @@
                                 
                             }
                         }
-                    ?>				
+                    ?>                
                 
                 </li>
             

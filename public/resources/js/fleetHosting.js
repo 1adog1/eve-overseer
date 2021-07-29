@@ -213,21 +213,21 @@ function newTab() {
             </div>
             <br>
             <div class="row" id="overviewRow_${tabID}" hidden>
-                <div class="col-xl-4">			
+                <div class="col-xl-4">            
                     <div class="card bg-dark">
                         <div class="card-header" id="fleet_boss_${tabID}">
                             Fleet Boss: 
                         </div>
                     </div>
                 </div>
-                <div class="col-xl-4">			
+                <div class="col-xl-4">            
                     <div class="card bg-dark">
                         <div class="card-header" id="member_count_${tabID}">
                             Fleet Members: 
                         </div>
                     </div>
                 </div>
-                <div class="col-xl-4">			
+                <div class="col-xl-4">            
                     <div class="card bg-dark">
                         <div class="card-header" id="fleet_started_${tabID}">
                             Fleet Started: 
@@ -259,7 +259,7 @@ function newTab() {
                         </div>
                     </div>
                 </div>
-                <div class="col-xl-3">			
+                <div class="col-xl-3">            
                     <div class="card bg-dark mt-4">
                         <div class="card-header">
                             Affiliation Breakdown

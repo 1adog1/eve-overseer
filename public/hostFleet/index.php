@@ -1,56 +1,56 @@
 <?php
-	session_start();
+    session_start();
 
-	require $_SERVER['DOCUMENT_ROOT'] . "/../src/auth/accessControl.php";
-	
-	configureErrorChecking();
+    require $_SERVER['DOCUMENT_ROOT'] . "/../src/auth/accessControl.php";
+    
+    configureErrorChecking();
 
-	require $_SERVER['DOCUMENT_ROOT'] . "/../config/config.php";
-	
-	checkForErrors();
+    require $_SERVER['DOCUMENT_ROOT'] . "/../config/config.php";
+    
+    checkForErrors();
 
     $PageMinimumAccessLevel = ["Super Admin", "Fleet Commander"];
-	checkLastPage();
-	$_SESSION["CurrentPage"] = "Host Fleet";
+    checkLastPage();
+    $_SESSION["CurrentPage"] = "Host Fleet";
 
-	checkCookies();
+    checkCookies();
     
     determineAccess($_SESSION["AccessRoles"], $PageMinimumAccessLevel);
     
     if ($_SESSION["LoginType"] !== "FC") {
         
-		makeLogEntry("Page Access Denied", $_SESSION["CurrentPage"], $_SESSION["Character Name"], "Login Type: [" . json_encode($_SESSION["LoginType"]) . "] / Required: FC");
-		
-		ob_flush();
-		header("Location: /accessDenied");
-		ob_end_flush();
-		die();        
+        makeLogEntry("Page Access Denied", $_SESSION["CurrentPage"], $_SESSION["Character Name"], "Login Type: [" . json_encode($_SESSION["LoginType"]) . "] / Required: FC");
+        
+        ob_flush();
+        header("Location: /accessDenied");
+        ob_end_flush();
+        die();        
         
     }
-	
-	$characterImageLink = "https://images.evetech.net/characters/" . $_SESSION["CharacterID"] . "/portrait";
-	
+    
+    $characterImageLink = "https://images.evetech.net/characters/" . $_SESSION["CharacterID"] . "/portrait";
+    
 ?>
 
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Fleet Hosting</title>
-	<link rel="stylesheet" href="../resources/stylesheets/styleMasterSheet.css">
-	<link rel="icon" href="../resources/images/favicon.ico">
-	
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link rel="stylesheet" href="../resources/bootstrap/css/bootstrap.css">
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
-	<script src="../resources/bootstrap/js/bootstrap.bundle.js"></script>
+    <title>Fleet Hosting</title>
+    <link rel="stylesheet" href="../resources/stylesheets/styleMasterSheet.css">
+    <link rel="icon" href="../resources/images/favicon.ico">
     
-	<script src="../resources/js/fleetHosting.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../resources/bootstrap/css/bootstrap.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+    <script src="../resources/bootstrap/js/bootstrap.bundle.js"></script>
     
-	<meta property="og:title" content="Fleet Hosting">
-	<meta property="og:description" content="The Overseer Website">
-	<meta property="og:type" content="website">
-	<meta property="og:url" content="<?php echo $siteURL; ?>">
+    <script src="../resources/js/fleetHosting.js"></script>
+    
+    <meta property="og:title" content="Fleet Hosting">
+    <meta property="og:description" content="The Overseer Website">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="<?php echo $siteURL; ?>">
 
 </head>
 <style>
@@ -68,7 +68,7 @@
 <?php require $_SERVER['DOCUMENT_ROOT'] . "/../src/site/siteCore.php"; ?>
 
 <body class="background">
-	<div class="container-fluid">
+    <div class="container-fluid">
     
         <br>
         
@@ -150,21 +150,21 @@
                 </div>
                 <br>
                 <div class="row" id="overviewRow_main" hidden>
-                    <div class="col-xl-4">			
+                    <div class="col-xl-4">            
                         <div class="card bg-dark">
                             <div class="card-header" id="fleet_boss_main">
                                 Fleet Boss: 
                             </div>
                         </div>
                     </div>
-                    <div class="col-xl-4">			
+                    <div class="col-xl-4">            
                         <div class="card bg-dark">
                             <div class="card-header" id="member_count_main">
                                 Fleet Members: 
                             </div>
                         </div>
                     </div>
-                    <div class="col-xl-4">			
+                    <div class="col-xl-4">            
                         <div class="card bg-dark">
                             <div class="card-header" id="fleet_started_main">
                                 Fleet Started: 
@@ -196,7 +196,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-xl-3">			
+                    <div class="col-xl-3">            
                         <div class="card bg-dark mt-4">
                             <div class="card-header">
                                 Affiliation Breakdown
@@ -223,7 +223,7 @@
                 </div>
             </div>
         </div>
-	</div>
+    </div>
 </body>
 
 <?php require $_SERVER['DOCUMENT_ROOT'] . "/../src/site/footer.php"; ?>

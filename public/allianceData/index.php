@@ -1,54 +1,54 @@
 <?php
-	session_start();
+    session_start();
 
-	require $_SERVER['DOCUMENT_ROOT'] . "/../src/auth/accessControl.php";
-	
-	configureErrorChecking();
+    require $_SERVER['DOCUMENT_ROOT'] . "/../src/auth/accessControl.php";
+    
+    configureErrorChecking();
 
-	require $_SERVER['DOCUMENT_ROOT'] . "/../config/config.php";
-	
-	checkForErrors();
+    require $_SERVER['DOCUMENT_ROOT'] . "/../config/config.php";
+    
+    checkForErrors();
 
     $PageMinimumAccessLevel = ["Super Admin", "HR", "CEO"];
-	checkLastPage();
-	$_SESSION["CurrentPage"] = "Alliance PAP";
+    checkLastPage();
+    $_SESSION["CurrentPage"] = "Alliance PAP";
 
-	checkCookies();
+    checkCookies();
     
     determineAccess($_SESSION["AccessRoles"], $PageMinimumAccessLevel);
-	
-	$characterImageLink = "https://images.evetech.net/characters/" . $_SESSION["CharacterID"] . "/portrait";
-	
+    
+    $characterImageLink = "https://images.evetech.net/characters/" . $_SESSION["CharacterID"] . "/portrait";
+    
 ?>
 
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Alliance Participation</title>
-	<link rel="stylesheet" href="../resources/stylesheets/styleMasterSheet.css">
-	<link rel="icon" href="../resources/images/favicon.ico">
-	
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link rel="stylesheet" href="../resources/bootstrap/css/bootstrap.css">
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
-	<script src="../resources/bootstrap/js/bootstrap.bundle.js"></script>
+    <title>Alliance Participation</title>
+    <link rel="stylesheet" href="../resources/stylesheets/styleMasterSheet.css">
+    <link rel="icon" href="../resources/images/favicon.ico">
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../resources/bootstrap/css/bootstrap.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+    <script src="../resources/bootstrap/js/bootstrap.bundle.js"></script>
     
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script>var pageName = "Alliance Data";</script>
     <script src="../resources/js/paps.js"></script>
-	
-	<meta property="og:title" content="Alliance Participation">
-	<meta property="og:description" content="The Overseer Website">
-	<meta property="og:type" content="website">
-	<meta property="og:url" content="<?php echo $siteURL; ?>">
+    
+    <meta property="og:title" content="Alliance Participation">
+    <meta property="og:description" content="The Overseer Website">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="<?php echo $siteURL; ?>">
 
 </head>
 
 <?php require $_SERVER['DOCUMENT_ROOT'] . "/../src/site/siteCore.php"; ?>
 
 <body class="background">
-	<div class="container-fluid">
+    <div class="container-fluid">
         
         <noscript>
             <div class="alert alert-danger text-center">
@@ -61,9 +61,9 @@
         
         <div class="row">
             <div class="col-xl-8">
-				<br>
-				<h2 class="ColumnHeader">Alliance Breakdown</h2>
-				<hr>
+                <br>
+                <h2 class="ColumnHeader">Alliance Breakdown</h2>
+                <hr>
                 <div class="small text-right text-white font-italic">Click an alliance to view its corporations and generate an overview graph.</div>
                 <div class="list-group text-left">
                     <div class="list-group-item list-group-item-dark bg-dark border-secondary text-white p-1 mt-1">
@@ -96,9 +96,9 @@
                 </div>
             </div>
             <div class="col-xl-4">
-				<br>
-				<h2 class="ColumnHeader">Alliance Overview</h2>
-				<hr>
+                <br>
+                <h2 class="ColumnHeader">Alliance Overview</h2>
+                <hr>
                 
                 <div id="affiliation-overview">
                 
@@ -106,7 +106,7 @@
             </div>
         </div>
         
-	</div>
+    </div>
 </body>
 
 <?php require $_SERVER['DOCUMENT_ROOT'] . "/../src/site/footer.php"; ?>

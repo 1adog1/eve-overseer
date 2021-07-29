@@ -58,8 +58,8 @@ function getWherePrefix($alreadyWhere) {
 function checkFilter() {
     
     $whereData = ["Prepare" => "", "Arguments" => []];
-	
-	if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    
+    if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 
         $alreadyWhere = false;
         
@@ -96,46 +96,46 @@ function checkFilter() {
             }
             
         }
-		
-		if (isset($_POST["access_g"]) and $_POST["access_g"] == "true") {
+        
+        if (isset($_POST["access_g"]) and $_POST["access_g"] == "true") {
             array_push($whereArray, "Page Access Granted");
-		}
-		
-		if (isset($_POST["access_d"]) and $_POST["access_d"] == "true") {
+        }
+        
+        if (isset($_POST["access_d"]) and $_POST["access_d"] == "true") {
             array_push($whereArray, "Page Access Denied");
-		}
-		
-		if (isset($_POST["login"]) and $_POST["login"] == "true") {
+        }
+        
+        if (isset($_POST["login"]) and $_POST["login"] == "true") {
             array_push($whereArray, "User Login");
-		}
-		
-		if (isset($_POST["s_database"]) and $_POST["s_database"] == "true") {
+        }
+        
+        if (isset($_POST["s_database"]) and $_POST["s_database"] == "true") {
             array_push($whereArray, "Automated Database Edit", "Automated Database Creation", "Outside Database Posted");
-		}
+        }
 
-		if (isset($_POST["u_database"]) and $_POST["u_database"] == "true") {
+        if (isset($_POST["u_database"]) and $_POST["u_database"] == "true") {
             array_push($whereArray, "User Database Edit");
-		}
+        }
         
-		if (isset($_POST["checker_errors"]) and $_POST["checker_errors"] == "true") {
+        if (isset($_POST["checker_errors"]) and $_POST["checker_errors"] == "true") {
             array_push($whereArray, "Checker Error");
-		}
+        }
         
-		if (isset($_POST["cronjob"]) and $_POST["cronjob"] == "true") {
+        if (isset($_POST["cronjob"]) and $_POST["cronjob"] == "true") {
             array_push($whereArray, "Cronjob Error", "Analysis Complete");
-		}
+        }
         
-		if (isset($_POST["tracking"]) and $_POST["tracking"] == "true") {
+        if (isset($_POST["tracking"]) and $_POST["tracking"] == "true") {
             array_push($whereArray, "Tracking Started", "Tracking Concluded", "Fleet Stopped");
-		}
-		
-		if (isset($_POST["c_errors"]) and $_POST["c_errors"] == "true") {
+        }
+        
+        if (isset($_POST["c_errors"]) and $_POST["c_errors"] == "true") {
             array_push($whereArray, "Critical Error");
-		}
+        }
 
-		if (isset($_POST["p_errors"]) and $_POST["p_errors"] == "true") {
+        if (isset($_POST["p_errors"]) and $_POST["p_errors"] == "true") {
             array_push($whereArray, "Page Error");
-		}
+        }
         
         if (!empty($whereArray)) {
             
@@ -155,18 +155,18 @@ function checkFilter() {
             $whereData["Prepare"] .= (getWherePrefix($alreadyWhere) . $inStatement);
             
         }
-		
-		if (isset($_POST["all"]) and $_POST["all"] == "true") {
-			
-			$whereData["Prepare"] = "";
+        
+        if (isset($_POST["all"]) and $_POST["all"] == "true") {
+            
+            $whereData["Prepare"] = "";
             $whereData["Arguments"] = [];
-			
-		}
-		
-	}
+            
+        }
+        
+    }
 
-	return $whereData;
-	
+    return $whereData;
+    
 }
 
 ?>

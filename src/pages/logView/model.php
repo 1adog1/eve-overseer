@@ -47,37 +47,37 @@ function generatePageNav() {
 
 function getLogArray() {
 
-	$logArray = [];
+    $logArray = [];
     
     $pageOffset = getPageOffset();
     $whereStatement = checkFilter();
-	    
-	$toPull = $GLOBALS['MainDatabase']->prepare("SELECT * FROM logs" . $whereStatement["Prepare"] . " ORDER BY timestamp DESC LIMIT 100 OFFSET :offset");
+        
+    $toPull = $GLOBALS['MainDatabase']->prepare("SELECT * FROM logs" . $whereStatement["Prepare"] . " ORDER BY timestamp DESC LIMIT 100 OFFSET :offset");
     $toPull->bindParam(":offset", $pageOffset, PDO::PARAM_INT);
     
     foreach ($whereStatement["Arguments"] as $eachArg) {
         $toPull->bindValue($eachArg["Placeholder"], $eachArg["Value"], $eachArg["Type"]);
     }
     
-	$toPull->execute();
-	
-	$pulledArray = $toPull->fetchAll();
-	
-	foreach ($pulledArray as $throwaway => $arrayData) {
-		$logArray[] = $arrayData;
-	}
-	
-	return $logArray;
-	
+    $toPull->execute();
+    
+    $pulledArray = $toPull->fetchAll();
+    
+    foreach ($pulledArray as $throwaway => $arrayData) {
+        $logArray[] = $arrayData;
+    }
+    
+    return $logArray;
+    
 }
 
 function displayLogs($logArray, $maxTableRows) {
 
-	$maxCounter = 0;
+    $maxCounter = 0;
 
-	foreach($logArray as $throwaway => $logDetails) {
-		
-		if ($maxCounter < $maxTableRows) {
+    foreach($logArray as $throwaway => $logDetails) {
+        
+        if ($maxCounter < $maxTableRows) {
             
             $maxCounter += 1;
             
@@ -103,17 +103,17 @@ function displayLogs($logArray, $maxTableRows) {
                 </td>
                 <td align='center'>
                     " . $logDetails["forwardip"] . "
-                </td>																	
+                </td>                                                                    
             </tr>
             ";
-			
-		}
-		else {
-			
-			break;
-			
-		}
-	}
+            
+        }
+        else {
+            
+            break;
+            
+        }
+    }
 }
 
 ?>

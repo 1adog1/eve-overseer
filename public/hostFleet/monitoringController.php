@@ -1,31 +1,31 @@
 <?php
 
-	session_start();
+    session_start();
 
-	require $_SERVER['DOCUMENT_ROOT'] . "/../src/auth/accessControl.php";
-	
-	configureErrorChecking();
+    require $_SERVER['DOCUMENT_ROOT'] . "/../src/auth/accessControl.php";
+    
+    configureErrorChecking();
 
-	require $_SERVER['DOCUMENT_ROOT'] . "/../config/config.php";
-	
-	checkForErrors();
+    require $_SERVER['DOCUMENT_ROOT'] . "/../config/config.php";
+    
+    checkForErrors();
 
     $PageMinimumAccessLevel = ["Super Admin", "Fleet Commander"];
-	checkLastPage();
-	$_SESSION["CurrentPage"] = "Host Fleet";
+    checkLastPage();
+    $_SESSION["CurrentPage"] = "Host Fleet";
     
-	checkCookies();
+    checkCookies();
     
     determineAccess($_SESSION["AccessRoles"], $PageMinimumAccessLevel, false);
     
     if ($_SESSION["LoginType"] !== "FC") {
         
-		makeLogEntry("Page Access Denied", $_SESSION["CurrentPage"], $_SESSION["Character Name"], "Login Type: [" . json_encode($_SESSION["LoginType"]) . "] / Required: FC");
-		
-		ob_flush();
-		header("Location: /accessDenied");
-		ob_end_flush();
-		die();        
+        makeLogEntry("Page Access Denied", $_SESSION["CurrentPage"], $_SESSION["Character Name"], "Login Type: [" . json_encode($_SESSION["LoginType"]) . "] / Required: FC");
+        
+        ob_flush();
+        header("Location: /accessDenied");
+        ob_end_flush();
+        die();        
         
     }
     

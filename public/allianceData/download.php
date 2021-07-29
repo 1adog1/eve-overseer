@@ -1,19 +1,19 @@
 <?php
-	session_start();
+    session_start();
 
-	require $_SERVER['DOCUMENT_ROOT'] . "/../src/auth/accessControl.php";
-	
-	configureErrorChecking();
+    require $_SERVER['DOCUMENT_ROOT'] . "/../src/auth/accessControl.php";
+    
+    configureErrorChecking();
 
-	require $_SERVER['DOCUMENT_ROOT'] . "/../config/config.php";
-	
-	checkForErrors();
+    require $_SERVER['DOCUMENT_ROOT'] . "/../config/config.php";
+    
+    checkForErrors();
 
     $PageMinimumAccessLevel = ["Super Admin", "HR", "CEO"];
-	checkLastPage();
-	$_SESSION["CurrentPage"] = "Alliance PAP";
+    checkLastPage();
+    $_SESSION["CurrentPage"] = "Alliance PAP";
     
-	checkCookies();
+    checkCookies();
     
     determineAccess($_SESSION["AccessRoles"], $PageMinimumAccessLevel);
     

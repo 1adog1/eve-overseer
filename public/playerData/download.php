@@ -1,22 +1,22 @@
 <?php
-	session_start();
+    session_start();
 
-	require $_SERVER['DOCUMENT_ROOT'] . "/../src/auth/accessControl.php";
-	
-	configureErrorChecking();
+    require $_SERVER['DOCUMENT_ROOT'] . "/../src/auth/accessControl.php";
+    
+    configureErrorChecking();
 
-	require $_SERVER['DOCUMENT_ROOT'] . "/../config/config.php";
-	
-	checkForErrors();
+    require $_SERVER['DOCUMENT_ROOT'] . "/../config/config.php";
+    
+    checkForErrors();
 
     $PageMinimumAccessLevel = ["Super Admin", "HR", "CEO"];
-	checkLastPage();
-	$_SESSION["CurrentPage"] = "Player PAP";
+    checkLastPage();
+    $_SESSION["CurrentPage"] = "Player PAP";
     
-	checkCookies();
+    checkCookies();
     
     determineAccess($_SESSION["AccessRoles"], $PageMinimumAccessLevel);
-	    
+        
     $rowCounter = 0;
     
     function checkCEORestrictions() {
@@ -176,5 +176,5 @@
         makeLogEntry("Page Error", $_SESSION["CurrentPage"] . " (Download)", $_SESSION["Character Name"], "Bad Method");
         
     }
-	
+    
 ?>

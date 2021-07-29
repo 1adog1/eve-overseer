@@ -1,46 +1,46 @@
 <?php
-	session_start();
+    session_start();
 
-	require $_SERVER['DOCUMENT_ROOT'] . "/../src/auth/accessControl.php";
-	
-	configureErrorChecking();
+    require $_SERVER['DOCUMENT_ROOT'] . "/../src/auth/accessControl.php";
+    
+    configureErrorChecking();
 
-	require $_SERVER['DOCUMENT_ROOT'] . "/../config/config.php";
-	
-	checkForErrors();
+    require $_SERVER['DOCUMENT_ROOT'] . "/../config/config.php";
+    
+    checkForErrors();
 
     $PageMinimumAccessLevel = ["Super Admin", "Fleet Commander", "All"];
-	checkLastPage();
-	$_SESSION["CurrentPage"] = "Personal Stats";
+    checkLastPage();
+    $_SESSION["CurrentPage"] = "Personal Stats";
 
-	checkCookies();
+    checkCookies();
     
     determineAccess($_SESSION["AccessRoles"], $PageMinimumAccessLevel);
-	
-	$characterImageLink = "https://images.evetech.net/characters/" . $_SESSION["CharacterID"] . "/portrait";
-	
+    
+    $characterImageLink = "https://images.evetech.net/characters/" . $_SESSION["CharacterID"] . "/portrait";
+    
 ?>
 
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Personal Stats</title>
-	<link rel="stylesheet" href="../resources/stylesheets/styleMasterSheet.css">
-	<link rel="icon" href="../resources/images/favicon.ico">
-	
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link rel="stylesheet" href="../resources/bootstrap/css/bootstrap.css">
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
-	<script src="../resources/bootstrap/js/bootstrap.bundle.js"></script>
+    <title>Personal Stats</title>
+    <link rel="stylesheet" href="../resources/stylesheets/styleMasterSheet.css">
+    <link rel="icon" href="../resources/images/favicon.ico">
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../resources/bootstrap/css/bootstrap.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+    <script src="../resources/bootstrap/js/bootstrap.bundle.js"></script>
     
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script src="../resources/js/personalStats.js"></script>
-	
-	<meta property="og:title" content="Personal Stats">
-	<meta property="og:description" content="The Overseer Website">
-	<meta property="og:type" content="website">
-	<meta property="og:url" content="<?php echo $siteURL; ?>">
+    
+    <meta property="og:title" content="Personal Stats">
+    <meta property="og:description" content="The Overseer Website">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="<?php echo $siteURL; ?>">
 
 </head>
 <style>
@@ -54,7 +54,7 @@
 <?php require $_SERVER['DOCUMENT_ROOT'] . "/../src/site/siteCore.php"; ?>
 
 <body class="background">
-	<div class="container-fluid">
+    <div class="container-fluid">
     
         <br>
         
@@ -67,24 +67,24 @@
             </div>
         </noscript>
 
-		<div class="row" id="headerRow">
+        <div class="row" id="headerRow">
             
             <div class="col-xl-4 mb-4">
 
-				<div class="card bg-dark">
-					<div class="card-header">
+                <div class="card bg-dark">
+                    <div class="card-header">
                         <h3>Character Overview</h3>
-					</div>
+                    </div>
                     <div class="card-body" id="characterOverview">
                     
                     </div>
-				</div>
+                </div>
 
             </div>
             
             <div class="col-xl-4 mb-4">
-				<div class="card bg-dark">
-					<div class="card-header text-center">
+                <div class="card bg-dark">
+                    <div class="card-header text-center">
                     
                         <h3>Time Period</h3>
 
@@ -117,13 +117,13 @@
                             </div>
                         </div>
                     </div>
-				</div>
+                </div>
             </div>
             
             <div class="col-xl-4 mb-4">
             
-				<div class="card bg-dark">
-					<div class="card-header">
+                <div class="card bg-dark">
+                    <div class="card-header">
 
                         <h3>Fleet Overview</h3>
 
@@ -131,15 +131,15 @@
                     <div class="card-body" id="fleetOverview">
                     
                     </div>
-				</div>
+                </div>
 
             </div>
 
-		</div>
+        </div>
         
         <br>
 
-		<div class="row" id="calendarRow" hidden>
+        <div class="row" id="calendarRow" hidden>
                         
             <div class="col-xl-3">
             
@@ -147,7 +147,7 @@
             
             <div class="col-xl-6">
 
-				<div id="calendarContainer">
+                <div id="calendarContainer">
                 
                 </div>
                 
@@ -158,11 +158,11 @@
 
             </div>
 
-		</div>
+        </div>
         
         <br>
         
-		<div class="row" id="breakdownRow" hidden>
+        <div class="row" id="breakdownRow" hidden>
             
             <div class="col-xl-4">
                 
@@ -199,11 +199,11 @@
             
             <div class="col-xl-4">
                 
-				<div class="card bg-dark">
-					<div class="card-header">
+                <div class="card bg-dark">
+                    <div class="card-header">
                         <h3>Attended Fleets</h3>
                         Click Rows For Personalized Stats
-					</div>
+                    </div>
                     <div class="card-body" style="max-height: 600px; overflow: auto;">
                     
                         <div class="list-group">
@@ -226,13 +226,13 @@
                         </div>
                     
                     </div>
-				</div>
+                </div>
 
             </div>
 
-		</div>
+        </div>
         
-	</div>
+    </div>
 </body>
 
 <?php require $_SERVER['DOCUMENT_ROOT'] . "/../src/site/footer.php"; ?>
