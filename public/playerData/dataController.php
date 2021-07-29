@@ -9,7 +9,7 @@
 	
 	checkForErrors();
 
-    $PageMinimumAccessLevel = ["Super Admin", "HR"];
+    $PageMinimumAccessLevel = ["Super Admin", "HR", "CEO"];
 	checkLastPage();
 	$_SESSION["CurrentPage"] = "Player PAP";
     
@@ -21,6 +21,12 @@
     
     $rowCounter = 0;
     
+    function checkCEORestrictions() {
+        
+        return (in_array("CEO", $_SESSION["AccessRoles"]) and !in_array("HR", $_SESSION["AccessRoles"]) and !in_array("Super Admin", $_SESSION["AccessRoles"]));
+        
+    }
+    
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
         
         if (isset($_POST["Action"]) and $_POST["Action"] == "getGroups") {
@@ -28,7 +34,17 @@
             $checkData["Alliances"] = [];
             $checkData["Corporations"] = [];
             
-            $pullAlliances = $GLOBALS['MainDatabase']->query("SELECT allianceid, alliancename FROM alliances");
+            $ceoAllianceRestriction = (checkCEORestrictions()) ? " WHERE allianceid=:allianceid" : "";
+            
+            $pullAlliances = $GLOBALS['MainDatabase']->prepare("SELECT allianceid, alliancename FROM alliances" . $ceoAllianceRestriction);
+            
+            if (checkCEORestrictions()) {
+                
+                $pullAlliances->bindParam(":allianceid", $_SESSION["AllianceID"]);
+                
+            }
+            
+            $pullAlliances->execute();
             
             while ($pulledAllianceData = $pullAlliances->fetch(PDO::FETCH_ASSOC)) {
                 
@@ -38,7 +54,17 @@
                 
             }
             
-            $pullCorporations = $GLOBALS['MainDatabase']->query("SELECT corporationid, corporationname FROM corporations");
+            $ceoCorporationRestriction = (checkCEORestrictions()) ? " WHERE corporationid=:corporationid" : "";
+            
+            $pullCorporations = $GLOBALS['MainDatabase']->prepare("SELECT corporationid, corporationname FROM corporations" . $ceoCorporationRestriction);
+            
+            if (checkCEORestrictions()) {
+                
+                $pullCorporations->bindParam(":corporationid", $_SESSION["CorporationID"]);
+                
+            }
+            
+            $pullCorporations->execute();
             
             while ($pulledCorporationData = $pullCorporations->fetch(PDO::FETCH_ASSOC)) {
                 
@@ -64,7 +90,17 @@
             
             if ((htmlspecialchars($_POST["Times"])) === "true") {
                 
-                $toPull = $GLOBALS['MainDatabase']->query("SELECT playerid, playername, hascore, recentattendedtime, totalattendedtime, recentcommandedtime, totalcommandedtime, shortstats, isfc FROM players ORDER BY playername ASC");
+                $ceoPlayerRestriction = (checkCEORestrictions()) ? " WHERE playercorps LIKE :likecorp " : " ";
+                
+                $toPull = $GLOBALS['MainDatabase']->prepare("SELECT playerid, playername, hascore, recentattendedtime, totalattendedtime, recentcommandedtime, totalcommandedtime, shortstats, isfc FROM players" . $ceoPlayerRestriction . "ORDER BY playername ASC");
+                
+                if (checkCEORestrictions()) {
+                    
+                    $toPull->bindValue(":likecorp", "%\"" . $_SESSION["CorporationID"] . "\"%");
+                    
+                }
+                
+                $toPull->execute();
                 
                 $checkData["Status"] = "No Data";
                 
@@ -87,7 +123,17 @@
             }
             else {
                 
-                $toPull = $GLOBALS['MainDatabase']->query("SELECT playerid, playername, hascore, recentattendedfleets, totalattendedfleets, shortstats, recentcommandedfleets, totalcommandedfleets, isfc FROM players ORDER BY playername ASC");
+                $ceoPlayerRestriction = (checkCEORestrictions()) ? " WHERE playercorps LIKE :likecorp " : " ";
+                
+                $toPull = $GLOBALS['MainDatabase']->prepare("SELECT playerid, playername, hascore, recentattendedfleets, totalattendedfleets, shortstats, recentcommandedfleets, totalcommandedfleets, isfc FROM players" . $ceoPlayerRestriction . "ORDER BY playername ASC");
+                
+                if (checkCEORestrictions()) {
+                    
+                    $toPull->bindValue(":likecorp", "%\"" . $_SESSION["CorporationID"] . "\"%");
+                    
+                }
+                
+                $toPull->execute();
                 
                 $checkData["Status"] = "No Data";
                 
@@ -118,9 +164,18 @@
             
             $altIDList = [];
             $checkData["Alt List"] = [];
+            
+            $ceoPlayerRestriction = (checkCEORestrictions()) ? " AND playercorps LIKE :likecorp " : " ";
 
-            $toPull = $GLOBALS['MainDatabase']->prepare("SELECT playeralts FROM players WHERE playerid=:playerid LIMIT 1");
+            $toPull = $GLOBALS['MainDatabase']->prepare("SELECT playeralts FROM players WHERE playerid=:playerid" . $ceoPlayerRestriction . "LIMIT 1");
             $toPull->bindParam(":playerid", $accountToCheck);
+            
+            if (checkCEORestrictions()) {
+                
+                $toPull->bindValue(":likecorp", "%\"" . $_SESSION["CorporationID"] . "\"%");
+                
+            }
+            
             $toPull->execute();
             $pulledArrayData = $toPull->fetchAll();
             
@@ -167,7 +222,17 @@
             
             if ((htmlspecialchars($_POST["Times"])) === "true") {
                 
-                $toPull = $GLOBALS['MainDatabase']->query("SELECT playerid, playername, hascore, playercorps, playeralliances, recentattendedfleets, recentattendedtime, totalattendedtime, recentcommandedfleets, recentcommandedtime, totalcommandedtime, shortstats, isfc FROM players ORDER BY playername ASC");
+                $ceoPlayerRestriction = (checkCEORestrictions()) ? " WHERE playercorps LIKE :likecorp " : " ";
+                
+                $toPull = $GLOBALS['MainDatabase']->prepare("SELECT playerid, playername, hascore, playercorps, playeralliances, recentattendedfleets, recentattendedtime, totalattendedtime, recentcommandedfleets, recentcommandedtime, totalcommandedtime, shortstats, isfc FROM players" . $ceoPlayerRestriction . "ORDER BY playername ASC");
+                
+                if (checkCEORestrictions()) {
+                    
+                    $toPull->bindValue(":likecorp", "%\"" . $_SESSION["CorporationID"] . "\"%");
+                    
+                }
+                
+                $toPull->execute();
                 
                 $checkData["Status"] = "No Data";
                 while ($pulledData = $toPull->fetch(PDO::FETCH_ASSOC)) {
@@ -197,7 +262,17 @@
             }
             else {
                 
-                $toPull = $GLOBALS['MainDatabase']->query("SELECT playerid, playername, hascore, playercorps, playeralliances, recentattendedfleets, totalattendedfleets, shortstats, recentcommandedfleets, totalcommandedfleets, isfc FROM players ORDER BY playername ASC");
+                $ceoPlayerRestriction = (checkCEORestrictions()) ? " WHERE playercorps LIKE :likecorp " : " ";
+                
+                $toPull = $GLOBALS['MainDatabase']->prepare("SELECT playerid, playername, hascore, playercorps, playeralliances, recentattendedfleets, totalattendedfleets, shortstats, recentcommandedfleets, totalcommandedfleets, isfc FROM players" . $ceoPlayerRestriction . "ORDER BY playername ASC");
+                
+                if (checkCEORestrictions()) {
+                    
+                    $toPull->bindValue(":likecorp", "%\"" . $_SESSION["CorporationID"] . "\"%");
+                    
+                }
+                
+                $toPull->execute();
                 
                 $checkData["Status"] = "No Data";
                 while ($pulledData = $toPull->fetch(PDO::FETCH_ASSOC)) {

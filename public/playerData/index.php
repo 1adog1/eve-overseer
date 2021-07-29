@@ -9,7 +9,7 @@
 	
 	checkForErrors();
 
-    $PageMinimumAccessLevel = ["Super Admin", "HR"];
+    $PageMinimumAccessLevel = ["Super Admin", "HR", "CEO"];
 	checkLastPage();
 	$_SESSION["CurrentPage"] = "Player PAP";
 

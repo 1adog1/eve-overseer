@@ -191,6 +191,33 @@ function checkForFC($CharacterID, $coreGroups) {
     
 }
 
+function checkForCEO($CharacterID, $CorporationID) {
+    
+        $CorpJson = file_get_contents("http://esi.evetech.net/latest/corporations/" . $CorporationID . "/?datasource=tranquility");
+        $CorpData = json_decode($CorpJson, TRUE);
+        
+        if (!empty($CorpData) and isset($CorpData["ceo_id"])) {
+            
+            if ((string)$CorpData["ceo_id"] === (string)$CharacterID) {
+                
+                return true;
+                
+            }
+            else {
+                
+                return false;
+                
+            }
+            
+        }
+        else {
+            
+            return false;
+            
+        }
+    
+}
+
 function determineAccess($AccessRoles, $RequiredRoles, $logGrant = true) {
 	
 	$hasAccess = false;
@@ -298,6 +325,10 @@ function checkCookies() {
 		if (checkForHR($_SESSION["CharacterID"], $_SESSION["CoreData"]["Groups"])) {
 			$_SESSION["AccessRoles"][] = "HR";
 		}
+        
+        if (checkForCEO($_SESSION["CharacterID"], $_SESSION["CorporationID"])) {
+            $_SESSION["AccessRoles"][] = "CEO";
+        }
 		
 		$accessRolesToAdd = json_encode($_SESSION["AccessRoles"]);
 		
@@ -456,14 +487,17 @@ function checkForErrors() {
 	
 	$lastError = error_get_last();
 	
-	if ($lastError["type"] === E_ERROR) {
-		makeLogEntry("Critical Error", $lastError["file"], $_SESSION["Character Name"], $lastError["message"] . " on line " . $lastError["line"]);
-	}
-	if ($lastError["type"] === E_WARNING or $lastError["type"] === E_NOTICE) {
-		makeLogEntry("Page Error", $lastError["file"], $_SESSION["Character Name"], $lastError["message"] . " on line " . $lastError["line"]);
-	}
-	
-	error_clear_last();
+    if (!is_null($lastError)) {
+    
+        if ($lastError["type"] === E_ERROR) {
+            makeLogEntry("Critical Error", $lastError["file"], $_SESSION["Character Name"], $lastError["message"] . " on line " . $lastError["line"]);
+        }
+        if ($lastError["type"] === E_WARNING or $lastError["type"] === E_NOTICE) {
+            makeLogEntry("Page Error", $lastError["file"], $_SESSION["Character Name"], $lastError["message"] . " on line " . $lastError["line"]);
+        }
+        
+        error_clear_last();
+    }
 	
 }
 

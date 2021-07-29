@@ -12,7 +12,7 @@
         
 		<?php 
 		
-		$pageList = ["Personal Stats" => ["Required Roles" => ["Super Admin", "HR", "Fleet Commander", "All"], "Link" => "/personalStats/", "Need FC" => false], "Fleet Stats" => ["Required Roles" => ["Super Admin", "Fleet Commander"], "Link" => "/fleetStats/", "Need FC" => false], "Host Fleet" => ["Required Roles" => ["Super Admin", "Fleet Commander"], "Link" => "/hostFleet/", "Need FC" => true], "Player PAP" => ["Required Roles" => ["Super Admin", "HR"], "Link" => "/playerData/", "Need FC" => false], "Alliance PAP" => ["Required Roles" => ["Super Admin", "HR"], "Link" => "/allianceData/", "Need FC" => false], "Admin" => ["Required Roles" => ["Super Admin"], "Link" => "/admin/", "Need FC" => false], "Site Logs" => ["Required Roles" => ["Super Admin"], "Link" => "/logView/", "Need FC" => false]];
+		$pageList = ["Personal Stats" => ["Required Roles" => ["Super Admin", "HR", "Fleet Commander", "All"], "Link" => "/personalStats/", "Need FC" => false], "Fleet Stats" => ["Required Roles" => ["Super Admin", "Fleet Commander"], "Link" => "/fleetStats/", "Need FC" => false], "Host Fleet" => ["Required Roles" => ["Super Admin", "Fleet Commander"], "Link" => "/hostFleet/", "Need FC" => true], "Player PAP" => ["Required Roles" => ["Super Admin", "HR", "CEO"], "Link" => "/playerData/", "Need FC" => false], "Alliance PAP" => ["Required Roles" => ["Super Admin", "HR", "CEO"], "Link" => "/allianceData/", "Need FC" => false], "Admin" => ["Required Roles" => ["Super Admin"], "Link" => "/admin/", "Need FC" => false], "Site Logs" => ["Required Roles" => ["Super Admin"], "Link" => "/logView/", "Need FC" => false]];
 		
 		if ($_SESSION["AccessRoles"] != ["None"] and $_SESSION["AccessRoles"] != []) {
 			

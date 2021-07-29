@@ -9,7 +9,7 @@
 	
 	checkForErrors();
 
-    $PageMinimumAccessLevel = ["Super Admin", "HR"];
+    $PageMinimumAccessLevel = ["Super Admin", "HR", "CEO"];
 	checkLastPage();
 	$_SESSION["CurrentPage"] = "Player PAP";
     
@@ -18,6 +18,12 @@
     determineAccess($_SESSION["AccessRoles"], $PageMinimumAccessLevel);
 	    
     $rowCounter = 0;
+    
+    function checkCEORestrictions() {
+        
+        return (in_array("CEO", $_SESSION["AccessRoles"]) and !in_array("HR", $_SESSION["AccessRoles"]) and !in_array("Super Admin", $_SESSION["AccessRoles"]));
+        
+    }
     
     function getFormattedHours($timeframe) {
         
@@ -52,13 +58,29 @@
             
             $logString = "Download request made for a group of players with conditions: [Name: " . htmlspecialchars($_POST["CharacterName"]) . ", Alliance: " . htmlspecialchars($_POST["AllianceName"]) . ", Corporation: " . htmlspecialchars($_POST["CorporationName"]) . ", Core Only: " . (isset($_POST["core"]) ? "True" : "False") . ", FC Only: " . (isset($_POST["fc"]) ? "True" : "False") . ", Show All: " . (isset($_POST["all"]) ? "True" : "False") . ", Use Times: " . htmlspecialchars($_POST["exportTimes"]) . "] / File Signature: " . $fileSignature . " / File Tag: [" . substr($originalTag, 0, -2) . "]";
             
+            if (checkCEORestrictions()) {
+                
+                $logString .= (" / Corporation CEO Restriction: " . $_SESSION["CorporationID"]);
+                
+            }
+            
             makeLogEntry("User Database Edit", $_SESSION["CurrentPage"] . " (Download)", $_SESSION["Character Name"], $logString);
         
             if ((htmlspecialchars($_POST["exportTimes"])) === "true") {
                 
                 $downloadData = [["Name" . $fileTag[0] . $fileTag[1], "Time Recently Attended" . $fileTag[2] . $fileTag[3], "Total Time Attended" . $fileTag[4] . $fileTag[5], "Time Recently Led" . $fileTag[6] . $fileTag[7], "Total Time Led" . $fileTag[8] . $fileTag[9], "Last Active" . $fileTag[10] . $fileTag[11], "Has Core?" . $fileTag[12] . $fileTag[13], "Is FC?"]];
                 
-                $toPull = $GLOBALS['MainDatabase']->query("SELECT playerid, playername, hascore, playercorps, playeralliances, recentattendedfleets, recentattendedtime, totalattendedtime, recentcommandedfleets, recentcommandedtime, totalcommandedtime, shortstats, isfc FROM players ORDER BY playername ASC");
+                $ceoPlayerRestriction = (checkCEORestrictions()) ? " WHERE playercorps LIKE :likecorp " : " ";
+                
+                $toPull = $GLOBALS['MainDatabase']->prepare("SELECT playerid, playername, hascore, playercorps, playeralliances, recentattendedfleets, recentattendedtime, totalattendedtime, recentcommandedfleets, recentcommandedtime, totalcommandedtime, shortstats, isfc FROM players" . $ceoPlayerRestriction . "ORDER BY playername ASC");
+                
+                if (checkCEORestrictions()) {
+                    
+                    $toPull->bindValue(":likecorp", "%\"" . $_SESSION["CorporationID"] . "\"%");
+                    
+                }
+                
+                $toPull->execute();
                 
                 while ($pulledData = $toPull->fetch(PDO::FETCH_ASSOC)) {
                     
@@ -89,7 +111,17 @@
                 
                 $downloadData = [["Name" . $fileTag[0] . $fileTag[1], "Recently Attended Fleets" . $fileTag[2] . $fileTag[3], "Total Attended Fleets" . $fileTag[4] . $fileTag[5], "Recently Led Fleets" . $fileTag[6] . $fileTag[7], "Total Led Fleets" . $fileTag[8] . $fileTag[9], "Last Active" . $fileTag[10] . $fileTag[11], "Has Core?" . $fileTag[12] . $fileTag[13], "Is FC?"]];
                 
-                $toPull = $GLOBALS['MainDatabase']->query("SELECT playerid, playername, hascore, playercorps, playeralliances, recentattendedfleets, totalattendedfleets, shortstats, recentcommandedfleets, totalcommandedfleets, isfc FROM players ORDER BY playername ASC");
+                $ceoPlayerRestriction = (checkCEORestrictions()) ? " WHERE playercorps LIKE :likecorp " : " ";
+                
+                $toPull = $GLOBALS['MainDatabase']->prepare("SELECT playerid, playername, hascore, playercorps, playeralliances, recentattendedfleets, totalattendedfleets, shortstats, recentcommandedfleets, totalcommandedfleets, isfc FROM players" . $ceoPlayerRestriction . "ORDER BY playername ASC");
+                
+                if (checkCEORestrictions()) {
+                    
+                    $toPull->bindValue(":likecorp", "%\"" . $_SESSION["CorporationID"] . "\"%");
+                    
+                }
+                
+                $toPull->execute();
                 
                 while ($pulledData = $toPull->fetch(PDO::FETCH_ASSOC)) {
                     
