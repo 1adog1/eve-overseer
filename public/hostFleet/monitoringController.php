@@ -37,8 +37,8 @@
         
         $encodedAuthorization = "Basic " . base64_encode($clientid . ":" . $clientsecret);
         $requestURL = "https://login.eveonline.com/oauth/token";
-        $requestData = json_encode(["grant_type" => "refresh_token", "refresh_token" => $refreshToken]);
-        $requestOptions = ["http" => ["method" => "POST", "header" => ["Content-Type:application/json", "Authorization:" . $encodedAuthorization, "Accept-Charset:UTF-8"], "content" => $requestData]];
+        $requestData = http_build_query(["grant_type" => "refresh_token", "refresh_token" => $refreshToken]);
+        $requestOptions = ["http" => ["method" => "POST", "header" => ["Content-Type:application/x-www-form-urlencoded", "Authorization:" . $encodedAuthorization, "Accept-Charset:UTF-8"], "content" => $requestData]];
         $requestContext = stream_context_create($requestOptions);
         
         $requestReturned = @file_get_contents($requestURL, false, $requestContext);
