@@ -36,9 +36,9 @@
         require $_SERVER['DOCUMENT_ROOT'] . "/../config/config.php";
         
         $encodedAuthorization = "Basic " . base64_encode($clientid . ":" . $clientsecret);
-        $requestURL = "https://login.eveonline.com/oauth/token";
+        $requestURL = "https://login.eveonline.com/v2/oauth/token";
         $requestData = http_build_query(["grant_type" => "refresh_token", "refresh_token" => $refreshToken]);
-        $requestOptions = ["http" => ["method" => "POST", "header" => ["Content-Type:application/x-www-form-urlencoded", "Authorization:" . $encodedAuthorization, "Accept-Charset:UTF-8"], "content" => $requestData]];
+        $requestOptions = ["http" => ["method" => "POST", "header" => ["Content-Type:application/x-www-form-urlencoded", "Authorization:" . $encodedAuthorization, "Host:login.eveonline.com"], "content" => $requestData]];
         $requestContext = stream_context_create($requestOptions);
         
         $requestReturned = @file_get_contents($requestURL, false, $requestContext);
@@ -46,7 +46,7 @@
         
         if (isset($fullRequest["access_token"])) {
             
-            return $fullRequest["access_token"];
+            return $fullRequest;
             
         }
         else {
@@ -54,6 +54,15 @@
             return false;
             
         }
+    }
+    
+    function updateRefreshToken($refreshToken) {
+        
+        $toUpdate = $GLOBALS['MainDatabase']->prepare("UPDATE commanders SET refreshtoken=:refreshtoken WHERE id=:id");
+        $toUpdate->bindParam(":refreshtoken", $refreshToken);
+        $toUpdate->bindParam(":id", $_SESSION["CharacterID"]);
+        $toUpdate->execute();
+        
     }
 
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -109,13 +118,19 @@
                                     
                     if (!empty($queryArrayData)) {
                     
-                        $authCode = getAuthCode($queryArrayData[0]["refreshtoken"]);
+                        $authData = getAuthCode($queryArrayData[0]["refreshtoken"]);
                         
-                        if ($authCode !== false) {
+                        if ($authData !== false) {
+                            
+                            if ($authData["refresh_token"] != $queryArrayData[0]["refreshtoken"]) {
+                                
+                                updateRefreshToken($authData["refresh_token"]);
+                                
+                            }
                             
                             $requestURL = "https://esi.evetech.net/dev/characters/" . $_SESSION["CharacterID"] . "/fleet/?datasource=tranquility";
                             
-                            $requestOptions = ["http" => ["method" => "GET", "header" => ["Content-Type:application/json", "Authorization: Bearer " . $authCode]]];
+                            $requestOptions = ["http" => ["method" => "GET", "header" => ["Content-Type:application/json", "Authorization: Bearer " . $authData["access_token"]]]];
                             $requestContext = stream_context_create($requestOptions);
                             
                             $fleetReturned = @file_get_contents($requestURL, false, $requestContext);

@@ -89,6 +89,15 @@ def runChecks():
             
             sq1Database.commit()
             updateCursor.close()
+            
+        def updateRefreshToken(characterID, refreshToken):
+            updateCursor = sq1Database.cursor(buffered=True)
+            
+            updateStatement = "UPDATE commanders SET refreshtoken=%s WHERE id=%s"
+            updateCursor.execute(updateStatement, (refreshToken, characterID))
+            
+            sq1Database.commit()
+            updateCursor.close()
                         
         aggregateCursor = sq1Database.cursor(buffered=True)
         
@@ -377,15 +386,20 @@ def runChecks():
             tokenCursor.execute(tokenQuery, (commanderID,))
             
             for (refreshID, refreshToken) in tokenCursor:
-                accessCode = ESI.getAccessToken(appInfo, refreshToken)
+                accessData = ESI.getAccessToken(appInfo, refreshToken)
                 
-                if accessCode == "Bad Token":
+                if accessData == "Bad Token":
                     print("Tracking was stopped for " + commanderName + " due to a bad token.")
                     writeToLogs("Fleet Stopped", "Tracking was stopped for " + commanderName + " due to a bad token.")
                     stopTracking(fleetID)
                     
                 else:
-                
+                    
+                    if accessData["refresh_token"] != refreshToken:
+                        updateRefreshToken(commanderID, accessData["refresh_token"])
+                    
+                    accessCode = accessData["access_token"]
+                    
                     fleetData = ESI.getFleetData(commanderID, accessCode)
                     
                     if not fleetData:

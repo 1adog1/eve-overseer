@@ -7,12 +7,12 @@ def getAccessToken(appInfo, refreshToken):
     authHeader = "Basic " + base64.urlsafe_b64encode(toHeader.encode('utf-8')).decode()
     authBody = {"grant_type":"refresh_token","refresh_token":refreshToken}
 
-    accessPOST = requests.post("https://login.eveonline.com/oauth/token", headers={"Accept-Charset":'UTF-8', "content-type":"application/x-www-form-urlencoded", "Authorization":authHeader}, data=authBody)
+    accessPOST = requests.post("https://login.eveonline.com/v2/oauth/token", headers={"Host":"login.eveonline.com", "content-type":"application/x-www-form-urlencoded", "Authorization":authHeader}, data=authBody)
     accessResponse = json.loads(accessPOST.text)
     
     if accessPOST.status_code == 200:
     
-        return accessResponse["access_token"]
+        return accessResponse
         
     elif accessPOST.status_code == 400:
     
