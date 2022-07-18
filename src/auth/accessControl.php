@@ -52,6 +52,10 @@ if (checkTableExists($GLOBALS['MainDatabase'], "roles") === false) {
     $GLOBALS['MainDatabase']->exec("CREATE TABLE roles (roleid BIGINT, rolename TEXT, isfc INT, ishr INT)");
 }
 
+if (checkTableExists($GLOBALS['MainDatabase'], "fleettypes") === false) {
+    $GLOBALS['MainDatabase']->exec("CREATE TABLE fleettypes (typename TEXT)");
+}
+
 function checkLastPage() {
     if (isset($_SESSION["CurrentPage"])) {
         $_SESSION["LastPage"] = $_SESSION["CurrentPage"];

@@ -68,8 +68,10 @@
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
         
         if (isset($_POST["Action"]) and htmlspecialchars($_POST["Action"]) == "Start") {
-                        
-            $approvedSRP = ["Fun", "Stratop", "CTA", "Save", "ADM"];
+            
+            $typesPull = $GLOBALS['MainDatabase']->prepare("SELECT typename FROM fleettypes");
+            $typesPull->execute();
+            $approvedSRP = $typesPull->fetchAll(PDO::FETCH_COLUMN);
             
             $fleetName = htmlspecialchars($_POST["Name"]);
                         
@@ -223,10 +225,10 @@
             }
             else {
 
-                $checkData["Error"] = "Oi! Please don't mess with the form HTML!";
+                $checkData["Error"] = "That SRP Level is invalid. Refresh and try again.";
                 
                 error_log("HTML Error");
-                makeLogEntry("Page Error", $_SESSION["CurrentPage"] . " (Data Controller)", $_SESSION["Character Name"], "User Messed With Fleet Start Form HTML");
+                makeLogEntry("Page Error", $_SESSION["CurrentPage"] . " (Data Controller)", $_SESSION["Character Name"], "User Tried to Use Invalid SRP Level");
                 
             }
             

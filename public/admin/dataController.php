@@ -18,7 +18,7 @@
     
     determineAccess($_SESSION["AccessRoles"], $PageMinimumAccessLevel, false);
     
-    $checkData = ["Status" => "Unknown", "Role Data" => [], "Fleet Data" => []];
+    $checkData = ["Status" => "Unknown", "Role Data" => [], "Fleet Data" => [], "SRP Data" => []];
 
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
         
@@ -280,6 +280,99 @@
                 
                 error_log("No Tracking to Stop");
                 makeLogEntry("Page Error", $_SESSION["CurrentPage"] . " (Data Controller)", $_SESSION["Character Name"], "Tried to Stop a Fleet Not Being Tracked");
+                
+            }
+            
+        }
+        elseif (isset($_POST["Action"]) and $_POST["Action"] == "Get_Types") {
+            
+            $checkData["Status"] = "No Data";
+            
+            $toPull = $GLOBALS['MainDatabase']->prepare("SELECT typename FROM fleettypes");
+            $toPull->execute();
+            $pulledArrayData = $toPull->fetchAll(PDO::FETCH_COLUMN);
+            
+            foreach ($pulledArrayData as $eachType) {
+                
+                $checkData["Status"] = "Data Found";
+                
+                $checkData["SRP Data"][] = htmlspecialchars($eachType);
+                
+            }
+            
+        }
+        elseif (isset($_POST["Action"]) and $_POST["Action"] == "Create_Type") {
+            
+            if (!is_null($_POST["Name"]) and $_POST["Name"] !== "" and $_POST["Name"] === htmlspecialchars($_POST["Name"])) {
+                
+                $toCreate = htmlspecialchars($_POST["Name"]);
+                
+                $pullStatus = "Active";
+                
+                $toPull = $GLOBALS['MainDatabase']->prepare("SELECT typename FROM fleettypes WHERE typename=:typename");
+                $toPull->bindParam(":typename", $toCreate);
+                $toPull->execute();
+                $pulledArrayData = $toPull->fetchAll(PDO::FETCH_COLUMN);
+
+                if (empty($pulledArrayData)) {
+                    
+                    $toInsert = $GLOBALS['MainDatabase']->prepare("INSERT INTO fleettypes VALUES (:typename)");
+                    $toInsert->bindParam(":typename", $toCreate);
+                    
+                    $toInsert->execute();
+                    
+                    $checkData["Status"] = "Success";
+                    makeLogEntry("SRP Level Added", "Site Administration", "[Server Backend]", "A new SRP Level " . $toCreate . " was added.");
+                    
+                }
+                else {
+                    
+                    $checkData["Error"] = "That SRP Level already exists.";
+                    
+                    error_log("SRP Level Already Exists");
+                    makeLogEntry("Page Error", $_SESSION["CurrentPage"] . " (Data Controller)", $_SESSION["Character Name"], "Tried to Create an SRP Level that Already Exists");
+                    
+                }
+            
+            }
+            else {
+                
+                    $checkData["Error"] = "That SRP Level has an invalid name. Choose one that isn't empty and doesn't contain any HTML special characters.";
+                    
+                    error_log("SRP Level Has Invalid Name");
+                    makeLogEntry("Page Error", $_SESSION["CurrentPage"] . " (Data Controller)", $_SESSION["Character Name"], "Tried to Create an SRP Level With an Invalid Name");
+                
+            }
+            
+        }
+        elseif (isset($_POST["Action"]) and $_POST["Action"] == "Delete_Type") {
+            
+            $toDelete = htmlspecialchars($_POST["Name"]);
+            
+            $pullStatus = "Active";
+            
+            $toPull = $GLOBALS['MainDatabase']->prepare("SELECT typename FROM fleettypes WHERE typename=:typename");
+            $toPull->bindParam(":typename", $toDelete);
+            $toPull->execute();
+            $pulledArrayData = $toPull->fetchAll(PDO::FETCH_COLUMN);
+
+            if (!empty($pulledArrayData)) {
+                
+                $deleteRequest = $GLOBALS['MainDatabase']->prepare("DELETE FROM fleettypes WHERE typename=:typename");
+                $deleteRequest->bindParam(":typename", $toDelete);
+                
+                $deleteRequest->execute();
+                
+                $checkData["Status"] = "Success";
+                makeLogEntry("SRP Level Added", "Site Administration", "[Server Backend]", "The SRP Level " . $toDelete . " was deleted.");
+                
+            }
+            else {
+                
+                $checkData["Error"] = "That SRP Level doesn't exist.";
+                
+                error_log("SRP Level Doesn't Exist");
+                makeLogEntry("Page Error", $_SESSION["CurrentPage"] . " (Data Controller)", $_SESSION["Character Name"], "Tried to Delete an SRP Level that Doesn't Exist");
                 
             }
             

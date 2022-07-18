@@ -93,6 +93,35 @@
                     </div>
                 </div>
                 
+                <br>
+                <br>
+                <h2 class="ColumnHeader">SRP Levels</h2>
+                <hr>
+                
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" id="creation-field">
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-success" type="button" id="create-button">Create New SRP Level</button>
+                    </div>
+                </div>
+                
+                <br>
+                <div class="list-group text-left">
+                    <div class="list-group-item list-group-item-dark bg-dark border-secondary text-white p-1 mt-1">
+                        <div class="row ml-2 mr-2">
+                            <div class="col-11 mt-2 p-0 h5 align-self-center">
+                                <strong>SRP Level</strong>
+                            </div>
+                            <div class="col-1 mt-1 p-0 text-center align-self-center">
+                                <span style="height: 22px; width: 22px;" id="types-status-indicator"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="fleet-types">
+                    
+                    </div>
+                </div>
+                
             </div>
             <div class="col-xl-4">
                 <br>

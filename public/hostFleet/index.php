@@ -107,11 +107,19 @@
                         <label for="fleet_srp">SRP Level</label>
                         <select class="form-control" id="fleet_srp">
                         
-                            <option value="Fun">Fun Fleet</option>
-                            <option value="Stratop">Stratop</option>
-                            <option value="CTA">CTA</option>
-                            <option value="Save">Save Fleet</option>
-                            <option value="ADM">ADM Fleet</option>
+                        <?php
+                        
+                            $typesPull = $GLOBALS['MainDatabase']->prepare("SELECT typename FROM fleettypes");
+                            $typesPull->execute();
+                            $approvedSRP = $typesPull->fetchAll(PDO::FETCH_COLUMN);
+                            
+                            foreach ($approvedSRP as $eachLevel) {
+                                
+                                echo "<option value='" . htmlspecialchars($eachLevel) . "'>" . htmlspecialchars($eachLevel) . "</option>";
+                                
+                            }
+                            
+                        ?>
                         
                         </select>
                         

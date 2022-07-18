@@ -2,6 +2,7 @@ jQuery(document).ready(function () {
     
     populateRoles();
     populateFleets();
+    populateTypes();
     
     $(document).on("change", ".permission-setting", function() {
                 
@@ -12,6 +13,18 @@ jQuery(document).ready(function () {
     $(document).on("click", ".stop-button", function() {
                 
         terminateFleet($(this).attr("data-fleet-id"));
+        
+    });
+    
+    $(document).on("click", "#create-button", function() {
+                
+        createType($("#creation-field").val());
+        
+    });
+    
+    $(document).on("click", ".delete-button", function() {
+                
+        deleteType($(this).attr("data-type-name"));
         
     });
     
@@ -240,6 +253,99 @@ function populateRoles() {
             $("#roles-status-indicator").removeClass("spinner-border");
             
         }
+    });
+    
+}
+    
+function createType(typeName) {
+    
+    $("#create-button").prop("disabled", true);
+    
+    $.ajax({
+        url: "dataController.php",
+        type: "POST",
+        data: {"Action": "Create_Type", "Name": typeName},
+        mimeType: "application/json",
+        dataType: "json",
+        success: function(result){
+            
+            populateTypes();
+            $("#create-button").prop("disabled", false);
+            
+        }
+        
+    });
+    
+}
+    
+function deleteType(typeName) {
+    
+    $(".delete-button").prop("disabled", true);
+    
+    $.ajax({
+        url: "dataController.php",
+        type: "POST",
+        data: {"Action": "Delete_Type", "Name": typeName},
+        mimeType: "application/json",
+        dataType: "json",
+        success: function(result){
+            
+            populateTypes();
+            $(".delete-button").prop("disabled", false);
+            
+        }
+        
+    });
+    
+}
+
+function populateTypes() {
+    
+    $("#fleet-types").empty();
+    $("#types-status-indicator").empty();
+    $("#types-status-indicator").addClass("spinner-border");
+    
+    $.ajax({
+        url: "dataController.php",
+        type: "POST",
+        data: {"Action": "Get_Types"},
+        mimeType: "application/json",
+        dataType: "json",
+        success: function(result){
+            
+            for (eachType of result["SRP Data"]) {
+                
+                $("#fleet-types").append(
+                    $("<div/>")
+                        .addClass("list-group-item list-group-item-dark bg-dark border-secondary text-white p-1 mt-1")
+                        .append(
+                            $("<div/>")
+                                .addClass("row ml-2 mr-2")
+                                .append(
+                                    $("<div/>")
+                                        .addClass("col-9 mt-1 p-0 text-left h5 font-weight-bold align-self-center")
+                                        .text(eachType)
+                                )
+                                .append(
+                                    $("<div/>")
+                                        .addClass("col-3 p-0 text-left align-self-center")
+                                        .append(
+                                            $("<button/>")
+                                                .addClass("btn btn-outline-danger btn-block delete-button")
+                                                .attr("data-type-name", eachType)
+                                                .text("Delete SRP Level")
+                                        )
+                                )
+                        )
+                );
+                
+            }
+            
+            $("#types-status-indicator").empty();
+            $("#types-status-indicator").removeClass("spinner-border");
+            
+        }
+        
     });
     
 }
