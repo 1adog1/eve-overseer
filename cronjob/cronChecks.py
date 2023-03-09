@@ -251,6 +251,7 @@ class player:
         
         while True:
         
+            time.sleep(0.4)
             accountRequest = requests.get(accountURL, headers=coreHeader)
             
             if str(accountRequest.status_code) == "200":
@@ -295,7 +296,8 @@ class player:
                     self.characters.append(altData)
                     
                 while True:
-                
+
+                    time.sleep(0.4)
                     groupsRequest = requests.get(groupsURL, headers=coreHeader)
                     
                     if str(groupsRequest.status_code) == "200":
