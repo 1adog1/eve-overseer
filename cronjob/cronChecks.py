@@ -80,6 +80,8 @@ def getCoreData(request_method, request_url, data=None):
     
     for tries in range(5):
         core_request = request_method(request_url, data=json.dumps(data), headers=core_header)
+
+        time.sleep(0.4)
         
         if core_request.status_code == requests.codes.ok:
         
@@ -95,8 +97,6 @@ def getCoreData(request_method, request_url, data=None):
             
             print("Error (" + str(core_request.status_code) + ") while making a call to " + str(request_url) + " - Trying again in a sec.")
             time.sleep(1)
-                
-        time.sleep(0.4)
 
     raise Exception("5 Errors (" + str(core_request.status_code) + ") while making a call to " + str(request_url))
 
