@@ -18,6 +18,12 @@ playerDict = {}
 corporationDict = {}
 allianceDict = {}
 
+coreCharacters = {}
+coreAccounts = {}
+esiCharacters = {}
+
+scriptTime = int(time.time())
+
 #################
 # PATH OVERRIDE #
 #################
@@ -58,6 +64,65 @@ with open(dataFile(dataPathOverride, "/resources/data") + "/geographicInformatio
         
 with open(dataFile(dataPathOverride, "/resources/data") + "/TypeIDs.json", "r") as typeIDFile:
     typeIDList = json.load(typeIDFile)
+
+##########################
+#                        #
+#  Neucore Call Wrapper  #
+#                        #
+##########################
+
+def getCoreData(request_method, request_url, data=None):
+
+    core_raw_auth = str(coreInfo["AppID"]) + ":" + coreInfo["AppSecret"]
+    core_auth = "Bearer " + base64.urlsafe_b64encode(core_raw_auth.encode("utf-8")).decode()
+    
+    core_header = {"Authorization" : core_auth, "accept": "application/json", "Content-Type": "application/json"}
+    
+    for tries in range(5):
+        core_request = request_method(request_url, data=json.dumps(data), headers=core_header)
+        
+        if core_request.status_code == requests.codes.ok:
+        
+            request_data = json.loads(core_request.text)
+            
+            return request_data
+        
+        elif core_request.status_code == 404:
+            
+            return
+        
+        else:
+            
+            print("Error (" + str(core_request.status_code) + ") while making a call to " + str(request_url) + " - Trying again in a sec.")
+            time.sleep(1)
+                
+        time.sleep(0.4)
+
+    raise Exception("5 Errors (" + str(core_request.status_code) + ") while making a call to " + str(request_url))
+
+###########################
+#                         #
+#  Bulk ESI Call Wrapper  #
+#                         #
+###########################
+
+def getBulkESIData(endpoint, ids):
+
+    for tries in range(5):
+        affiliation_request = requests.post("https://esi.evetech.net/latest/" + endpoint + "/?datasource=tranquility", data=json.dumps(ids))
+        
+        if affiliation_request.status_code == requests.codes.ok:
+        
+            request_data = json.loads(affiliation_request.text)
+            
+            return request_data
+        
+        else:
+            
+            print("Error (" + str(affiliation_request.status_code) + ") while making a call to " + endpoint + " - Trying again in a sec.")
+            time.sleep(1)
+                
+    raise Exception("5 Errors (" + str(affiliation_request.status_code) + ") while making a call to " + endpoint)
 
 #########################
 #                       #
@@ -241,173 +306,46 @@ class player:
         
     #Gets details of a player from core
     def checkForCore(self, characterID):
-    
-        authCode = str(coreInfo["AppID"]) + ":" + coreInfo["AppSecret"]
-        encodedString = base64.urlsafe_b64encode(authCode.encode("utf-8")).decode()
-        coreHeader = {"Authorization" : "Bearer " + encodedString}
-        
-        accountURL = coreInfo["AppURL"] + "api/app/v1/player-with-characters/" + str(characterID)
-        groupsURL = coreInfo["AppURL"] + "api/app/v2/groups/" + str(characterID)
-        
-        while True:
-        
-            time.sleep(0.4)
-            accountRequest = requests.get(accountURL, headers=coreHeader)
-            
-            if str(accountRequest.status_code) == "200":
-            
-                accountData = json.loads(accountRequest.text)
-                
-                self.name = str(accountData["name"])
-                self.core = 1
-                self.id = "core-" + str(accountData["id"])
-                
-                for eachAlt in accountData["characters"]:
-                
-                    altData = {
-                        "ID": str(eachAlt["id"]),
-                        "Name": eachAlt["name"]
-                    }
-                    
-                    if "corporation" in eachAlt and eachAlt["corporation"] != None:
-                        altData["Corporation ID"] = eachAlt["corporation"]["id"]
-                        altData["Corporation"] = eachAlt["corporation"]["name"]
-                        
-                        if str(eachAlt["corporation"]["id"]) not in self.corporations:
-                            self.corporations.append(str(eachAlt["corporation"]["id"]))
-                        
-                        if "alliance" in eachAlt["corporation"] and eachAlt["corporation"]["alliance"] != None:
-                            altData["Alliance ID"] = eachAlt["corporation"]["alliance"]["id"]
-                            altData["Alliance"] = eachAlt["corporation"]["alliance"]["name"]
-                            
-                            if str(eachAlt["corporation"]["alliance"]["id"]) not in self.alliances:
-                                self.alliances.append(str(eachAlt["corporation"]["alliance"]["id"]))
-                        
-                        else:
-                            altData["Alliance ID"] = 0
-                            altData["Alliance"] = "[No Alliance]"
-                        
-                    else:
-                        altData["Corporation ID"] = 0
-                        altData["Corporation"] = "[No Corporation]"
-                        altData["Alliance ID"] = 0
-                        altData["Alliance"] = "[No Alliance]"
-                        
-                    self.characters.append(altData)
-                    
-                while True:
 
-                    time.sleep(0.4)
-                    groupsRequest = requests.get(groupsURL, headers=coreHeader)
-                    
-                    if str(groupsRequest.status_code) == "200":
-                    
-                        groupsData = json.loads(groupsRequest.text)
-                                                            
-                        for eachGroup in groupsData:
-                            if int(eachGroup["id"]) in fcGroups:
-                                self.fc = 1
-                    
-                        break
-                    
-                    else:
-                    
-                        print("An error occurred while looking for the groups of " + str(memberDict[eachMember]["name"]) + "... Trying again in a sec.")
-                        
-                        time.sleep(1)
+        if characterID in coreCharacters:
+
+            accountReference = coreAccounts[coreCharacters[characterID]["Account"]]
+            self.name = accountReference["Name"]
+            self.core = 1
+            self.fc = accountReference["FC"]
+            self.id = "core-" + str(coreCharacters[characterID]["Account"])
+
+            for eachAlt in accountReference["Alts"]:
                 
-                break
+                altData = {
+                    "ID": eachAlt
+                }
+                altData.update(coreCharacters[eachAlt])
+                del altData["Account"]
+
+                if altData["Corporation ID"] not in self.corporations:
+                    self.corporations.append(altData["Corporation ID"])
                 
-            elif str(accountRequest.status_code) == "404":
+                if altData["Alliance ID"] != "0" and altData["Alliance ID"] not in self.alliances:
+                    self.alliances.append(altData["Alliance ID"])
+
+                self.characters.append(altData)
+
+        else:
             
-                self.checkESI(characterID)
-                
-                break
-            
-            else:
-            
-                print("An error occurred while looking for the core account of " + str(characterID) + ". Trying again in a sec...")
-                
-                time.sleep(1)
+            self.checkESI(characterID)
     
     #Gets details of a player that doesn't have a core account.
     def checkESI(self, characterID):
-    
-        while True:
+
+        esiReference = esiCharacters[characterID]
+
+        self.characters.append(esiReference)
         
-            try:
-            
-                affiliationURL = "https://esi.evetech.net/latest/characters/affiliation/?datasource=tranquility"
-                affiliationHeaders = {"accept": "application/json", "Content-Type": "application/json"}
-                affiliationPost = json.dumps([int(characterID)])
-                
-                namesURL = "https://esi.evetech.net/latest/universe/names/?datasource=tranquility"
-                namesToPost = []
-                
-                affiliationRequest = requests.post(affiliationURL, headers=affiliationHeaders, data=affiliationPost)
-                
-                affiliationData = json.loads(affiliationRequest.text)
-                
-                altData = {
-                    "ID": str(characterID),
-                    "Name": self.name
-                }
-                
-                for eachAffiliation in affiliationData:
-                
-                    if str(eachAffiliation["corporation_id"]) not in self.corporations:
-                        self.corporations.append(str(eachAffiliation["corporation_id"]))
-                
-                    namesToPost.append(eachAffiliation["corporation_id"])
-                    altData["Corporation ID"] = eachAffiliation["corporation_id"]
-                    
-                    if "alliance_id" in eachAffiliation:
-                    
-                        if str(eachAffiliation["alliance_id"]) not in self.alliances:
-                            self.alliances.append(str(eachAffiliation["alliance_id"]))
-                    
-                        namesToPost.append(eachAffiliation["alliance_id"])
-                        altData["Alliance ID"] = eachAffiliation["alliance_id"]
-                        
-                    else:
-                    
-                        altData["Alliance ID"] = 0
-                        altData["Alliance"] = "[No Alliance]"
-                        
-                    if str(altData["Corporation ID"]) in corporationDict:
-                        altData["Corporation"] = corporationDict[str(altData["Corporation ID"])].name
-                        
-                        if corporationDict[str(altData["Corporation ID"])].hasAlliance:
-                        
-                            altData["Alliance"] = allianceDict[str(corporationDict[str(altData["Corporation ID"])].allianceID)].name
-                            
-                        else:
-                        
-                            altData["Alliance"] = "[No Alliance]"
-                            
-                    else:
-                        
-                        namesRequest = requests.post(namesURL, headers=affiliationHeaders, data=json.dumps(namesToPost))
-                        namesData = json.loads(namesRequest.text)
-                        
-                        for eachName in namesData:
-                            
-                            if eachName["category"] == "corporation" and str(eachName["id"]) == str(altData["Corporation ID"]):
-                            
-                                altData["Corporation"] = eachName["name"]
-                            
-                            if eachName["category"] == "alliance" and str(eachName["id"]) == str(altData["Alliance ID"]):
-                            
-                                altData["Alliance"] = eachName["name"]
-                                
-                    self.characters.append(altData)
-                        
-                break
-            
-            except:
-                 print("An Error Occurred While Trying to Get Player Details for " + str(characterID) + ". Trying again in a sec...")
-                 
-                 time.sleep(1)
+        self.corporations.append(esiReference["Corporation ID"])
+        
+        if esiReference["Alliance ID"] != "0":
+            self.alliances.append(esiReference["Alliance ID"])
     
     def saveToDatabase(self):
     
@@ -457,11 +395,12 @@ def runChecks():
         currentTime = datetime.now()
         readableCurrentTime = currentTime.strftime("%d %B, %Y - %H:%M:%S EVE")
         print("[" + readableCurrentTime + "] Starting Analysis...\n")
+
         startingTime = time.perf_counter()
         
         sq1Database = DatabaseConnector.connect(user=databaseInfo["DatabaseUsername"], password=databaseInfo["DatabasePassword"], host=databaseInfo["DatabaseServer"] , port=int(databaseInfo["DatabasePort"]), database=databaseInfo["DatabaseName"])
         
-        fcGroups = [];
+        fcGroups = []
         
         roleCursor = sq1Database.cursor(buffered=True)
         
@@ -469,7 +408,7 @@ def runChecks():
         roleCursor.execute(roleStatement)
         
         for (roleID, roleName, isFC, isHR) in roleCursor:
-            fcGroups.append(int(roleID))
+            fcGroups.append(roleID)
         
         roleCursor.close()
 
@@ -485,16 +424,155 @@ def runChecks():
             sq1Database.commit()
             logCursor.close()
         
-        initialCursor = insertCursor = sq1Database.cursor(buffered=True)
+        #Get All Characters and Assign Them to Their Core Accounts
+        currentTime = datetime.now()
+        readableCurrentTime = currentTime.strftime("%d %B, %Y - %H:%M:%S EVE")
+        print("[" + readableCurrentTime + "] Getting Core Accounts...")
+
+        coreCursor = sq1Database.cursor(buffered=True)
+
+        coreStatement = ("SELECT memberstats FROM fleets WHERE endtime < %s ORDER BY starttime DESC LIMIT %s")
+        coreCursor.execute(coreStatement, (scriptTime, int(websiteInfo["MaxTableRows"])))
+
+        allCharacters = set()
+
+        for (memberStats,) in coreCursor:
+
+            memberDict = json.loads(memberStats)
+            memberSet = set(memberDict.keys())
+            allCharacters.update(memberSet)
+
+        listCharacters = list(allCharacters)
+        chunkedCharacters = [listCharacters[x:x+500] for x in range(0, len(listCharacters), 500)]
+
+        for eachChunk in chunkedCharacters:
+            characterData = getCoreData(requests.post, (coreInfo["AppURL"] + "api/app/v1/characters"), eachChunk)
+
+            for eachList in characterData:
+
+                if eachList[0] not in coreCharacters:
+                    
+                    accountData = getCoreData(requests.get, (coreInfo["AppURL"] + "api/app/v1/player/" + str(eachList[0])))
+                    coreAccounts[accountData["id"]] = {"Name": accountData["name"], "FC": False, "Alts": []}
+
+                    for eachCoreCharacter in eachList:
+                        coreAccounts[accountData["id"]]["Alts"].append(str(eachCoreCharacter))
+                        coreCharacters[str(eachCoreCharacter)] = {
+                            "Name": None, 
+                            "Corporation ID": None, 
+                            "Corporation": None, 
+                            "Alliance ID": None, 
+                            "Alliance": None, 
+                            "Account": accountData["id"]
+                        }
+
+        coreCursor.close()
+
+        #Get All Core Groups and Alt Data
+        currentTime = datetime.now()
+        readableCurrentTime = currentTime.strftime("%d %B, %Y - %H:%M:%S EVE")
+        print("[" + readableCurrentTime + "] Getting Core Groups...")
+
+        coreCharacterList = list(coreCharacters.keys())
+        chunkedCoreCharacters = [coreCharacterList[x:x+500] for x in range(0, len(coreCharacterList), 500)]
+
+        for eachChunk in chunkedCoreCharacters:
+            groupData = getCoreData(requests.post, (coreInfo["AppURL"] + "api/app/v1/groups"), eachChunk)
+
+            for eachBlob in groupData:
+                characterBlob = eachBlob["character"]
+                groupsBlob = eachBlob["groups"]
+
+                coreCharacters[str(characterBlob["id"])]["Name"] = characterBlob["name"]
+                coreCharacters[str(characterBlob["id"])]["Corporation ID"] = str(characterBlob["corporation"]["id"])
+                coreCharacters[str(characterBlob["id"])]["Corporation"] = characterBlob["corporation"]["name"]
+
+                if characterBlob["corporation"]["alliance"] is None:
+                    coreCharacters[str(characterBlob["id"])]["Alliance ID"] = "0"
+                    coreCharacters[str(characterBlob["id"])]["Alliance"] = "[No Alliance]"
+                else:
+                    coreCharacters[str(characterBlob["id"])]["Alliance ID"] = str(characterBlob["corporation"]["alliance"]["id"])
+                    coreCharacters[str(characterBlob["id"])]["Alliance"] = characterBlob["corporation"]["alliance"]["name"]
+
+                for eachGroup in groupsBlob:
+
+                    if eachGroup["id"] in fcGroups:
+
+                        coreAccounts[coreCharacters[str(characterBlob["id"])]["Account"]]["FC"] = True
+                        break
         
-        initialStatement = ("SELECT fleetid, commanderid, commandername, starttime, endtime, peakmembers, memberstats FROM fleets ORDER BY starttime DESC LIMIT %s")
-        initialCursor.execute(initialStatement, (int(websiteInfo["MaxTableRows"]),))
+        #Get ESI Data For Non-Core Characters
+        currentTime = datetime.now()
+        readableCurrentTime = currentTime.strftime("%d %B, %Y - %H:%M:%S EVE")
+        print("[" + readableCurrentTime + "] Getting ESI Characters...")
+
+        idsToCheck = set()
+        charactersToESI = list(set(listCharacters) - set(coreCharacterList))
+        chunkedESICharacters = [charactersToESI[x:x+995] for x in range(0, len(charactersToESI), 995)]
+
+        for eachChunk in chunkedESICharacters:
+            affiliationData = getBulkESIData("characters/affiliation", eachChunk)
+
+            for eachAffiliation in affiliationData:
+                esiCharacters[str(eachAffiliation["character_id"])] = {
+                    "ID": str(eachAffiliation["character_id"]),
+                    "Name": None,
+                    "Corporation ID": str(eachAffiliation["corporation_id"]),
+                    "Corporation": None,
+                    "Alliance ID": (str(eachAffiliation["alliance_id"]) if "alliance_id" in eachAffiliation else "0"),
+                    "Alliance": (None if "alliance_id" in eachAffiliation else "[No Alliance]")
+                }
+
+                idsToCheck.add(eachAffiliation["character_id"])
+                idsToCheck.add(eachAffiliation["corporation_id"])
+                if "alliance_id" in eachAffiliation:
+                    idsToCheck.add(eachAffiliation["alliance_id"])
+
+        idListToCheck = list(idsToCheck)
+        chunkedIdsToCheck = [idListToCheck[x:x+995] for x in range(0, len(idListToCheck), 995)]
+
+        associatedIDs = {}
+
+        for eachChunk in chunkedIdsToCheck:
+            namesData = getBulkESIData("universe/names", eachChunk)
+
+            for eachName in namesData:
+
+                if eachName["category"] not in associatedIDs:
+                    associatedIDs[eachName["category"]] = {}
+
+                associatedIDs[eachName["category"]][str(eachName["id"])] = eachName["name"]
+        
+        for eachESIID, eachESIData in esiCharacters.items():
+            esiCharacters[eachESIID]["Name"] = associatedIDs["character"][eachESIData["ID"]]
+            esiCharacters[eachESIID]["Corporation"] = associatedIDs["corporation"][eachESIData["Corporation ID"]]
+
+            if eachESIData["Alliance ID"] != "0":
+                esiCharacters[eachESIID]["Alliance"] = associatedIDs["alliance"][eachESIData["Alliance ID"]]
+
+        #Delete some large unused variables for memory management
+        del associatedIDs
+        del chunkedIdsToCheck
+        del idListToCheck
+        del chunkedESICharacters
+        del charactersToESI
+        del idsToCheck
+        del chunkedCoreCharacters
+        del coreCharacterList
+        del chunkedCharacters
+        del listCharacters
+        del allCharacters
+
+        #Start Building Fleet Data
+        initialCursor = sq1Database.cursor(buffered=True)
+        
+        initialStatement = ("SELECT fleetid, commanderid, commandername, starttime, endtime, peakmembers, memberstats FROM fleets WHERE endtime < %s ORDER BY starttime DESC LIMIT %s")
+        initialCursor.execute(initialStatement, (scriptTime, int(websiteInfo["MaxTableRows"])))
         
         for (fleetID, commanderID, commanderName, startTime, endTime, peakMembers, memberStats) in initialCursor:
 
             currentTime = datetime.now()
             readableCurrentTime = currentTime.strftime("%d %B, %Y - %H:%M:%S EVE")
-            
             print("[" + readableCurrentTime + "] Checking " + str(fleetID) + " with " + str(peakMembers) + " members...")
             
             fleetRecent = False
