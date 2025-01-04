@@ -391,7 +391,7 @@ function listAffiliations(incomingData) {
         $("#corps-" + eachAlliance).append(
             $("<a/>")
                 .addClass("btn btn-outline-danger btn-large btn-block mt-2")
-                .attr("href", "download?alliance=" + eachAlliance)
+                .attr("href", "download.php?alliance=" + eachAlliance)
                 .attr("target", "_blank")
                 .text("Download " + allianceData["Name"] + " Data as CSV")
         )

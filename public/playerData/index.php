@@ -80,7 +80,7 @@
                 <h2 class="ColumnHeader">Filter Players</h2>
                 <hr>
                 
-                <form action="download" method="post" target="_blank">
+                <form action="download.php" method="post" target="_blank">
                     <div class="form-group">
                         <label for="CharacterName">Account Name</label>
                         <input type="text" name="CharacterName" class="form-control" id="CharacterName">
